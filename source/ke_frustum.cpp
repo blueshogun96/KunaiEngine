@@ -21,11 +21,11 @@ float frustum[6][4];    /* The frustum created from the supplied modelview and p
 
 
 /*
- * Name: calculate_frustum
+ * Name: ke_calculate_frustum
  * Desc: Calculates the current frustum based on the supplied modelview and projection
  *       matrices.
  */
-void calculate_frustum( Matrix4 modelview_matrix, Matrix4 projection_matrix )
+void ke_calculate_frustum( Matrix4 modelview_matrix, Matrix4 projection_matrix )
 {
     float   proj[16];
     float   modl[16];
@@ -137,10 +137,10 @@ void calculate_frustum( Matrix4 modelview_matrix, Matrix4 projection_matrix )
 
 
 /*
- * Name: point_in_frustum
+ * Name: ke_point_in_frustum
  * Desc: Returns yes if this point is in the viewing frustum.
  */
-bool point_in_frustum( VmathVector3 v )
+bool ke_point_in_frustum( VmathVector3 v )
 {
     int p;
     
@@ -156,10 +156,10 @@ bool point_in_frustum( VmathVector3 v )
 
 
 /*
- * Name: sphere_in_frustum
+ * Name: ke_sphere_in_frustum
  * Desc: Returns the distance between the camera and the sphere if it's within the frustum.
  */
-float sphere_in_frustum( VmathVector3 v, float radius )
+float ke_sphere_in_frustum( VmathVector3 v, float radius )
 {
     int p;
     float d;
@@ -179,10 +179,10 @@ float sphere_in_frustum( VmathVector3 v, float radius )
 
 
 /*
- * Name: cube_in_frustum
+ * Name: ke_cube_in_frustum
  * Desc: Checks each corner of the cube if it is within our viewing frustum.
  */
-bool cube_in_frustum( VmathVector3 v, float size )
+bool ke_cube_in_frustum( VmathVector3 v, float size )
 {
     int p;
     
@@ -212,10 +212,10 @@ bool cube_in_frustum( VmathVector3 v, float size )
 
 
 /*
- * Name: sphere_in_frustum2
+ * Name: ke_sphere_in_frustum2
  * Desc: Same as the previous, except also capable of telling if the sphere is partly visible.
  */
-int sphere_in_frustum2( VmathVector3 v, float radius )
+int ke_sphere_in_frustum2( VmathVector3 v, float radius )
 {
     int p;
     int c = 0;
@@ -235,10 +235,10 @@ int sphere_in_frustum2( VmathVector3 v, float radius )
 
 
 /*
- * Name: cube_in_frustum2
+ * Name: ke_cube_in_frustum2
  * Desc: Same as the previous, except also capable of telling us if the cube is partly visible.
  */
-int cube_in_frustum2( VmathVector3 v, float size )
+int ke_cube_in_frustum2( VmathVector3 v, float size )
 {
     int p;
     int c;
@@ -274,10 +274,10 @@ int cube_in_frustum2( VmathVector3 v, float size )
 
 
 /*
- * Name: polygon_in_frustum
+ * Name: ke_polygon_in_frustum
  * Desc: Tests a polygon for visibility.
  */
-bool polygon_in_frustum( int num_points, VmathVector3* point_list )
+bool ke_polygon_in_frustum( int num_points, VmathVector3* point_list )
 {
     int f, p;
     
@@ -298,14 +298,14 @@ bool polygon_in_frustum( int num_points, VmathVector3* point_list )
 
 
 /*
- * Name: project_vertex
+ * Name: ke_project_vertex
  * Desc: Takes a point in 3D space and returns a 2D screen coordinate. This func-
  *		 ion is useful when drawing 2D shapes over 3D objects, picking, etc.
  *		 Keep in mind that this code does not work for orthographic projections
  *		 and assumes the depth range is 0.0-1.0f.  Also, if win_coord.z's value is
  *		 greater than 1.0, then the object is behind the camera.
  */
-int project_vertex( VmathVector3* obj, float* modelview, float* projection, int* viewport, VmathVector3* win_coord )
+int ke_project_vertex( VmathVector3* obj, float* modelview, float* projection, int* viewport, VmathVector3* win_coord )
 {
 	/* Transformation vectors */
 	VmathVector4 tv1, tv2;
