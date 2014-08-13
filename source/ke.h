@@ -13,6 +13,10 @@
 #include "ke_renderdevice.h"
 #include "ke_audiodevice.h"
 
+/* Debug output level */
+#ifndef KE_DBG_LEVEL
+#define KE_DBG_LEVEL 1
+#endif
 
 /*
  * Kunai engine basics

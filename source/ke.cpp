@@ -22,7 +22,7 @@ bool ke_initialize()
     ke_set_current_path_to_resource_directory();
     
     /* Initial debug logging */
-    dbg = new NVDebug( 1, "debug.txt" );
+    dbg = new NVDebug( KE_DBG_LEVEL, "debug.txt" );
     DISPDBG( 1, "ke_initialize(): Initialization started\n" );
     
     /* Initialize SDL and the necessary sub-systems. For now, we only want to initialize 

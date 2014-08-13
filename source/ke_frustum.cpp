@@ -236,7 +236,7 @@ int sphere_in_frustum2( VmathVector3 v, float radius )
 
 /*
  * Name: cube_in_frustum2
- * Desc: Same as the previous, except also capaoble of telling us if the cube is partly visible.
+ * Desc: Same as the previous, except also capable of telling us if the cube is partly visible.
  */
 int cube_in_frustum2( VmathVector3 v, float size )
 {
