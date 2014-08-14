@@ -17,11 +17,11 @@ SDL_Event   event;
 uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
 uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;
 
-void (*ke_pfn_initialize)( void* );
-void (*ke_pfn_uninitialize)( void* );
-void (*ke_pfn_mouse)( void*, int );
-void (*ke_pfn_keyboard)( void*, int  );
-void (*ke_pfn_gamepad)( void*, int );
+void (*ke_pfn_initialize)( void* ) = NULL;
+void (*ke_pfn_uninitialize)( void* ) = NULL;
+void (*ke_pfn_mouse)( void*, int ) = NULL;
+void (*ke_pfn_keyboard)( void*, int  ) = NULL;
+void (*ke_pfn_gamepad)( void*, int ) = NULL;
 
 
 /* Thread structure */

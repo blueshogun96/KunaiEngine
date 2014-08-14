@@ -262,6 +262,9 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     
     /* Mark as initialized */
     initialized = Yes;
+    
+    /* Print OpenGL driver/implementation details */
+    DISPDBG( 1, "OpenGL Vendor: " << glGetString( GL_VENDOR ) << "\nOpenGL Version: " << glGetString( GL_VERSION ) << "\n" );
 }
 
 
