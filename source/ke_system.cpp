@@ -19,9 +19,10 @@ uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;
 
 void (*ke_pfn_initialize)( void* ) = NULL;
 void (*ke_pfn_uninitialize)( void* ) = NULL;
-void (*ke_pfn_mouse)( void*, int ) = NULL;
-void (*ke_pfn_keyboard)( void*, int  ) = NULL;
-void (*ke_pfn_gamepad)( void*, int ) = NULL;
+void (*ke_pfn_mouse)( void*, void* ) = NULL;
+void (*ke_pfn_keyboard)( void*, void*  ) = NULL;
+void (*ke_pfn_gamepad)( void*, void* ) = NULL;
+void* ke_context_ptr = NULL;
 
 
 /* Thread structure */
@@ -70,27 +71,18 @@ void ke_process_events()
                 break;
                 
             case SDL_KEYDOWN:
-                ke_on_keyboard( &event, Yes );
-                break;
-                
             case SDL_KEYUP:
-                ke_on_keyboard( &event, No );
+                ke_on_keyboard( ke_get_context_pointer(), &event );
                 break;
                 
             case SDL_MOUSEBUTTONDOWN:
-                ke_on_mouse( &event, Yes );
-                break;
-                
             case SDL_MOUSEBUTTONUP:
-                ke_on_mouse( &event, No );
+                ke_on_mouse( ke_get_context_pointer(), &event );
                 break;
                 
             case SDL_CONTROLLERBUTTONDOWN:
-                ke_on_gamepad( &event, Yes );
-                break;
-                
             case SDL_CONTROLLERBUTTONUP:
-                ke_on_gamepad( &event, No );
+                ke_on_gamepad( ke_get_context_pointer(), &event );
                 break;
         }
     }
@@ -104,6 +96,24 @@ bool ke_quit_requested()
 {
     /* Was a quit event processed? */
     return ( event.type == SDL_QUIT );
+}
+
+/*
+ * Name: ke_set_context_pointer
+ * Desc: 
+ */
+void ke_set_context_pointer( void* context_pointer )
+{
+    ke_context_ptr = context_pointer;
+}
+
+/*
+ * Name: ke_get_context_pointer
+ * Desc:
+ */
+void* ke_get_context_pointer()
+{
+    return ke_context_ptr;
 }
 
 /*
@@ -128,7 +138,7 @@ void ke_set_uninitialize_callback(void (*callback)(void*))
  * Name: ke_set_keyboard_callback
  * Desc: 
  */
-void ke_set_keyboard_callback(void (*callback)(void*, int))
+void ke_set_keyboard_callback(void (*callback)(void*, void*))
 {
     ke_pfn_keyboard = callback;
 }
@@ -137,7 +147,7 @@ void ke_set_keyboard_callback(void (*callback)(void*, int))
  * Name: ke_set_mouse_callback
  * Desc:
  */
-void ke_set_mouse_callback(void (*callback)(void*, int))
+void ke_set_mouse_callback(void (*callback)(void*, void*))
 {
     ke_pfn_mouse = callback;
 }
@@ -146,7 +156,7 @@ void ke_set_mouse_callback(void (*callback)(void*, int))
  * Name: ke_set_gamepad_callback
  * Desc: 
  */
-void ke_set_gamepad_callback(void (*callback)(void*, int))
+void ke_set_gamepad_callback(void (*callback)(void*, void*))
 {
     ke_pfn_gamepad = callback;
 }
@@ -175,30 +185,30 @@ void ke_on_uninitialize( void* context )
  * Name: ke_on_keyboard
  * Desc:
  */
-void ke_on_keyboard( void* context, int down )
+void ke_on_keyboard( void* context, void* input_context )
 {
     if( ke_pfn_keyboard )
-        ke_pfn_keyboard( context, down );
+        ke_pfn_keyboard( context, input_context );
 }
 
 /*
  * Name: ke_on_mouse
  * Desc:
  */
-void ke_on_mouse( void* context, int down )
+void ke_on_mouse( void* context, void* input_context )
 {
     if( ke_pfn_mouse )
-        ke_pfn_mouse( context, down );
+        ke_pfn_mouse( context, input_context );
 }
 
 /*
  * Name: ke_on_gamepad
  * Desc:
  */
-void ke_on_gamepad( void* context, int down )
+void ke_on_gamepad( void* context, void* input_context )
 {
     if( ke_pfn_gamepad )
-        ke_pfn_gamepad( context, down );
+        ke_pfn_gamepad( context, input_context );
 }
 
 /*

@@ -12,6 +12,9 @@
 #include <SDL2/SDL.h>
 #include <pthread.h>
 
+#include "nvdebug.h"
+#include "Framerate.h"
+
 
 //typedef void (*callback)(void*, int) ke_input_callback;
 
@@ -31,15 +34,17 @@ void ke_process_events();
 bool ke_quit_requested();
 void ke_set_initialize_callback(void (*callback)(void*));
 void ke_set_uninitialize_callback(void (*callback)(void*));
-void ke_set_keyboard_callback(void (*callback)(void*, int));
-void ke_set_mouse_callback(void (*callback)(void*, int));
-void ke_set_gamepad_callback(void (*callback)(void*, int));
+void ke_set_keyboard_callback(void (*callback)(void*, void*));
+void ke_set_mouse_callback(void (*callback)(void*, void*));
+void ke_set_gamepad_callback(void (*callback)(void*, void*));
 
+void ke_set_context_pointer( void* context_pointer );
+void* ke_get_context_pointer();
 void ke_on_initialize( void* context );
 void ke_on_uninitialize( void* context );
-void ke_on_keyboard( void* context, int down );
-void ke_on_mouse( void* context, int down );
-void ke_on_gamepad( void* context, int down );
+void ke_on_keyboard( void* context, void* input_context );
+void ke_on_mouse( void* context, void* input_context );
+void ke_on_gamepad( void* context, void* input_context );
 
 
 /*

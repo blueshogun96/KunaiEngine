@@ -6,10 +6,12 @@
 //
 
 #include "ke.h"
+#include "ke_system.h"
 #include "nvdebug.h"
 
 
 NVDebug* dbg = NULL;
+
 
 /*
  * Name: ke_initialize
@@ -31,6 +33,9 @@ bool ke_initialize()
         return false;
     DISPDBG( 1, "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK" );
     
+    /* Call user specified initialization routine */
+    ke_on_initialize( ke_get_context_pointer() );
+    
     return true;
 }
 
@@ -40,6 +45,9 @@ bool ke_initialize()
  */
 void ke_uninitialize()
 {
+    /* Call user specified uninitialization routine */
+    ke_on_uninitialize( ke_get_context_pointer() );
+    
     DISPDBG( 1, "ke_uninitialize(): Uninitializing SDL..." );
     
     /* Delete the debug log */
@@ -77,8 +85,8 @@ bool ke_create_window_and_device( ke_renderdevice_desc_t* device_desc, ke_render
  */
 void ke_destroy_window_and_device( ke_renderdevice_t* device )
 {
-    /* Unitialize SDL */
-    //SDL_Quit(); /* TODO: Do this elsewhere */
+    /* Destroy the device and unitialize SDL's video component or Direct3D */
+    delete device;
 }
 
 /*

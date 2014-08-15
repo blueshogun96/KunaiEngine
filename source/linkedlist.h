@@ -5,6 +5,8 @@
 //  Copyright (c) 2013 Shogun3D. All rights reserved.
 //
 
+#pragma once
+
 #include <stdio.h>
 #include "linkedlist.hpp"
 
