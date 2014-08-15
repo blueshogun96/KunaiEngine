@@ -82,6 +82,19 @@
 #define KE_RS_POLYGONMODE   7
 #define KE_RS_BLENDFUNC     8
 
+/*
+ * Polygon modes
+ */
+#define KE_FRONT            0
+#define KE_BACK             1
+#define KE_FRONT_AND_BACK   2
+
+/* 
+ * Fill modes
+ */
+#define KE_POINT            0
+#define KE_LINE             1
+#define KE_SOLID            2
 
 /*
  * Texture types
