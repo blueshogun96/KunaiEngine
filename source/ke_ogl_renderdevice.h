@@ -146,6 +146,7 @@ public:
     //virtual void draw_vertices_im();
     virtual void draw_vertices( uint32_t primtype, int first, int count );
     virtual void draw_indexed_vertices( uint32_t primtype, int count );
+    virtual void draw_indexed_vertices_range( uint32_t primtype, int start, int end, int count );
     
     /* Matrix/viewport related */
     virtual void set_viewport( int x, int y, int width, int height );

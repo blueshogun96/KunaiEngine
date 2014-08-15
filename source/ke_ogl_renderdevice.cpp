@@ -982,6 +982,8 @@ void ke_ogl_renderdevice_t::set_render_states( ke_state_t* states )
                 break;
                 
         }
+        
+        i++;
     }
 }
 
@@ -1048,14 +1050,44 @@ void ke_ogl_renderdevice_t::draw_indexed_vertices( uint32_t primtype, int count 
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
     error = glGetError();
-    //if( error != GL_NO_ERROR )
-    //    DISPDBG( 1, "draw_indexed_vertices(): error binding buffers\n" );
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "draw_indexed_vertices(): error binding buffers\n" );
     
     /* Draw the vertices */
     glDrawElements( primitive_types[primtype], count, data_types[gb->index_type], NULL );
     error = glGetError();
-    //if( error != GL_NO_ERROR )
-    //    DISPDBG( 1, "draw_indexed_vertices(): error drawing vertices\n" );
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "draw_indexed_vertices(): error drawing vertices\n" );
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::draw_indexed_vertices_range
+ * Desc: Same as above, but allows the user to specify the start/end vertex.
+ */
+void ke_ogl_renderdevice_t::draw_indexed_vertices_range( uint32_t primtype, int start, int end, int count )
+{
+    
+    ke_ogl_geometrybuffer_t* gb = static_cast<ke_ogl_geometrybuffer_t*>( current_geometrybuffer );
+    ke_ogl_gpu_program_t* gp = static_cast<ke_ogl_gpu_program_t*>( current_gpu_program );
+    GLenum error = glGetError();
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, &world_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[1], 1, No, &view_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[2], 1, No, &projection_matrix.col0.x );
+    
+    /* Bind the vertex buffer object, but not the index buffer object */
+    glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+    error = glGetError();
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "draw_indexed_vertices_range(): error binding buffers\n" );
+    
+    /* Draw the vertices */
+    glDrawRangeElements( primitive_types[primtype], start, end, count, data_types[gb->index_type], NULL );
+    error = glGetError();
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "draw_indexed_vertices_range(): error drawing vertices\n" );
 }
 
 /*
