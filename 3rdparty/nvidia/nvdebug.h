@@ -56,7 +56,7 @@
 #ifdef _MSC_VER
 #define __trap  _asm int 3
 #else
-#define __tram  __asm__("int $3")
+#define __trap  __asm__("int $3")
 #endif
 
 
