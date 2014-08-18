@@ -47,6 +47,9 @@ public:
     bool set_animated_body_position( uint32_t id, neV3 position );
     bool set_animated_body_rotation( uint32_t id, neV3 rotation );
     
+    ke_rigid_body_t* get_rigid_body( uint32_t id );
+    ke_animated_body_t* get_animated_body( uint32_t id );
+    
     void remove_all_rigid_bodies();
     void remove_all_animated_bodies();
     

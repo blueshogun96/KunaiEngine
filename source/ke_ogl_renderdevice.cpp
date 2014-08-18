@@ -978,9 +978,13 @@ void ke_ogl_renderdevice_t::set_render_states( ke_state_t* states )
                 break;
                 
             default:
-                /* TODO */
+                DISPDBG( 2, "Bad render state!\nstate: " << states[i].state << "\n"
+                            "param1: " << states[i].param1 << "\n"
+                            "param2: " << states[i].param2 << "\n"
+                            "param3: " << states[i].param3 << "\n"
+                            "fparam: " << states[i].fparam << "\n"
+                            "dparam: " << states[i].dparam << "\n" );
                 break;
-                
         }
         
         i++;

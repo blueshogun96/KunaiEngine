@@ -15,7 +15,7 @@
  * Name: ke_physics_simulator_t::
  * Desc: 
  */
-ke_physics_simulator_t::ke_physics_simulator_t() : time_since_last_update(0), start_time(ke_get_performance_counter())
+ke_physics_simulator_t::ke_physics_simulator_t() : time_since_last_update(0), start_time(ke_get_performance_counter()), rigid_bodies(NULL), animated_bodies(NULL)
 {
     /* Default gravity setting */
     neV3 gravity;
@@ -29,7 +29,7 @@ ke_physics_simulator_t::ke_physics_simulator_t() : time_since_last_update(0), st
  * Name: ke_physics_simulator_t::
  * Desc:
  */
-ke_physics_simulator_t::ke_physics_simulator_t( int max_rigid_bodies, int max_animated_bodies, neV3 gravity ) : time_since_last_update(0), start_time(ke_get_performance_counter())
+ke_physics_simulator_t::ke_physics_simulator_t( int max_rigid_bodies, int max_animated_bodies, neV3 gravity ) : time_since_last_update(0), start_time(ke_get_performance_counter()), rigid_bodies(NULL), animated_bodies(NULL)
 {
     /* Manually calculate the simulator size requirements */
     size_info.rigidBodiesCount = max_rigid_bodies;
@@ -254,6 +254,56 @@ bool ke_physics_simulator_t::set_animated_body_rotation( uint32_t id, neV3 rotat
     return false;
 }
 
+ke_rigid_body_t* ke_physics_simulator_t::get_rigid_body( uint32_t id )
+{
+    node_t<ke_rigid_body_t*>* n = rigid_bodies;
+    
+    /* Traverse though the list in search for a rigid body with a matching id number */
+    while( n != NULL )
+    {
+        ke_rigid_body_t* rb = n->data;
+        n = n->next;
+        
+        if( rb != NULL )
+        {
+            /* Does this id match? */
+            if( rb->rb_id == id )
+            {
+                /* If so, return with this pointer as a match */
+                return rb;
+            }
+        }
+    }
+    
+    /* Did not find a match */
+    return NULL;
+}
+
+ke_animated_body_t* ke_physics_simulator_t::get_animated_body( uint32_t id )
+{
+    node_t<ke_animated_body_t*>* n = animated_bodies;
+    
+    /* Traverse though the list in search for an animated body with a matching id number */
+    while( n != NULL )
+    {
+        ke_animated_body_t* ab = n->data;
+        n = n->next;
+        
+        if( ab != NULL )
+        {
+            /* Does this id match? */
+            if( ab->ab_id == id )
+            {
+                /* If so, return with this pointer as a match */
+                return ab;
+            }
+        }
+    }
+    
+    /* Did not find a match */
+    return NULL;
+}
+
 void ke_physics_simulator_t::remove_all_rigid_bodies()
 {
     node_t<ke_rigid_body_t*>* n = rigid_bodies;
@@ -306,7 +356,7 @@ void ke_physics_simulator_t::update_simulator( float frame_interval )
     end_time = ke_get_performance_counter();
     
     /* Calculate the elapsed time since the physics engine was last updated */
-    float frame_time = ( (float) end_time - (float) start_time ) / (float) ke_get_performance_frequency();
+    float frame_time = float( end_time - start_time ) / float(ke_get_performance_frequency());
     time_since_last_update += frame_time;
     
     /* If the time is greater than the desired frame interval (i.e. 1/60th of a second), update the physics. */
