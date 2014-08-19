@@ -36,6 +36,9 @@ bool ke_initialize()
     /* Call user specified initialization routine */
     ke_on_initialize( ke_get_context_pointer() );
     
+    /* Reset keys */
+    ke_reset_keys();
+    
     return true;
 }
 

@@ -26,6 +26,25 @@ struct ke_mutex_t;
 struct ke_semaphore_t;
 struct ke_critical_section_t;
 
+/*
+ * Input timestamp structure
+ */
+struct ke_timestamp_t
+{
+    float start_time;   /* Starting time when this input started */
+    float elapsed_time; /* Number of milliseconds since the input */
+    int frames;         /* The number of frames since the input */
+};
+
+/*
+ * Keyboard and gamepad button structure
+ */
+struct ke_button_t
+{
+    bool            pressed;
+    ke_timestamp_t  timestamp;
+};
+
 
 /*
  * Application lifetime
@@ -45,6 +64,10 @@ void ke_on_uninitialize( void* context );
 void ke_on_keyboard( void* context, void* input_context );
 void ke_on_mouse( void* context, void* input_context );
 void ke_on_gamepad( void* context, void* input_context );
+
+void ke_reset_keys();
+void ke_get_key_state( ke_button_t* _keys );
+bool ke_got_any_key();
 
 
 /*

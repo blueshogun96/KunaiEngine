@@ -14,8 +14,10 @@
  * Globals
  */
 SDL_Event   event;
-uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
-uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;
+ke_button_t keys[256];
+
+/*uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
+uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;*/
 
 void (*ke_pfn_initialize)( void* ) = NULL;
 void (*ke_pfn_uninitialize)( void* ) = NULL;
@@ -51,6 +53,9 @@ struct ke_critical_section_t
 };
 
 
+/* Input functions */
+void ke_update_keys();
+void ke_process_key_event( SDL_Event* event );
 
 /*
  * Name: ke_process_events
@@ -72,6 +77,7 @@ void ke_process_events()
                 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
+                ke_process_key_event( &event );
                 ke_on_keyboard( ke_get_context_pointer(), &event );
                 break;
                 
@@ -86,6 +92,9 @@ void ke_process_events()
                 break;
         }
     }
+    
+    /* Update keys */
+    ke_update_keys();
 }
 
 /*
@@ -300,4 +309,83 @@ bool ke_try_enter_critical_section( struct ke_critical_section_t* critical_secti
 {
     /* Attempt to lock this critical section. Return the result. */
     return (bool) pthread_mutex_trylock( &critical_section->mutex );
+}
+
+/*
+ * Name: ke_reset_keys
+ * Desc: Resets the keyboard state structure.
+ */
+void ke_reset_keys()
+{
+    ZeroMemory( keys, sizeof( ke_button_t ) * 256 );
+}
+
+/*
+ * Name: ke_get_key_state
+ * Desc: Get the state of the keyboard.
+ */
+void ke_get_key_state( ke_button_t* _keys )
+{
+    memmove( _keys, keys, sizeof( ke_button_t ) * 256 );
+}
+
+/*
+ * Name: ke_got_any_key
+ * Desc: Return true if any keyboard keys were pressed.
+ */
+bool ke_got_any_key()
+{
+    int i = 0;
+    while( i < 256 )
+    {
+        if( keys[i].pressed )
+            return true;
+    }
+    
+    return false;
+}
+
+/*
+ * Name: ke_update_keys
+ * Desc: Updates the timestamp values for keyboard keys
+ */
+void ke_update_keys()
+{
+    for( int i = 0; i < 256; i++ )
+    {
+        if( keys[i].pressed )
+        {
+            keys[i].timestamp.frames++;
+            keys[i].timestamp.elapsed_time = float(ke_get_tick_count()) - keys[i].timestamp.start_time;
+        }
+    }
+}
+
+/*
+ * Name: ke_process_key_event
+ * Desc: Processes key events.
+ */
+void ke_process_key_event( SDL_Event* event )
+{
+    /* Sanity check */
+    if( !event )
+        return;
+    
+    /* Determine what key was pressed or released */
+    //keys[event->key.keysym.sym].pressed = event->key.state = SDL_PRESSED ? true : false;
+    
+    /* Reset timestamps if this is the first key press */
+    if( !keys[event->key.keysym.sym].pressed && event->key.state == SDL_PRESSED )
+    {
+        keys[event->key.keysym.sym].timestamp.frames = 0;
+        keys[event->key.keysym.sym].timestamp.start_time = float(ke_get_tick_count());
+        keys[event->key.keysym.sym].timestamp.elapsed_time = 0;
+        keys[event->key.keysym.sym].pressed = true;
+    }
+    
+    /* Mark key as released when it's up */
+    if( event->key.state == SDL_RELEASED )
+    {
+        keys[event->key.keysym.sym].pressed = false;
+    }
 }
