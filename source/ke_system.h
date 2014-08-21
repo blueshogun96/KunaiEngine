@@ -9,7 +9,11 @@
 #define __ke_system__
 
 #include "ke_platform.h"
+#ifdef __APPLE__
 #include <SDL2/SDL.h>
+#else
+#include <SDL.h>
+#endif
 #include <pthread.h>
 
 #include "nvdebug.h"

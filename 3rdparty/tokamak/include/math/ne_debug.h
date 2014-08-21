@@ -57,22 +57,22 @@
 		#define TOKAMAK_OUTPUT_1(frmt,d) \
 		{	char tmpBuffer[256];\
 			sprintf(tmpBuffer, frmt, d);\
-			OutputDebugString(tmpBuffer);\
+			OutputDebugStringA(tmpBuffer);\
 		}
 		#define TOKAMAK_OUTPUT_2(frmt,d1,d2) \
 		{	char tmpBuffer[256];\
 			sprintf(tmpBuffer, frmt, d1, d2);\
-			OutputDebugString(tmpBuffer);\
+			OutputDebugStringA(tmpBuffer);\
 		}
 		#define TOKAMAK_OUTPUT_3(frmt,d1,d2,d3) \
 		{	char tmpBuffer[256];\
 			sprintf(tmpBuffer, frmt, d1, d2,d3);\
-			OutputDebugString(tmpBuffer);\
+			OutputDebugStringA(tmpBuffer);\
 		}
 		#define TOKAMAK_OUTPUT_4(frmt,d1,d2,d3,d4) \
 		{	char tmpBuffer[256];\
 			sprintf(tmpBuffer, frmt, d1,d2,d3,d4);\
-			OutputDebugString(tmpBuffer);\
+			OutputDebugStringA(tmpBuffer);\
 		}
 
 	#else
