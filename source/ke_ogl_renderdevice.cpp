@@ -234,6 +234,14 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     if( !context )
         return;
     
+#ifndef __APPLE__
+	GLenum error = glewInit();
+	if (error != GLEW_NO_ERROR)
+	{
+		DISPDBG(1, "Error initializing glew!\n");
+	}
+#endif
+
     /* Initialize default OpenGL vertex and fragment program */
     ke_initialize_default_shaders();
     

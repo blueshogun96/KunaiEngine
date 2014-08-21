@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <stdint.h>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -60,6 +61,10 @@
  #else
   #include "ke_osx_util.h"
  #endif
+#endif
+
+#ifdef _WIN32
+#include "ke_win32_util.h"
 #endif
 
 #ifdef __ANDROID__

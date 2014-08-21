@@ -9,10 +9,16 @@
 #define __ke_ogl_renderdevice__
 
 #include "ke_renderdevice.h"
+#ifdef __APPLE__
 #include <SDL2/SDL.h>
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
+#else
+#include <SDL.h>
+#include <GL/glew.h>
+#include <GL/wglew.h>
+#endif
 
 
 #ifndef BUFFER_OFFSET

@@ -8,9 +8,15 @@
 #ifndef __ke_al_audiodevice__
 #define __ke_al_audiodevice__
 
+#ifdef __APPLE__
 #include <OpenAL-Soft/al.h>
 #include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/alext.h>
+#else
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alext.h>
+#endif
 #include "ke_audiodevice.h"
 
 
