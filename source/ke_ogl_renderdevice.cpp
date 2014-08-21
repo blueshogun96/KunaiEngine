@@ -191,7 +191,7 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     memmove( device_desc, renderdevice_desc, sizeof( ke_renderdevice_desc_t ) );
     
     /* Verify device type */
-    if( device_desc->device_type == KE_RENDERDEVICE_D3D11_1 || device_desc->device_type == KE_RENDERDEVICE_OGLES2_0 || device_desc->device_type == KE_RENDERDEVICE_OGLES3_0 )
+    if( device_desc->device_type == KE_RENDERDEVICE_D3D11 || device_desc->device_type == KE_RENDERDEVICE_OGLES2 || device_desc->device_type == KE_RENDERDEVICE_OGLES3 )
         return;
     
     /* Initialize SDL video */
@@ -204,13 +204,13 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, device_desc->stencil_bpp );
     
     /* Set the appropriate OpenGL version and profile */
-    if( device_desc->device_type == KE_RENDERDEVICE_OGL4_1 )
+    if( device_desc->device_type == KE_RENDERDEVICE_OGL4 )
     {
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
     }
-    else if( device_desc->device_type == KE_RENDERDEVICE_OGL3_2 )
+    else if( device_desc->device_type == KE_RENDERDEVICE_OGL3 )
     {
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 );

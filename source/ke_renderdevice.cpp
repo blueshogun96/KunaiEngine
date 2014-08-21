@@ -15,7 +15,7 @@
  */
 ke_renderdevice_t* ke_create_renderdevice( ke_renderdevice_desc_t* renderdevice_desc )
 {
-    if( renderdevice_desc->device_type == KE_RENDERDEVICE_OGL3_2 || renderdevice_desc->device_type == KE_RENDERDEVICE_OGL4_1 )
+    if( renderdevice_desc->device_type == KE_RENDERDEVICE_OGL3 || renderdevice_desc->device_type == KE_RENDERDEVICE_OGL4 )
         return new ke_ogl_renderdevice_t( renderdevice_desc );
     
     return NULL;

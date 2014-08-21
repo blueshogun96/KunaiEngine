@@ -16,11 +16,11 @@
 /*
  * Render device types
  */
-#define KE_RENDERDEVICE_D3D11_1     1
-#define KE_RENDERDEVICE_OGL3_2      2
-#define KE_RENDERDEVICE_OGL4_1      3
-#define KE_RENDERDEVICE_OGLES2_0    4
-#define KE_RENDERDEVICE_OGLES3_0    5
+#define KE_RENDERDEVICE_D3D11     1
+#define KE_RENDERDEVICE_OGL3      2
+#define KE_RENDERDEVICE_OGL4      3
+#define KE_RENDERDEVICE_OGLES2    4
+#define KE_RENDERDEVICE_OGLES3    5
 
 
 /*
