@@ -303,6 +303,14 @@ bool ke_ogl_renderdevice_t::confirm_device()
     return initialized;
 }
 
+/*
+ * Name: ke_ogl_renderdevice_t::get_device_desc
+ * Desc: Returns a copy of the device description structure
+ */
+void ke_ogl_renderdevice_t::get_device_desc( ke_renderdevice_desc_t* device_desc )
+{
+    memmove( device_desc, this->device_desc, sizeof( ke_renderdevice_desc_t ) );
+}
 
 /*
  * Name: ke_ogl_renderdevice::set_clear_colour_fv
@@ -1100,6 +1108,29 @@ void ke_ogl_renderdevice_t::draw_indexed_vertices_range( uint32_t primtype, int 
     error = glGetError();
     if( error != GL_NO_ERROR )
         DISPDBG( 1, "draw_indexed_vertices_range(): error drawing vertices\n" );
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::get_framebuffer_region
+ * Desc: Returns a pointer filled with pixels of the given region of the current framebuffer.
+ * TODO: Determine bit depth, allow reading from depth buffers, etc.
+ */
+bool ke_ogl_renderdevice_t::get_framebuffer_region( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels )
+{
+    int buffer_bpp = device_desc->colour_bpp;
+    
+    /* Return the bit depth of this framebuffer */
+    *bpp = buffer_bpp;
+    
+    /* Allocate pointer to hold the pixel data */
+    (*pixels) = new uint8_t[(width-x)*(height-y)*(buffer_bpp/8)];
+    if( !(*pixels) )
+        return false;
+    
+    /* Read from the current framebuffer */
+    glReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, *pixels );
+    
+    return true;
 }
 
 /*

@@ -199,6 +199,7 @@ public:
 public:
     /* Misc */
     virtual bool confirm_device() PURE;
+    virtual void get_device_desc( ke_renderdevice_desc_t* device_desc ) PURE;
     
     /* General rendering stuff */
     virtual void set_clear_colour_fv( float* colour ) PURE;
@@ -239,6 +240,8 @@ public:
     virtual void draw_vertices( uint32_t primtype, int first, int count ) PURE;
     virtual void draw_indexed_vertices( uint32_t primtype, int count ) PURE;
     virtual void draw_indexed_vertices_range( uint32_t primtype, int start, int end, int count ) PURE;
+    
+    virtual bool get_framebuffer_region( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels ) PURE;
     
     /* Matrix/viewport related */
     virtual void set_viewport( int x, int y, int width, int height ) PURE;
