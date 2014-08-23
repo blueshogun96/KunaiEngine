@@ -103,6 +103,14 @@ uint32_t texture_formats[] =
     GL_BGRA
 };
 
+/* OpenGL cull modes */
+uint32_t cull_modes[] =
+{
+    GL_NONE,
+    GL_CW,
+    GL_CCW
+};
+
 
 /*
  * Name: ke_initialize_default_shaders
@@ -1086,6 +1094,14 @@ void ke_ogl_renderdevice_t::set_render_states( ke_state_t* states )
                 
             case KE_RS_BLENDFUNC:
                 glBlendFunc( states[i].param1, states[i].param2 );
+                break;
+                
+            case KE_RS_CULLMODE:
+                if( states[i].param1 )
+                    glEnable( GL_CULL_FACE );
+                else
+                    glDisable( GL_CULL_FACE );
+                glCullFace( cull_modes[states[i].param2] );
                 break;
                 
             default:

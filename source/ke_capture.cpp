@@ -78,6 +78,10 @@ bool ke_save_screenshot_jpg( ke_renderdevice_t* renderdevice )
     return true;
 }
 
+/*
+ * Name: ke_save_screenshot_bmp
+ * Desc: Same as above, but in BMP format.
+ */
 bool ke_save_screenshot_bmp( ke_renderdevice_t* renderdevice )
 {
     FILE* bmpfile;

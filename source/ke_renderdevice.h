@@ -97,6 +97,13 @@
 #define KE_SOLID            2
 
 /*
+ * Cull modes
+ */
+#define KE_CULL_NONE        0
+#define KE_CULL_CW          1
+#define KE_CULL_CCW         2
+
+/*
  * Texture types
  */
 #define KE_TEXTURE_1D       0
