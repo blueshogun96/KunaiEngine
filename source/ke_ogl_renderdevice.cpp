@@ -965,6 +965,7 @@ bool ke_ogl_renderdevice_t::create_render_target( int width, int height, int dep
     if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
     {
         error = glGetError();
+        DISPDBG( 1, "ke_ogl_renderdevice_t::create_render_target(): Error during rendertarget creation! (error=0x" << error << ")\n" );
     }
     
     return true;

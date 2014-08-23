@@ -12,5 +12,6 @@
 #include "ke_renderdevice.h"
 
 bool ke_save_screenshot_jpg( ke_renderdevice_t* renderdevice );
+bool ke_save_screenshot_bmp( ke_renderdevice_t* renderdevice );
 
 #endif /* defined(__ke_capture__) */
