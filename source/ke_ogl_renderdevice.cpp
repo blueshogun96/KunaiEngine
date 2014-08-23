@@ -96,6 +96,14 @@ uint32_t fill_modes[] =
     GL_FILL,
 };
 
+/* OpenGL texture formats */
+uint32_t texture_formats[] =
+{
+    GL_RGBA,
+    GL_BGRA
+};
+
+
 /*
  * Name: ke_initialize_default_shaders
  * Desc: Initializes the default shaders to be used when there is
@@ -757,9 +765,9 @@ bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int m
     /* Set texture attributes */
     t->width = width;
     t->target = target;
-    t->data_type = data_type;
-    t->depth_format = format;
-    t->internal_format = format;
+    t->data_type = data_types[data_type];
+    t->depth_format = texture_formats[format];
+    t->internal_format = texture_formats[format];
     t->target = target;
     
     /* Use OpenGL to create a new 1D texture */
@@ -768,7 +776,7 @@ bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int m
     error = glGetError();
     
     /* Set the initial texture attributes */
-    glTexImage1D( t->target, 0, format, width, 0, format, data_type, NULL );
+    glTexImage1D( t->target, 0, texture_formats[format], width, 0, texture_formats[format], data_types[data_type], NULL );
     error = glGetError();
     
     /* Set texture parameters */
@@ -796,18 +804,18 @@ bool ke_ogl_renderdevice_t::create_texture_2d( uint32_t target, int width, int h
     t->width = width;
     t->height = height;
     t->target = target;
-    t->data_type = data_type;
-    t->depth_format = format;
-    t->internal_format = format;
+    t->data_type = data_types[data_type];
+    t->depth_format = texture_formats[format];
+    t->internal_format = texture_formats[format];
     t->target = target;
     
-    /* Use OpenGL to create a new 1D texture */
+    /* Use OpenGL to create a new 2D texture */
     glGenTextures( 1, &t->handle );
     glBindTexture( t->target, t->handle );
     error = glGetError();
     
     /* Set the initial texture attributes */
-    glTexImage2D( t->target, 0, format, width, height, 0, format, data_type, NULL );
+    glTexImage2D( t->target, 0, texture_formats[format], width, height, 0, texture_formats[format], data_types[data_type], NULL );
     error = glGetError();
     
     /* Set texture parameters */
@@ -836,18 +844,18 @@ bool ke_ogl_renderdevice_t::create_texture_3d( uint32_t target, int width, int h
     t->height = height;
     t->depth = depth;
     t->target = target;
-    t->data_type = data_type;
-    t->depth_format = format;
-    t->internal_format = format;
+    t->data_type = data_types[data_type];
+    t->depth_format = texture_formats[format];
+    t->internal_format = texture_formats[format];
     t->target = target;
     
-    /* Use OpenGL to create a new 1D texture */
+    /* Use OpenGL to create a new 3D texture */
     glGenTextures( 1, &t->handle );
     glBindTexture( t->target, t->handle );
     error = glGetError();
     
     /* Set the initial texture attributes */
-    glTexImage3D( t->target, 0, format, width, height, depth, 0, format, data_type, NULL );
+    glTexImage3D( t->target, 0, texture_formats[format], width, height, depth, 0, texture_formats[format], data_types[data_type], NULL );
     error = glGetError();
     
     /* Set texture parameters */
@@ -907,6 +915,92 @@ void ke_ogl_renderdevice_t::set_texture_data_3d( int offsetx, int offsety, int o
     ke_ogl_texture_t* t = static_cast<ke_ogl_texture_t*>( texture );
     
     glTexSubImage3D( t->target, miplevel, offsetx, offsety, offsetz, width, height, depth, t->internal_format, t->data_type, pixels );
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::create_render_target
+ * Desc: Creates a seperate render target (FBO), typically used for rendering to a texture.
+ *       Creates a colour, depth and stencil buffer (if desired) and can be set as a texture.
+ */
+bool ke_ogl_renderdevice_t::create_render_target( int width, int height, int depth, uint32_t flags, ke_rendertarget_t** rendertarget )
+{
+    GLenum error = glGetError();
+    ke_ogl_rendertarget_t* rt = static_cast<ke_ogl_rendertarget_t*>( *rendertarget );
+    
+    /* Generate frame buffer object */
+    glGenFramebuffers( 1, &rt->frame_buffer_object );
+    error = glGetError();
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "ke_ogl_renderdevice::create_render_target(): Error creating FBO!\n" );
+    
+    /* Bind the FBO */
+    glBindFramebuffer( GL_FRAMEBUFFER, rt->frame_buffer_object );
+    
+    /* Create a texture to render this FBO to */
+    this->create_texture_2d( KE_TEXTURE_2D, width, height, 0, KE_TEXTUREFORMAT_RGBA, KE_UNSIGNED_BYTE, &rt->texture );
+    
+    /* Use nearest point filtering */
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    
+    /* Create the depth buffer */
+    glGenRenderbuffers( 1, &rt->depth_render_buffer );
+    error = glGetError();
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "ke_ogl_renderdevice::create_render_target(): Error creating depth buffer!\n" );
+    
+    /* Set the depth buffer attributes */
+    ke_ogl_texture_t* tex = static_cast<ke_ogl_texture_t*>( rt->texture );
+    
+    glBindRenderbuffer( GL_RENDERBUFFER, rt->depth_render_buffer );
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, tex->width, tex->height );
+    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rt->depth_render_buffer );
+    
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex->height, 0 );
+    
+    GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers( 1, draw_buffers );
+    
+    /* Check the framebuffer status */
+    if( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
+    {
+        error = glGetError();
+    }
+    
+    return true;
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::delete_render_target
+ * Desc: Deletes the render target resources used.
+ */
+void ke_ogl_renderdevice_t::delete_render_target( ke_rendertarget_t* rendertarget )
+{
+    ke_ogl_rendertarget_t* rt = static_cast<ke_ogl_rendertarget_t*>( rendertarget );
+    
+    /* Delete the texture */
+    this->delete_texture( static_cast<ke_ogl_texture_t*>( rt->texture ) );
+    
+    /* Delete the render target */
+    glDeleteRenderbuffers( 1, &rt->depth_render_buffer );
+    glDeleteFramebuffers( 1, &rt->frame_buffer_object );
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::bind_render_target
+ * Desc: Binds the render target to OpenGL.  You set the texture to the appropriate  texture
+ *       stage yourself using ::set_texture().
+ */
+void ke_ogl_renderdevice_t::bind_render_target( ke_rendertarget_t* rendertarget )
+{
+    GLenum error = glGetError();
+    ke_ogl_rendertarget_t* rt = static_cast<ke_ogl_rendertarget_t*>( rendertarget );
+    
+    /* Bind the FBO */
+    glBindFramebuffer( GL_FRAMEBUFFER, rt->frame_buffer_object );
+    error = glGetError();
+    if( error != GL_NO_ERROR )
+        DISPDBG( 1, "ke_ogl_renderdevice_t::bind_render_target(): Error binding rendertarget! (error=0x" << error << ")\n" );
 }
 
 /*

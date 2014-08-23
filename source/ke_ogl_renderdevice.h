@@ -84,6 +84,18 @@ struct ke_ogl_texture_t : public ke_texture_t
 };
 
 /*
+ * Rendertarget base structure 
+ */
+struct ke_ogl_rendertarget_t : public ke_rendertarget_t
+{
+    uint32_t    frame_buffer_object;    /* Frame buffer object handle */
+    uint32_t    depth_render_buffer;    /* Depth render buffer */
+    /* TODO: Stencil? */
+    
+    ke_texture_t* texture;
+};
+
+/*
  * Palette base structure
  */
 struct ke_ogl_palette_t : public ke_palette_t
@@ -147,6 +159,9 @@ public:
     virtual void set_texture_data_1d( int offsetx, int width, int miplevel, void* pixels, ke_texture_t* texture );
     virtual void set_texture_data_2d( int offsetx, int offsety, int width, int height, int miplevel, void* pixels,  ke_texture_t* texture );
     virtual void set_texture_data_3d( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, ke_texture_t* texture );
+    virtual bool create_render_target( int width, int height, int depth, uint32_t flags, ke_rendertarget_t** rendertarget );
+    virtual void delete_render_target( ke_rendertarget_t* rendertarget );
+    virtual void bind_render_target( ke_rendertarget_t* rendertarget );
     virtual void set_texture( int stage, ke_texture_t* texture );
     virtual void set_render_states( ke_state_t* states );
     virtual void set_sampler_states( ke_state_t* states );

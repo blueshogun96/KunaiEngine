@@ -105,7 +105,14 @@
 #define KE_TEXTURE_2D_ARRAY 3
 #define KE_TEXTURE_3D       4
 #define KE_TEXTURE_RECT     5
-//#define KE_TEXTURE_1D       6
+
+/*
+ * Texture formats
+ */
+#define KE_TEXTUREFORMAT_RGBA   0
+#define KE_TEXTUREFORMAT_BGRA   1
+
+
 
 /*
  * Render device description
@@ -176,6 +183,11 @@ struct ke_gpu_program_t {};
 struct ke_texture_t {};
 
 /*
+ * Rendertarget base structure
+ */
+struct ke_rendertarget_t {};
+
+/*
  * Palette base structure
  */
 struct ke_palette_t {};
@@ -233,6 +245,9 @@ public:
     virtual void set_texture_data_1d( int offsetx, int width, int miplevel, void* pixels, ke_texture_t* texture ) PURE;
     virtual void set_texture_data_2d( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, ke_texture_t* texture ) PURE;
     virtual void set_texture_data_3d( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, ke_texture_t* texture ) PURE;
+    virtual bool create_render_target( int width, int height, int depth, uint32_t flags, ke_rendertarget_t** rendertarget ) PURE;
+    virtual void delete_render_target( ke_rendertarget_t* rendertarget ) PURE;
+    virtual void bind_render_target( ke_rendertarget_t* rendertarget ) PURE;
     virtual void set_texture( int stage, ke_texture_t* texture ) PURE;
     virtual void set_render_states( ke_state_t* states ) PURE;
     virtual void set_sampler_states( ke_state_t* states ) PURE;
