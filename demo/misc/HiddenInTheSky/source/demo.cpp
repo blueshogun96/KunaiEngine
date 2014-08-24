@@ -69,7 +69,7 @@ bool hiddendemo_t::initialize()
     start_physics();
     
     /* Create us a new camera */
-    m_camera = ke_new_camera();
+    //m_camera = ke_new_camera();
     
     return true;
 }
@@ -77,7 +77,7 @@ bool hiddendemo_t::initialize()
 void hiddendemo_t::uninitialize()
 {
     /* Kill the camera */
-    delete m_camera;
+    //delete m_camera;
     
     /* Stop the physics engine */
     stop_physics();
@@ -121,9 +121,9 @@ void hiddendemo_t::on_render()
      m_renderdevice->set_render_states(rs);
     
     /* Set view matrix */
-    view = vmathM4MakeLookAt_V( vmathP3MakeFromElems_V(-8.5f, 1.8f, 11.1f),
+    view = m_camera.get_view_matrix(); /*vmathM4MakeLookAt_V( vmathP3MakeFromElems_V(-8.5f, 1.8f, 11.1f),
                                vmathP3MakeFromElems_V(0.6f, 0.0f, -0.75f),
-                               vmathV3MakeFromElems_V( 0, 1, 0 ) );
+                               vmathV3MakeFromElems_V( 0, 1, 0 ) );*/
     m_renderdevice->set_view_matrix( &view );
     
     /* Set default program */
@@ -150,6 +150,9 @@ void hiddendemo_t::on_update()
     
     /* Get keyboard state */
     ke_get_key_state( keys );
+    
+    /* Update camera */
+    m_camera.update();
     
     /* Screenshot */
     if( keys['c'].pressed && keys['c'].timestamp.frames <= 1 )

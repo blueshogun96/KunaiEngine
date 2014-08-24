@@ -15,6 +15,7 @@
  */
 SDL_Event   event;
 ke_button_t keys[256];
+ke_mouse_t  mouse;
 
 /*uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
 uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;*/
@@ -56,6 +57,7 @@ struct ke_critical_section_t
 /* Input functions */
 void ke_update_keys();
 void ke_process_key_event( SDL_Event* event );
+void ke_process_mouse_event( SDL_Event* event );
 
 /*
  * Name: ke_process_events
@@ -83,7 +85,12 @@ void ke_process_events()
                 
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
+                ke_process_mouse_event( &event );
                 ke_on_mouse( ke_get_context_pointer(), &event );
+                break;
+                
+            case SDL_MOUSEMOTION:
+                ke_process_mouse_event( &event );
                 break;
                 
             case SDL_CONTROLLERBUTTONDOWN:
@@ -320,6 +327,15 @@ void ke_reset_keys()
     ZeroMemory( keys, sizeof( ke_button_t ) * 256 );
 }
 
+/* 
+ * Name: ke_reset_mouse
+ * Desc: Resets the mouse state structure
+ */
+void ke_reset_mouse()
+{
+    ZeroMemory( &mouse, sizeof( ke_mouse_t ) );
+}
+
 /*
  * Name: ke_get_key_state
  * Desc: Get the state of the keyboard.
@@ -361,6 +377,15 @@ void ke_update_keys()
     }
 }
 
+/* 
+ * Name: ke_get_mouse_state
+ * Desc: Gets the state of the mouse.
+ */
+void ke_get_mouse_state( ke_mouse_t* _mouse )
+{
+    memmove( _mouse, &mouse, sizeof( ke_mouse_t ) );
+}
+
 /*
  * Name: ke_process_key_event
  * Desc: Processes key events.
@@ -387,5 +412,39 @@ void ke_process_key_event( SDL_Event* event )
     if( event->key.state == SDL_RELEASED )
     {
         keys[event->key.keysym.sym].pressed = false;
+    }
+}
+
+/*
+ * Name: ke_process_mouse_event
+ * Desc: 
+ */
+void ke_process_mouse_event( SDL_Event* event )
+{
+    /* TODO: Figure out why the heck this mofo code isn't working when SDL's documentation tells me this is right */
+    
+    int button = 0;
+    
+    if( event->type == SDL_MOUSEMOTION )
+    {
+        mouse.x = event->motion.x;
+        mouse.y = event->motion.y;
+    }
+    
+    if( event->type == SDL_MOUSEBUTTONDOWN )
+    {
+        /*if( event->button.button == SDL_BUTTON_LEFT || event->button.button == SDL_BUTTON_X1 ) button = 0;
+        if( event->button.button == SDL_BUTTON_RIGHT || event->button.button == SDL_BUTTON_X2 ) button = 1;
+        if( event->button.button == SDL_BUTTON_MIDDLE ) button = 2;*/
+        
+        mouse.button[button] = Yes;
+    }
+    if( event->type == SDL_MOUSEBUTTONUP )
+    {
+        /*if( event->button.button == SDL_BUTTON_LEFT ) button = 0;
+        if( event->button.button == SDL_BUTTON_RIGHT ) button = 1;
+        if( event->button.button == SDL_BUTTON_MIDDLE ) button = 2;*/
+        
+        mouse.button[button] = No;
     }
 }

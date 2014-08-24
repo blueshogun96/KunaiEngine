@@ -49,6 +49,15 @@ struct ke_button_t
     ke_timestamp_t  timestamp;
 };
 
+/*
+ * Mouse state structure
+ */
+struct ke_mouse_t
+{
+    int x, y;       /* Mouse position */
+    int button[3];  /* Mouse buttons 1=Down, 0=Up */
+};
+
 
 /*
  * Application lifetime
@@ -70,8 +79,10 @@ void ke_on_mouse( void* context, void* input_context );
 void ke_on_gamepad( void* context, void* input_context );
 
 void ke_reset_keys();
+void ke_reset_mouse();
 void ke_get_key_state( ke_button_t* _keys );
 bool ke_got_any_key();
+void ke_get_mouse_state( ke_mouse_t* _mouse );
 
 
 /*

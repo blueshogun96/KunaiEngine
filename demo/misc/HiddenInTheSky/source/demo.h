@@ -20,7 +20,7 @@
 #include "ke_process.hpp"
 #include "linkedlist.h"
 #include "ke_capture.h"
-
+#include "camera.h"
 
 /* Rigid body demo class */
 class hiddendemo_t
@@ -38,9 +38,9 @@ public:
     static void on_mouse( void* context, void* input_context );
     static void on_gamepad( void* context, void* input_context );*/
     
-    ke_camera_t* get_camera()
+    /*ke_*/camera_t* get_camera()
     {
-        return m_camera;
+        return &m_camera;
     }
     
     ke_physics_simulator_t* get_physics()
@@ -72,7 +72,7 @@ protected:
     ke_gpu_program_t*       m_default_program;      /* Default program */
     ke_gpu_program_t*       m_vertex_light_program; /* Per-vertex lighting program */
     
-    ke_camera_t*            m_camera;               /* Camera class */
+    /*ke_*/camera_t         m_camera;               /* Camera class */
     
     ke_physics_simulator_t* m_physics;              /* Physics engine */
 };
