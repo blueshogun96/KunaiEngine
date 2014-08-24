@@ -993,6 +993,8 @@ void ke_ogl_renderdevice_t::delete_render_target( ke_rendertarget_t* rendertarge
     /* Delete the render target */
     glDeleteRenderbuffers( 1, &rt->depth_render_buffer );
     glDeleteFramebuffers( 1, &rt->frame_buffer_object );
+
+	delete rendertarget;
 }
 
 /*
