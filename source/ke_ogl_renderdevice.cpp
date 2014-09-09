@@ -411,15 +411,15 @@ void ke_ogl_renderdevice_t::swap()
  *       buffers are encapsulated into one interface for easy management, however, index data
  *       input is completely optional.  Interleaved vertex data is also supported.
  */
-bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* vertex_attributes, ke_geometrybuffer_t** geometry_buffer )
+bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_geometrybuffer_t** geometry_buffer )
 {
     GLenum error = glGetError();
     
     /* Sanity check(s) */
     if( !geometry_buffer )
         return false;
-    if( !vertex_attributes )
-        return false;
+    //if( !vertex_attributes )
+      //  return false;
     if( !vertex_data_size )
         return false;   /* Temporary? */
  
@@ -440,19 +440,6 @@ bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t 
     /* Set the vertex buffer data */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
     glBufferData( GL_ARRAY_BUFFER, vertex_data_size, vertex_data, GL_STATIC_DRAW );
-    error = glGetError();
-    
-    /* Set the vertex attributes for this geometry buffer */
-    for( int i = 0; vertex_attributes[i].index != -1; i++ )
-    {
-        glVertexAttribPointer( vertex_attributes[i].index,
-                              vertex_attributes[i].size,
-                              data_types[vertex_attributes[i].type],
-                              vertex_attributes[i].normalize,
-                              vertex_attributes[i].stride,
-                              BUFFER_OFFSET(vertex_attributes[i].offset) );
-        glEnableVertexAttribArray(vertex_attributes[i].index);
-    }
     error = glGetError();
     
     /* Create an index buffer if desired */
@@ -514,7 +501,7 @@ void ke_ogl_renderdevice_t::set_geometry_buffer( ke_geometrybuffer_t* geometry_b
  *       (see code below).
  *       TODO: Allow user defined constants.
  */
-bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_gpu_program_t** gpu_program )
+bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program )
 {
     GLuint p, f, v, t, g;
     *gpu_program = new ke_ogl_gpu_program_t;
@@ -600,6 +587,14 @@ bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const cha
     
     /* Save the handle to this newly created program */
     gp->program = p;
+
+	/* Copy vertex attributes */
+	int va_size = 0;
+	while( vertex_attributes[va_size].index != -1 )
+		va_size++;
+
+	gp->va = new ke_vertexattribute_t[va_size];
+	memmove( gp->va, vertex_attributes, sizeof( ke_vertexattribute_t ) * va_size );
     
     return true;
 }
@@ -614,6 +609,7 @@ void ke_ogl_renderdevice_t::delete_program( ke_gpu_program_t* gpu_program )
     if( gpu_program )
     {
         glDeleteProgram( static_cast<ke_ogl_gpu_program_t*>(gpu_program)->program );
+		delete[] static_cast<ke_ogl_gpu_program_t*>(gpu_program)->va;
         delete gpu_program;
     }
 }
@@ -624,6 +620,8 @@ void ke_ogl_renderdevice_t::delete_program( ke_gpu_program_t* gpu_program )
  */
 void ke_ogl_renderdevice_t::set_program( ke_gpu_program_t* gpu_program )
 {
+	GLenum error = glGetError();
+
     /* Check for a valid pointer. If NULL, then we set the current program to 0. */
     if( gpu_program )
     {
@@ -633,6 +631,19 @@ void ke_ogl_renderdevice_t::set_program( ke_gpu_program_t* gpu_program )
         current_gpu_program = gpu_program;
     
         glUseProgram( gp->program );
+
+		/* Set the vertex attributes for this geometry buffer */
+		for( int i = 0; gp->va[i].index != -1; i++ )
+		{
+			glVertexAttribPointer( gp->va[i].index,
+								  gp->va[i].size,
+								  data_types[gp->va[i].type],
+								  gp->va[i].normalize,
+								  gp->va[i].stride,
+								  BUFFER_OFFSET(gp->va[i].offset) );
+			glEnableVertexAttribArray(gp->va[i].index);
+		}
+		error = glGetError();
     }
     else
         glUseProgram(0);

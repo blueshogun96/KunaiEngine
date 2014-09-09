@@ -67,6 +67,7 @@ struct ke_ogl_gpu_program_t : public ke_gpu_program_t
 {
     uint32_t program;       /* GPU program handle */
     uint32_t matrices[3];   /* Handles to the world, view, and projection matrices (respectively) */
+	ke_vertexattribute_t* va;	/* Vertex attributes */
 };
 
 /*
@@ -136,10 +137,10 @@ public:
     virtual void clear_stencil_buffer();
     virtual void swap();
 
-    virtual bool create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* vertex_attributes, ke_geometrybuffer_t** geometry_buffer );
+    virtual bool create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_geometrybuffer_t** geometry_buffer );
     virtual void delete_geometry_buffer( ke_geometrybuffer_t* geometry_buffer );
     virtual void set_geometry_buffer( ke_geometrybuffer_t* geometry_buffer );
-    virtual bool create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_gpu_program_t** gpu_program );
+    virtual bool create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program );
     virtual void delete_program( ke_gpu_program_t* gpu_program );
     virtual void set_program( ke_gpu_program_t* gpu_program );
     virtual void set_program_constant_1fv( const char* location, int count, float* value );
