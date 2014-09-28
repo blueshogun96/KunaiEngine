@@ -16,7 +16,7 @@
 #endif
 #include <pthread.h>
 
-#include "ke_debug.h"
+//#include "ke_debug.h"
 #include "Framerate.h"
 
 

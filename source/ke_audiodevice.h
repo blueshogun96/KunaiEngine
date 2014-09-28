@@ -114,8 +114,17 @@ public:
     virtual void set_listener_velocity( float* velocity ) PURE;
     virtual void set_listener_orientation( float* at, float* up ) PURE;
     
+    virtual void set_buffer_position( ke_soundbuffer_t* sound_buffer, float* position ) PURE;
+    virtual void set_buffer_velocity( ke_soundbuffer_t* sound_buffer, float* velocity ) PURE;
+    virtual void set_buffer_volume( ke_soundbuffer_t* sound_buffer, float volume ) PURE;
+    virtual void set_buffer_pitch( ke_soundbuffer_t* sound_buffer, float pitch ) PURE;
+    
 protected:
     bool initialized;
+    float listener_position[3];
+    float listener_velocity[3];
+    float listener_orientation_at[3];
+    float listener_orientation_up[3];
 };
 
 #endif /* defined(__ke_audiodevice__) */

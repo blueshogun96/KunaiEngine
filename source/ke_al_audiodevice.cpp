@@ -216,3 +216,47 @@ void ke_al_audiodevice_t::set_listener_orientation( float* at, float* up )
     
     alListenerfv( AL_ORIENTATION, orientation );
 }
+
+void ke_al_audiodevice_t::set_buffer_position( ke_soundbuffer_t* sound_buffer, float* position )
+{
+    if( !sound_buffer )
+        return;
+    
+    ke_al_soundbuffer_t* sb = static_cast<ke_al_soundbuffer_t*>( sound_buffer );
+    
+    alSourcefv( sb->source, AL_POSITION, position );
+    memmove( sb->position, position, sizeof( float ) * 3 );
+}
+
+void ke_al_audiodevice_t::set_buffer_velocity( ke_soundbuffer_t* sound_buffer, float* velocity )
+{
+    if( !sound_buffer )
+        return;
+    
+    ke_al_soundbuffer_t* sb = static_cast<ke_al_soundbuffer_t*>( sound_buffer );
+    
+    alSourcefv( sb->source, AL_VELOCITY, velocity );
+    memmove( sb->velocity, velocity, sizeof( float ) * 3 );
+}
+
+void ke_al_audiodevice_t::set_buffer_volume( ke_soundbuffer_t* sound_buffer, float volume )
+{
+    if( !sound_buffer )
+        return;
+    
+    ke_al_soundbuffer_t* sb = static_cast<ke_al_soundbuffer_t*>( sound_buffer );
+    
+    alSourcef( sb->source, AL_GAIN, volume );
+    sb->volume = volume;
+}
+
+void ke_al_audiodevice_t::set_buffer_pitch( ke_soundbuffer_t* sound_buffer, float pitch )
+{
+    if( !sound_buffer )
+        return;
+    
+    ke_al_soundbuffer_t* sb = static_cast<ke_al_soundbuffer_t*>( sound_buffer );
+    
+    alSourcef( sb->source, AL_PITCH, pitch );
+    sb->pitch = pitch;
+}

@@ -29,7 +29,6 @@ struct ke_al_soundbuffer_t : public ke_soundbuffer_t
     uint32_t    source;
 	float       volume;
 	float       pitch;
-    float       gain;
     float       position[3];
     float       velocity[3];
     ke_audioformat_t audio_format;
@@ -109,6 +108,11 @@ public:
     virtual void set_listener_position( float* position );
     virtual void set_listener_velocity( float* velocity );
     virtual void set_listener_orientation( float* at, float* up );
+    
+    void set_buffer_position( ke_soundbuffer_t* sound_buffer, float* position );
+    void set_buffer_velocity( ke_soundbuffer_t* sound_buffer, float* velocity );
+    void set_buffer_volume( ke_soundbuffer_t* sound_buffer, float volume );
+    void set_buffer_pitch( ke_soundbuffer_t* sound_buffer, float pitch );
     
 private:
     ALCcontext* context;
