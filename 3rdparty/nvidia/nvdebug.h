@@ -101,7 +101,8 @@ public:
 		OutputDebugString(m_strStream.str().c_str());
 
 		//m_strStream.freeze(false);
-		m_strStream.seekp(0);
+		//m_strStream.seekp(0);
+		m_strStream.str("");
 	}
 
 	unsigned int GetLevel() const { return m_GlobalDebugLevel; };
@@ -120,7 +121,7 @@ do																\
 {																\
 	if (NVDebug::GetSingletonPtr() != NULL)						\
 	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
-		NVDebug::GetSingleton().GetStream() << b;			\
+		NVDebug::GetSingleton().GetStream() << __FUNCTION__ << "(): " << b;			\
 		NVDebug::GetSingleton().EndOutput(); }				\
 } while(0)
 

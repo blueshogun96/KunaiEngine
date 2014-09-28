@@ -25,13 +25,13 @@ bool ke_initialize()
     
     /* Initial debug logging */
     dbg = new NVDebug( KE_DBG_LEVEL, "debug.txt" );
-    DISPDBG( 1, "ke_initialize(): Initialization started\n" );
+    DISPDBG( 1, "Initialization started\n" );
     
     /* Initialize SDL and the necessary sub-systems. For now, we only want to initialize 
        timing and events. */
     if( SDL_Init( SDL_INIT_EVENTS | SDL_INIT_TIMER ) != 0 )
         return false;
-    DISPDBG( 1, "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK" );
+    DISPDBG( 1, "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK\n" );
     
     /* Call user specified initialization routine */
     ke_on_initialize( ke_get_context_pointer() );
@@ -51,7 +51,7 @@ void ke_uninitialize()
     /* Call user specified uninitialization routine */
     ke_on_uninitialize( ke_get_context_pointer() );
     
-    DISPDBG( 1, "ke_uninitialize(): Uninitializing SDL..." );
+    DISPDBG( 1, "Uninitializing SDL..." );
     
     /* Delete the debug log */
     delete dbg;
@@ -108,4 +108,30 @@ bool ke_create_audio_device( ke_audiodevice_desc_t* device_desc, ke_audiodevice_
 void ke_destroy_audio_device( ke_audiodevice_t* device )
 {
     
+}
+
+/*
+ * Name: ke_alloc_inhereted_resource
+ * Desc: Allocates the base pointer as the inhereted pointer type, and returns a pointer of the inhereted type
+ *		 with the same location as the base pointer.  Returns NULL upon failure.
+ */
+template <class ke_base_resource_t, class ke_inhereted_resource_t>
+ke_inhereted_resource_t* ke_alloc_inhereted_resource( ke_base_resource_t** resource )
+{
+	/* Sanity check */
+	if( resource == NULL )
+		return NULL;
+
+	/* Attempt to allocate a new resource pointer */
+	*resource = new ke_inhereted_resource_t;
+	if( *resource == NULL )
+	{
+		DISPDBG( 1, "ke_alloc_inhereted_resource() failed: Out of memory!\n" );
+		return NULL;
+	}
+
+	/* Return a copy of the inhereted type */
+	ke_inhereted_resource_t ir = static_cast<ke_inhereted_resource_t*>( *resource );
+
+	return ir;
 }

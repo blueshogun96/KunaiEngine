@@ -28,4 +28,10 @@ void ke_destroy_window_and_device( ke_renderdevice_t* device );
 bool ke_create_audio_device( ke_audiodevice_desc_t* device_desc, ke_audiodevice_t** device );
 void ke_destroy_audio_device( ke_audiodevice_t* device );
 
+/* 
+ * Inhereted resource allocation 
+ */
+template <class ke_base_resource_t, class ke_inhereted_resource_t>
+ke_inhereted_resource_t* ke_alloc_inhereted_resource( ke_base_resource_t** resource );
+
 #endif /* defined(__ke__) */

@@ -222,14 +222,18 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     /* Set the appropriate OpenGL version and profile */
     if( device_desc->device_type == KE_RENDERDEVICE_OGL4 )
     {
-        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
-        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+		major_version = 4;
+		minor_version = 5;
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, major_version );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, minor_version );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
     }
     else if( device_desc->device_type == KE_RENDERDEVICE_OGL3 )
     {
-        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 );
+		major_version = 3;
+		minor_version = 3;
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, major_version );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, minor_version );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
     }
     else
@@ -245,12 +249,26 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     if( !window )
         return;
     
-    /* Create our OpenGL context */
+    /* Create our OpenGL context. */
     context = SDL_GL_CreateContext( window );
-    if( !context )
-        return;
+	if( !context )
+	{
+		/* If it fails the first time around, lower the minor version until it succeeds. */
+		while( minor_version > -1 )
+		{
+			SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, --minor_version );
+			context = SDL_GL_CreateContext( window );
+			if( context )
+				break;
+		}
+	}
+
+	/* Verify that we have a valid context */
+	if( !context )
+		DISPDBG( 1, "Error creating OpenGL context!" );
     
 #ifndef __APPLE__
+	glewExperimental = GL_TRUE;
 	GLenum error = glewInit();
 	if (error != GLEW_NO_ERROR)
 	{
@@ -288,7 +306,7 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     initialized = Yes;
     
     /* Print OpenGL driver/implementation details */
-    DISPDBG( 1, "OpenGL Vendor: " << glGetString( GL_VENDOR ) << "\nOpenGL Version: " << glGetString( GL_VERSION ) << "\n" );
+    DISPDBG( 1, "OpenGL Vendor: " << glGetString( GL_VENDOR ) << "\nOpenGL Version: " << glGetString( GL_VERSION ) << "\nOpenGL Renderer: " << glGetString( GL_RENDERER ) << "\n" );
 }
 
 
@@ -411,7 +429,7 @@ void ke_ogl_renderdevice_t::swap()
  *       buffers are encapsulated into one interface for easy management, however, index data
  *       input is completely optional.  Interleaved vertex data is also supported.
  */
-bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_geometrybuffer_t** geometry_buffer )
+bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* va, ke_geometrybuffer_t** geometry_buffer )
 {
     GLenum error = glGetError();
     
@@ -441,7 +459,20 @@ bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t 
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
     glBufferData( GL_ARRAY_BUFFER, vertex_data_size, vertex_data, GL_STATIC_DRAW );
     error = glGetError();
-    
+     
+	/* Set the vertex attributes for this geometry buffer */
+	for( int i = 0; va[i].index != -1; i++ )
+	{
+		glVertexAttribPointer( va[i].index,
+								va[i].size,
+								data_types[va[i].type],
+								va[i].normalize,
+								va[i].stride,
+								BUFFER_OFFSET(va[i].offset) );
+		glEnableVertexAttribArray(va[i].index);
+	}
+	error = glGetError();
+
     /* Create an index buffer if desired */
     if( index_data_size )
     {
@@ -462,7 +493,7 @@ bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t 
 
 
 /*
- * Name: ke_ogl_renderdevice_t::create_geometry_buffer
+ * Name: ke_ogl_renderdevice_t::delete_geometry_buffer
  * Desc:
  */
 void ke_ogl_renderdevice_t::delete_geometry_buffer( ke_geometrybuffer_t* geometry_buffer )
@@ -503,7 +534,7 @@ void ke_ogl_renderdevice_t::set_geometry_buffer( ke_geometrybuffer_t* geometry_b
  */
 bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program )
 {
-    GLuint p, f, v, t, g;
+    GLuint p, f, v, t = 0, g;
     *gpu_program = new ke_ogl_gpu_program_t;
     ke_ogl_gpu_program_t* gp = static_cast<ke_ogl_gpu_program_t*>( *gpu_program );
     GLenum error = glGetError();
@@ -555,6 +586,10 @@ bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const cha
     glBindAttribLocation( p, 6, "in_tex1" );
     glBindAttribLocation( p, 7, "in_tex2" );
     glBindAttribLocation( p, 8, "in_tex3" );
+	glBindAttribLocation( p, 9, "in_tex4" );
+    glBindAttribLocation( p, 10, "in_tex5" );
+    glBindAttribLocation( p, 11, "in_tex6" );
+    glBindAttribLocation( p, 12, "in_tex7" );
     
 	glAttachShader( p, v );
 	glAttachShader( p, f );
@@ -570,6 +605,10 @@ bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const cha
     GLuint uniform_tex1 = glGetUniformLocation( p, "tex1" );
     GLuint uniform_tex2 = glGetUniformLocation( p, "tex2" );
     GLuint uniform_tex3 = glGetUniformLocation( p, "tex3" );
+	GLuint uniform_tex4 = glGetUniformLocation( p, "tex4" );
+    GLuint uniform_tex5 = glGetUniformLocation( p, "tex5" );
+    GLuint uniform_tex6 = glGetUniformLocation( p, "tex6" );
+    GLuint uniform_tex7 = glGetUniformLocation( p, "tex7" );
     
     gp->matrices[0] = glGetUniformLocation( p, "world" );
     error = glGetError();
@@ -582,20 +621,26 @@ bool ke_ogl_renderdevice_t::create_program( const char* vertex_shader, const cha
     glUniform1i( uniform_tex1, 1 );
     glUniform1i( uniform_tex2, 2 );
     glUniform1i( uniform_tex3, 3 );
+	glUniform1i( uniform_tex4, 4 );
+    glUniform1i( uniform_tex5, 5 );
+    glUniform1i( uniform_tex6, 6 );
+    glUniform1i( uniform_tex7, 7 );
 
     glUseProgram(0);
     
     /* Save the handle to this newly created program */
     gp->program = p;
 
+#if 0
 	/* Copy vertex attributes */
 	int va_size = 0;
 	while( vertex_attributes[va_size].index != -1 )
 		va_size++;
 
-	gp->va = new ke_vertexattribute_t[va_size];
-	memmove( gp->va, vertex_attributes, sizeof( ke_vertexattribute_t ) * va_size );
-    
+	gp->va = new ke_vertexattribute_t[va_size+1];
+	memmove( gp->va, vertex_attributes, sizeof( ke_vertexattribute_t ) * (va_size+1) );
+#endif
+
     return true;
 }
 
@@ -609,7 +654,7 @@ void ke_ogl_renderdevice_t::delete_program( ke_gpu_program_t* gpu_program )
     if( gpu_program )
     {
         glDeleteProgram( static_cast<ke_ogl_gpu_program_t*>(gpu_program)->program );
-		delete[] static_cast<ke_ogl_gpu_program_t*>(gpu_program)->va;
+		//delete[] static_cast<ke_ogl_gpu_program_t*>(gpu_program)->va;
         delete gpu_program;
     }
 }
@@ -631,19 +676,6 @@ void ke_ogl_renderdevice_t::set_program( ke_gpu_program_t* gpu_program )
         current_gpu_program = gpu_program;
     
         glUseProgram( gp->program );
-
-		/* Set the vertex attributes for this geometry buffer */
-		for( int i = 0; gp->va[i].index != -1; i++ )
-		{
-			glVertexAttribPointer( gp->va[i].index,
-								  gp->va[i].size,
-								  data_types[gp->va[i].type],
-								  gp->va[i].normalize,
-								  gp->va[i].stride,
-								  BUFFER_OFFSET(gp->va[i].offset) );
-			glEnableVertexAttribArray(gp->va[i].index);
-		}
-		error = glGetError();
     }
     else
         glUseProgram(0);
@@ -1151,12 +1183,12 @@ void ke_ogl_renderdevice_t::set_sampler_states( ke_state_t* states )
  * Name: ke_ogl_renderdevice::draw_vertices
  * Desc: Draws vertices from the current vertex buffer
  */
-void ke_ogl_renderdevice_t::draw_vertices( uint32_t primtype, int first, int count )
+void ke_ogl_renderdevice_t::draw_vertices( uint32_t primtype, uint32_t stride, int first, int count )
 {
     ke_ogl_geometrybuffer_t* gb = static_cast<ke_ogl_geometrybuffer_t*>( current_geometrybuffer );
     ke_ogl_gpu_program_t* gp = static_cast<ke_ogl_gpu_program_t*>( current_gpu_program );
     GLenum error = glGetError();
-    
+   
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, &world_matrix.col0.x );
     error = glGetError();
@@ -1179,7 +1211,7 @@ void ke_ogl_renderdevice_t::draw_vertices( uint32_t primtype, int first, int cou
  * Name: ke_ogl_renderdevice::draw_indexed_vertices
  * Desc: Draws vertices from the current vertex and index buffer.
  */
-void ke_ogl_renderdevice_t::draw_indexed_vertices( uint32_t primtype, int count )
+void ke_ogl_renderdevice_t::draw_indexed_vertices( uint32_t primtype, uint32_t stride, int count )
 {
     ke_ogl_geometrybuffer_t* gb = static_cast<ke_ogl_geometrybuffer_t*>( current_geometrybuffer );
     ke_ogl_gpu_program_t* gp = static_cast<ke_ogl_gpu_program_t*>( current_gpu_program );
@@ -1190,13 +1222,13 @@ void ke_ogl_renderdevice_t::draw_indexed_vertices( uint32_t primtype, int count 
     glUniformMatrix4fv( gp->matrices[1], 1, No, &view_matrix.col0.x );
     glUniformMatrix4fv( gp->matrices[2], 1, No, &projection_matrix.col0.x );
     
-    /* Bind the vertex buffer object, but not the index buffer object */
+    /* Bind the vertex and index buffer objects */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
     error = glGetError();
     if( error != GL_NO_ERROR )
         DISPDBG( 1, "draw_indexed_vertices(): error binding buffers\n" );
-    
+   
     /* Draw the vertices */
     glDrawElements( primitive_types[primtype], count, data_types[gb->index_type], NULL );
     error = glGetError();
@@ -1208,13 +1240,13 @@ void ke_ogl_renderdevice_t::draw_indexed_vertices( uint32_t primtype, int count 
  * Name: ke_ogl_renderdevice_t::draw_indexed_vertices_range
  * Desc: Same as above, but allows the user to specify the start/end vertex.
  */
-void ke_ogl_renderdevice_t::draw_indexed_vertices_range( uint32_t primtype, int start, int end, int count )
+void ke_ogl_renderdevice_t::draw_indexed_vertices_range( uint32_t primtype, uint32_t stride, int start, int end, int count )
 {
     
     ke_ogl_geometrybuffer_t* gb = static_cast<ke_ogl_geometrybuffer_t*>( current_geometrybuffer );
     ke_ogl_gpu_program_t* gp = static_cast<ke_ogl_gpu_program_t*>( current_gpu_program );
     GLenum error = glGetError();
-    
+   
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, &world_matrix.col0.x );
     glUniformMatrix4fv( gp->matrices[1], 1, No, &view_matrix.col0.x );

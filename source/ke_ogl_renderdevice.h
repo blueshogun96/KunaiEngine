@@ -137,7 +137,7 @@ public:
     virtual void clear_stencil_buffer();
     virtual void swap();
 
-    virtual bool create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_geometrybuffer_t** geometry_buffer );
+    virtual bool create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* va, ke_geometrybuffer_t** geometry_buffer );
     virtual void delete_geometry_buffer( ke_geometrybuffer_t* geometry_buffer );
     virtual void set_geometry_buffer( ke_geometrybuffer_t* geometry_buffer );
     virtual bool create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program );
@@ -167,9 +167,9 @@ public:
     virtual void set_render_states( ke_state_t* states );
     virtual void set_sampler_states( ke_state_t* states );
     //virtual void draw_vertices_im();
-    virtual void draw_vertices( uint32_t primtype, int first, int count );
-    virtual void draw_indexed_vertices( uint32_t primtype, int count );
-    virtual void draw_indexed_vertices_range( uint32_t primtype, int start, int end, int count );
+    virtual void draw_vertices( uint32_t primtype, uint32_t stride, int first, int count );
+    virtual void draw_indexed_vertices( uint32_t primtype, uint32_t stride, int count );
+    virtual void draw_indexed_vertices_range( uint32_t primtype, uint32_t stride, int start, int end, int count );
     
     virtual bool get_framebuffer_region( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels );
     
@@ -188,6 +188,8 @@ public:
 protected:
     SDL_GLContext context;
     SDL_Window* window;
+	int			major_version;
+	int			minor_version;
 };
 
 #endif /* defined(__ke_ogl_renderdevice__) */

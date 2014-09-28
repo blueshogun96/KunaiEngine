@@ -16,11 +16,9 @@
 #endif
 #include <pthread.h>
 
-#include "nvdebug.h"
+#include "ke_debug.h"
 #include "Framerate.h"
 
-
-//typedef void (*callback)(void*, int) ke_input_callback;
 
 /*
  * System objects

@@ -11,6 +11,8 @@
 
 #include "ke_platform.h"
 #include "vectormath.h"
+#include "NvFoundationMath.h"
+#include "NV/NvMath.h"
 
 
 /*
@@ -229,7 +231,7 @@ public:
     virtual void clear_stencil_buffer() PURE;
     virtual void swap() PURE;
     
-    virtual bool create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_geometrybuffer_t** geometry_buffer ) PURE;
+    virtual bool create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* va, ke_geometrybuffer_t** geometry_buffer ) PURE;
     virtual void delete_geometry_buffer( ke_geometrybuffer_t* geometry_buffer ) PURE;
     virtual void set_geometry_buffer( ke_geometrybuffer_t* geometry_buffer ) PURE;
     virtual bool create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program ) PURE;
@@ -259,9 +261,9 @@ public:
     virtual void set_render_states( ke_state_t* states ) PURE;
     virtual void set_sampler_states( ke_state_t* states ) PURE;
 //    virtual void draw_vertices_im() PURE;
-    virtual void draw_vertices( uint32_t primtype, int first, int count ) PURE;
-    virtual void draw_indexed_vertices( uint32_t primtype, int count ) PURE;
-    virtual void draw_indexed_vertices_range( uint32_t primtype, int start, int end, int count ) PURE;
+    virtual void draw_vertices( uint32_t primtype, uint32_t stride, int first, int count ) PURE;
+    virtual void draw_indexed_vertices( uint32_t primtype, uint32_t stride, int count ) PURE;
+    virtual void draw_indexed_vertices_range( uint32_t primtype, uint32_t stride, int start, int end, int count ) PURE;
     
     virtual bool get_framebuffer_region( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels ) PURE;
     
@@ -281,7 +283,8 @@ public:
 protected:
     bool                    initialized;
     float                   clear_colour[4];
-    float                   depth_colour[4];
+    float                   clear_depth;
+	uint32_t				clear_stencil;
     int                     viewport[4];
     ke_renderdevice_desc_t* device_desc;
     Matrix4                 world_matrix;
