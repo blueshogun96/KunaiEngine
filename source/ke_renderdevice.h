@@ -11,8 +11,8 @@
 
 #include "ke_platform.h"
 #include "vectormath.h"
-//#include "NvFoundationMath.h"
-//#include "NV/NvMath.h"
+#include "NvFoundationMath.h"
+#include "NV/NvMath.h"
 
 
 /*
