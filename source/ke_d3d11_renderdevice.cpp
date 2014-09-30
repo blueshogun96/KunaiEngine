@@ -342,7 +342,7 @@ bool ke_d3d11_renderdevice_t::confirm_device()
 */
 void ke_d3d11_renderdevice_t::get_device_desc(ke_renderdevice_desc_t* device_desc)
 {
-	memmove(device_desc, this->device_desc, sizeof(ke_renderdevice_desc_t));
+	memmove( device_desc, this->device_desc, sizeof( ke_renderdevice_desc_t ) );
 }
 
 /*
@@ -351,7 +351,7 @@ void ke_d3d11_renderdevice_t::get_device_desc(ke_renderdevice_desc_t* device_des
 */
 void ke_d3d11_renderdevice_t::set_clear_colour_fv(float* colour)
 {
-	memcpy(this->clear_colour, colour, sizeof(float)* 4);
+	memcpy( this->clear_colour, colour, sizeof(float)*4 );
 }
 
 
@@ -418,7 +418,7 @@ void ke_d3d11_renderdevice_t::swap()
 {
 	HRESULT hr = dxgi_swap_chain->Present(0, 0);
 	if( FAILED( hr ) )
-		DISPDBG( 1, "IDXGISwapChain::Present(): Error = 0x" << hr << "\n" );
+		DISPDBG( KE_ERROR, "IDXGISwapChain::Present(): Error = 0x" << hr << "\n" );
 }
 
 
@@ -784,6 +784,100 @@ void ke_d3d11_renderdevice_t::get_program_constant_iv(const char* location, int*
 }
 
 /*
+ * Name: ke_d3d11_renderdevice_t::create_constant_buffer
+ * Desc: Creates a constant buffer used for storing/setting constants in one call instead of one by one.
+ *		 If supported, this is the recommended method for setting constants.
+ */
+bool ke_d3d11_renderdevice_t::create_constant_buffer( uint32_t buffer_size, ke_constantbuffer_t** constant_buffer )
+{
+	*constant_buffer = new ke_d3d11_constantbuffer_t;
+	ke_d3d11_constantbuffer_t* cb = static_cast<ke_d3d11_constantbuffer_t*>( *constant_buffer );
+
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory( &bd, sizeof( bd ) );
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = buffer_size;
+	bd.CPUAccessFlags = 0;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	HRESULT hr = d3ddevice->CreateBuffer( &bd, NULL, &cb->cb );
+	if( FAILED( hr ) )
+	{
+		delete *constant_buffer;
+		DISPDBG( KE_ERROR, "Error creating constant buffer (0x" << hr << ")!\n" );
+		return false;
+	}
+
+	return true;
+}
+
+/*
+ * Name: ke_d3d11_renderdevice_t::delete_constant_buffer
+ * Desc: Deletes a constant buffer.
+ */
+void ke_d3d11_renderdevice_t::delete_constant_buffer( ke_constantbuffer_t* constant_buffer )
+{
+	ke_d3d11_constantbuffer_t* cb = static_cast<ke_d3d11_constantbuffer_t*>( constant_buffer );
+
+	if( cb )
+	{
+		if( cb->cb ) cb->cb->Release();
+		delete constant_buffer;
+	}
+}
+
+/*
+ * Name: ke_d3d11_renderdevice_t::set_constant_buffer_data
+ * Desc: 
+ */
+bool ke_d3d11_renderdevice_t::set_constant_buffer_data( void* data, ke_constantbuffer_t* constant_buffer )
+{
+	if( !constant_buffer )
+		return false;
+
+	d3ddevice_context->UpdateSubresource( static_cast<ke_d3d11_constantbuffer_t*>( constant_buffer )->cb, 0, NULL, data, 0, 0 );
+
+	return true;
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::set_vertex_shader_constant_buffer
+ * Desc: 
+ */
+void ke_d3d11_renderdevice_t::set_vertex_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+	d3ddevice_context->VSSetConstantBuffers( slot, 1, &static_cast<ke_d3d11_constantbuffer_t*>( constant_buffer )->cb );
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::set_pixel_shader_constant_buffer
+ * Desc: 
+ */
+void ke_d3d11_renderdevice_t::set_pixel_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+	d3ddevice_context->PSSetConstantBuffers( slot, 1, &static_cast<ke_d3d11_constantbuffer_t*>( constant_buffer )->cb );
+}
+
+/*
+ * Name: ke_d3d11_renderdevice_t::set_geometry_shader_constant_buffer
+ * Desc: 
+ */
+void ke_d3d11_renderdevice_t::set_geometry_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+	d3ddevice_context->GSSetConstantBuffers( slot, 1, &static_cast<ke_d3d11_constantbuffer_t*>( constant_buffer )->cb );
+}
+
+/*
+ * Name: ke_d3d11_renderdevice_t::set_tesselation_shader_constant_buffer
+ * Desc: 
+ */
+void ke_d3d11_renderdevice_t::set_tesselation_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+	d3ddevice_context->HSSetConstantBuffers( slot, 1, &static_cast<ke_d3d11_constantbuffer_t*>( constant_buffer )->cb );
+}
+
+/*
 * Name: ke_d3d11_renderdevice::create_texture_1d
 * Desc: Creates a 1D texture.
 */
@@ -949,7 +1043,7 @@ void ke_d3d11_renderdevice_t::set_render_states(ke_state_t* states)
 		switch (states[i].state)
 		{
 		default:
-			DISPDBG(2, "Bad render state!\nstate: " << states[i].state << "\n"
+			DISPDBG(KE_WARNING, "Bad render state!\nstate: " << states[i].state << "\n"
 				"param1: " << states[i].param1 << "\n"
 				"param2: " << states[i].param2 << "\n"
 				"param3: " << states[i].param3 << "\n"

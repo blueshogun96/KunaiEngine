@@ -20,22 +20,13 @@
 #endif
 
 
-#ifndef BUFFER_OFFSET
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-#endif
-
 
 /*
 * Constant buffer structure
 */
 struct ke_d3d11_constantbuffer_t : public ke_constantbuffer_t
 {
-	void*       buffer_data;    /* Constant buffer data */
-	uint32_t    data_size;      /* Size of the data buffer */
-	uint32_t*   locations;      /* Constant locations (for faux constant buffers) */
-	uint32_t    location_count; /* Number of constant locations (for faux constant buffers) */
-	uint32_t*   offsets;        /* Constant offsets (for faux constant buffers) */
-	uint32_t    offset_count;   /* Number of offsets (for faux constant buffers) */
+	ID3D11Buffer*	cb;		/* Constant buffer */
 };
 
 /*
@@ -156,6 +147,13 @@ public:
 	virtual void set_program_constant_4iv(const char* location, int count, int* value);
 	virtual void get_program_constant_fv(const char* location, float* value);
 	virtual void get_program_constant_iv(const char* location, int* value);
+	virtual bool create_constant_buffer( uint32_t buffer_size, ke_constantbuffer_t** constant_buffer );
+	virtual void delete_constant_buffer( ke_constantbuffer_t* constant_buffer );
+	virtual bool set_constant_buffer_data( void* data, ke_constantbuffer_t* constant_buffer );
+	virtual void set_vertex_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
+	virtual void set_pixel_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
+	virtual void set_geometry_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
+	virtual void set_tesselation_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
 	virtual bool create_texture_1d(uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture);
 	virtual bool create_texture_2d(uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture);
 	virtual bool create_texture_3d(uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture);

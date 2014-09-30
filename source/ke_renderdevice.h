@@ -247,6 +247,13 @@ public:
     virtual void set_program_constant_4iv( const char* location, int count, int* value ) PURE;
     virtual void get_program_constant_fv( const char* location, float* value ) PURE;
     virtual void get_program_constant_iv( const char* location, int* value ) PURE;
+	virtual bool create_constant_buffer( uint32_t buffer_size, ke_constantbuffer_t** constant_buffer ) PURE;
+	virtual void delete_constant_buffer( ke_constantbuffer_t* constant_buffer ) PURE;
+	virtual bool set_constant_buffer_data( void* data, ke_constantbuffer_t* constant_buffer ) PURE;
+	virtual void set_vertex_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
+	virtual void set_pixel_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
+	virtual void set_geometry_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
+	virtual void set_tesselation_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
     virtual bool create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture ) PURE;
     virtual bool create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture ) PURE;
     virtual bool create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture ) PURE;

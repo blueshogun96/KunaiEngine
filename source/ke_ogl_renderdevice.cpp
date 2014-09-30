@@ -802,6 +802,70 @@ void ke_ogl_renderdevice_t::get_program_constant_iv( const char* location, int* 
 }
 
 /*
+ * Name: ke_ogl_renderdevice_t::create_constant_buffer
+ * Desc: Creates a constant buffer.
+ * TODO: Support for OpenGL.
+ */
+bool ke_ogl_renderdevice_t::create_constant_buffer( uint32_t buffer_size, ke_constantbuffer_t** constant_buffer )
+{
+	return false;
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::delete_constant_buffer
+ * Desc: 
+ */
+void ke_ogl_renderdevice_t::delete_constant_buffer( ke_constantbuffer_t* constant_buffer )
+{
+
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::set_constant_buffer_data
+ * Desc: 
+ */
+bool ke_ogl_renderdevice_t::set_constant_buffer_data( void* data, ke_constantbuffer_t* constant_buffer )
+{
+	return true;
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::set_vertex_shader_constant_buffer
+ * Desc: 
+ */
+void ke_ogl_renderdevice_t::set_vertex_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::set_pixel_shader_constant_buffer
+ * Desc: 
+ */
+void ke_ogl_renderdevice_t::set_pixel_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::set_geometry_shader_constant_buffer
+ * Desc: 
+ */
+void ke_ogl_renderdevice_t::set_geometry_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::set_tesselation_shader_constant_buffer
+ * Desc: 
+ */
+void ke_ogl_renderdevice_t::set_tesselation_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer )
+{
+
+}
+
+/*
  * Name: ke_ogl_renderdevice::create_texture_1d
  * Desc: Creates a 1D texture.
  */
