@@ -7,7 +7,7 @@
 
 #include "ke_platform.h"
 #include "ke_al_audiodevice.h"
-#include "nvdebug.h"
+#include "ke_debug.h"
 
 
 /*
@@ -93,6 +93,11 @@ ke_al_audiodevice_t::ke_al_audiodevice_t( ke_audiodevice_desc_t* audiodevice_des
             DISPDBG( 1, "Max auxiliary sends: " << sends << "\n" );
     }
     
+	/* Print OpenAL driver/implementation details */
+    DISPDBG( 1, "\n\tOpenAL Vendor: " << alGetString( AL_VENDOR ) << 
+		"\n\tOpenAL Version: " << alGetString( AL_VERSION ) << 
+		"\n\tOpenAL Renderer: " << alGetString( AL_RENDERER ) << "\n" );
+
     initialized = Yes;
 }
 
@@ -126,12 +131,22 @@ bool ke_al_audiodevice_t::create_sound_buffer( ke_audioformat_t* audio_format, k
     /* Generate a sound buffer and source */
     alGenBuffers( 1, &sb->buffer );
     error = alGetError();
+	if( error != AL_NO_ERROR )
+	{
+		release_sound_buffer( sb );
+		DISPDBG( KE_ERROR, "Error creating buffer (0x" << error << ")!\n" );
+		return false;
+	}
+
     alGenSources( 1, &sb->source );
     error = alGetError();
-    
-    /* Set buffer data to NULL */
-//    alBufferData( sb->source, audio_format->format, NULL, audio_format->data_size, audio_format->frequency );
-    
+	if( error != AL_NO_ERROR )
+	{
+		release_sound_buffer( sb );
+		DISPDBG( KE_ERROR, "Error creating source (0x" << error << ")!\n" );
+		return false;
+	}
+
     /* Default 3D sound position and velocity */
     memset( sb->position, 0, sizeof( float ) * 3 );
 	memset( sb->velocity, 0, sizeof( float ) * 3 );

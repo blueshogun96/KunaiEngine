@@ -433,17 +433,17 @@ void ke_process_mouse_event( SDL_Event* event )
     
     if( event->type == SDL_MOUSEBUTTONDOWN )
     {
-        /*if( event->button.button == SDL_BUTTON_LEFT || event->button.button == SDL_BUTTON_X1 ) button = 0;
-        if( event->button.button == SDL_BUTTON_RIGHT || event->button.button == SDL_BUTTON_X2 ) button = 1;
-        if( event->button.button == SDL_BUTTON_MIDDLE ) button = 2;*/
+        if( event->button.button == SDL_BUTTON_LEFT ) button = 0;
+        if( event->button.button == SDL_BUTTON_RIGHT ) button = 1;
+        if( event->button.button == SDL_BUTTON_MIDDLE ) button = 2;
         
         mouse.button[button] = Yes;
     }
     if( event->type == SDL_MOUSEBUTTONUP )
     {
-        /*if( event->button.button == SDL_BUTTON_LEFT ) button = 0;
+        if( event->button.button == SDL_BUTTON_LEFT ) button = 0;
         if( event->button.button == SDL_BUTTON_RIGHT ) button = 1;
-        if( event->button.button == SDL_BUTTON_MIDDLE ) button = 2;*/
+        if( event->button.button == SDL_BUTTON_MIDDLE ) button = 2;
         
         mouse.button[button] = No;
     }

@@ -52,7 +52,7 @@
  */
 #define KE_POINTS           0
 #define KE_LINES            1
-#define KE_LINELIST         2
+#define KE_LINESTRIP        2
 #define KE_LINELOOP         3
 #define KE_TRIANGLES        4
 #define KE_TRIANGLESTRIP    5
@@ -72,17 +72,31 @@
 
 
 /*
+ * Buffer usage flags
+ */
+#define KE_USAGE_STATIC_WRITE		0	
+#define KE_USAGE_STATIC_READ		1
+#define KE_USAGE_STATIC_READ_WRITE	2
+#define KE_USAGE_DYNAMIC_WRITE		3
+#define KE_USAGE_DYNAMIC_READ		4
+#define KE_USAGE_DYNAMIC_READ_WRITE	5
+#define KE_USAGE_STREAM_WRITE		6
+#define KE_USAGE_STREAM_READ		7
+#define KE_USAGE_STREAM_READ_WRITE	8
+
+
+/*
  * Renderstate types 
  */
-#define KE_RS_DEPTHTEST     0
-#define KE_RS_DEPTHFUNC     1
-#define KE_RS_DEPTHMASK     2
-#define KE_RS_CLEARDEPTH    3
-#define KE_RS_ALPHABLEND    4
-#define KE_RS_FRONTFACE     5
-#define KE_RS_CULLMODE      6
-#define KE_RS_POLYGONMODE   7
-#define KE_RS_BLENDFUNC     8
+#define KE_RS_DEPTHTEST     1
+#define KE_RS_DEPTHFUNC     2
+#define KE_RS_DEPTHMASK     3
+#define KE_RS_CLEARDEPTH    4
+#define KE_RS_ALPHABLEND    5
+#define KE_RS_FRONTFACE     6
+#define KE_RS_CULLMODE      7
+#define KE_RS_POLYGONMODE   8
+#define KE_RS_BLENDFUNC     9
 
 /*
  * Polygon modes
@@ -104,6 +118,29 @@
 #define KE_CULL_NONE        0
 #define KE_CULL_CW          1
 #define KE_CULL_CCW         2
+
+/*
+ * Blend modes
+ */
+#define KE_ZERO						0
+#define KE_ONE						1
+#define KE_SRC_COLOR				2
+#define KE_INV_SRC_COLOR			3
+#define KE_DST_COLOR				4
+#define KE_INV_DST_COLOR			5
+#define KE_SRC_ALPHA				6
+#define KE_INV_SRC_ALPHA			7
+#define KE_DST_ALPHA				8
+#define KE_INV_DST_ALPHA			9
+#define KE_CONSTANT_COLOR			10
+#define KE_INV_CONSTANT_COLOR		11
+#define KE_CONSTANT_ALPHA			12
+#define KE_INV_CONSTANT_ALPHA		13
+#define KE_SRC_ALPHA_SATURATE		14
+#define KE_SRC1_COLOR				15
+#define KE_INV_SRC1_COLOR			16
+#define KE_SRC1_ALPHA				17
+#define KE_INV_SRC1_ALPHA			18
 
 /*
  * Texture types

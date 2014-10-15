@@ -18,6 +18,7 @@
 #ifdef __cplusplus
 #include <iostream>
 #include <sstream>
+#include <memory>
 #ifndef __ANDROID__	/* Skip these on android devices */
 /*#include <thread>
 #include <mutex>

@@ -14,9 +14,9 @@
 /*
  * Audio device types
  */
-#define KE_AUDIODEVICE_OPENAL   0
-#define KE_AUDIODEVICE_XAUDIO2  1
-#define KE_AUDIODEVICE_DSOUND   2
+#define KE_AUDIODEVICE_OPENAL   1
+#define KE_AUDIODEVICE_XAUDIO2  2
+#define KE_AUDIODEVICE_DSOUND   3
 
 
 /*
@@ -126,5 +126,8 @@ protected:
     float listener_orientation_at[3];
     float listener_orientation_up[3];
 };
+
+
+ke_audiodevice_t* ke_create_audiodevice( ke_audiodevice_desc_t* audiodevice_desc );
 
 #endif /* defined(__ke_audiodevice__) */

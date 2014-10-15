@@ -41,16 +41,6 @@ struct ke_d3d11_geometrybuffer_t : public ke_geometrybuffer_t
 };
 
 /*
-* Universal shader structure
-*/
-struct ke_d3d11_shader_t : public ke_shader_t
-{
-	uint32_t handle;        /* A handle to the GLSL shader */
-	uint32_t type;          /* OpenGL shader type */
-	char     version[32];   /* OpenGL shader version */
-};
-
-/*
 * GPU Program structure
 */
 struct ke_d3d11_gpu_program_t : public ke_gpu_program_t
@@ -69,13 +59,10 @@ struct ke_d3d11_gpu_program_t : public ke_gpu_program_t
 */
 struct ke_d3d11_texture_t : public ke_texture_t
 {
-	uint32_t handle;            /* Handle to the OpenGL texture */
-	uint32_t width, height;     /* Texture width/height */
-	uint32_t depth;             /* Texture depth (for 3D and array textures) */
-	uint32_t depth_format;      /* See glTexImageXD */
-	uint32_t internal_format;   /* See glTexImageXD */
-	uint32_t data_type;         /* Internal data type */
-	uint32_t target;            /* OpenGL texture target */
+	ID3D11Texture1D*	tex1d;
+	ID3D11Texture2D*	tex2d;
+	ID3D11Texture3D*	tex3d;
+	uint32_t			flags;
 };
 
 /*

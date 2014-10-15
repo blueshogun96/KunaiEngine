@@ -6,7 +6,7 @@
 //
 
 #include "ke_ogl_renderdevice.h"
-#include "nvdebug.h"
+#include "ke_debug.h"
 
 
 /*
@@ -54,6 +54,20 @@ uint32_t data_types[] =
     GL_UNSIGNED_INT,
     GL_FLOAT,
     GL_DOUBLE
+};
+
+/* OpenGL buffer usage types */
+uint32_t buffer_usage_types[] = 
+{
+	GL_STATIC_DRAW,
+	GL_STATIC_READ,
+	GL_STATIC_COPY,
+	GL_DYNAMIC_DRAW,
+	GL_DYNAMIC_READ,
+	GL_DYNAMIC_COPY,
+	GL_STREAM_DRAW,
+	GL_STREAM_READ,
+	GL_STREAM_COPY,
 };
 
 /* OpenGL depth/alpha test functions */
@@ -111,6 +125,29 @@ uint32_t cull_modes[] =
     GL_CCW
 };
 
+/* OpenGL blend modes */
+uint32_t blend_modes[] = 
+{
+	 GL_ZERO, 
+	 GL_ONE, 
+	 GL_SRC_COLOR, 
+	 GL_ONE_MINUS_SRC_COLOR, 
+	 GL_DST_COLOR, 
+	 GL_ONE_MINUS_DST_COLOR, 
+	 GL_SRC_ALPHA, 
+	 GL_ONE_MINUS_SRC_ALPHA, 
+	 GL_DST_ALPHA, 
+	 GL_ONE_MINUS_DST_ALPHA, 
+	 GL_CONSTANT_COLOR, 
+	 GL_ONE_MINUS_CONSTANT_COLOR, 
+	 GL_CONSTANT_ALPHA, 
+	 GL_ONE_MINUS_CONSTANT_ALPHA, 
+	 GL_SRC_ALPHA_SATURATE, 
+	 GL_SRC1_COLOR, 
+	 GL_ONE_MINUS_SRC1_COLOR, 
+	 GL_SRC1_ALPHA, 
+	 GL_ONE_MINUS_SRC1_ALPHA
+};
 
 /*
  * Name: ke_initialize_default_shaders
@@ -306,7 +343,9 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     initialized = Yes;
     
     /* Print OpenGL driver/implementation details */
-    DISPDBG( 1, "OpenGL Vendor: " << glGetString( GL_VENDOR ) << "\nOpenGL Version: " << glGetString( GL_VERSION ) << "\nOpenGL Renderer: " << glGetString( GL_RENDERER ) << "\n" );
+    DISPDBG( 1, "\n\tOpenGL Vendor: " << glGetString( GL_VENDOR ) << 
+		"\n\tOpenGL Version: " << glGetString( GL_VERSION ) << 
+		"\n\tOpenGL Renderer: " << glGetString( GL_RENDERER ) << "\n" );
 }
 
 
@@ -432,7 +471,7 @@ void ke_ogl_renderdevice_t::swap()
 bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* va, ke_geometrybuffer_t** geometry_buffer )
 {
     GLenum error = glGetError();
-    
+
     /* Sanity check(s) */
     if( !geometry_buffer )
         return false;
@@ -444,6 +483,8 @@ bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t 
     *geometry_buffer = new ke_ogl_geometrybuffer_t;
     ke_ogl_geometrybuffer_t* gb = static_cast<ke_ogl_geometrybuffer_t*>( *geometry_buffer );
     
+	/* Enumerate buffer usage flags */
+
     /* Create a vertex array object */
     glGenVertexArrays( 1, &gb->vao );
     error = glGetError();
@@ -457,7 +498,7 @@ bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t 
     
     /* Set the vertex buffer data */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
-    glBufferData( GL_ARRAY_BUFFER, vertex_data_size, vertex_data, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, vertex_data_size, vertex_data, buffer_usage_types[flags] );
     error = glGetError();
      
 	/* Set the vertex attributes for this geometry buffer */
@@ -481,7 +522,7 @@ bool ke_ogl_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t 
         error = glGetError();
         
         /* Set the index buffer data */
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, index_data_size, index_data, GL_STATIC_DRAW );
+        glBufferData( GL_ELEMENT_ARRAY_BUFFER, index_data_size, index_data, buffer_usage_types[flags] );
         gb->index_type = index_data_type;
     }
     
@@ -1202,7 +1243,7 @@ void ke_ogl_renderdevice_t::set_render_states( ke_state_t* states )
                 break;
                 
             case KE_RS_BLENDFUNC:
-                glBlendFunc( states[i].param1, states[i].param2 );
+                glBlendFunc( blend_modes[states[i].param1], blend_modes[states[i].param2] );
                 break;
                 
             case KE_RS_CULLMODE:
@@ -1214,7 +1255,7 @@ void ke_ogl_renderdevice_t::set_render_states( ke_state_t* states )
                 break;
                 
             default:
-                DISPDBG( 2, "Bad render state!\nstate: " << states[i].state << "\n"
+                DISPDBG( KE_WARNING, "Bad render state!\nstate: " << states[i].state << "\n"
                             "param1: " << states[i].param1 << "\n"
                             "param2: " << states[i].param2 << "\n"
                             "param3: " << states[i].param3 << "\n"

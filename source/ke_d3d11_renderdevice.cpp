@@ -206,7 +206,8 @@ ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t(ke_renderdevice_desc_t* renderd
 	memmove( device_desc, renderdevice_desc, sizeof(ke_renderdevice_desc_t));
 
 	/* Verify device type */
-	if( device_desc->device_type == KE_RENDERDEVICE_OGL3 || device_desc->device_type == KE_RENDERDEVICE_OGLES2 || device_desc->device_type == KE_RENDERDEVICE_OGLES3 || device_desc->device_type == KE_RENDERDEVICE_OGL4 )
+	if( device_desc->device_type == KE_RENDERDEVICE_OGL3 || device_desc->device_type == KE_RENDERDEVICE_OGLES2 || 
+		device_desc->device_type == KE_RENDERDEVICE_OGLES3 || device_desc->device_type == KE_RENDERDEVICE_OGL4 )
 		return;
 
 	/* Initialize SDL video */
@@ -242,7 +243,7 @@ ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t(ke_renderdevice_desc_t* renderd
 	swapchain_desc.BufferCount = renderdevice_desc->buffer_count;
     swapchain_desc.BufferDesc.Width = renderdevice_desc->width;
     swapchain_desc.BufferDesc.Height = renderdevice_desc->height;
-    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     swapchain_desc.BufferDesc.RefreshRate.Numerator = renderdevice_desc->refresh_rate;
     swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -253,6 +254,8 @@ ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t(ke_renderdevice_desc_t* renderd
 
 	HRESULT hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
 		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
+	if( FAILED( hr ) )
+		return;
 
 	/* Create our render target view */
 	ID3D11Texture2D* back_buffer = NULL;

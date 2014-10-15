@@ -20,7 +20,6 @@
 #include <GL/wglew.h>
 #endif
 
-
 #ifndef BUFFER_OFFSET
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #endif

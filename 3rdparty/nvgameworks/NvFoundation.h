@@ -389,7 +389,7 @@ template <class T> NV_CUDA_CALLABLE NV_INLINE void NV_UNUSED(T const&) {}
 
 typedef struct NvPackValidation { char _; long long a; } NvPackValidation;
 
-#if !defined(NV_APPLE)
+#if !defined(NV_APPLE) && !defined(_WIN32)
 NV_COMPILE_TIME_ASSERT(NV_OFFSET_OF(NvPackValidation, a) == 8);
 #endif
 

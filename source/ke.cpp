@@ -98,6 +98,19 @@ void ke_destroy_window_and_device( ke_renderdevice_t* device )
  */
 bool ke_create_audio_device( ke_audiodevice_desc_t* device_desc, ke_audiodevice_t** device )
 {
+	 /* Sanity check */
+    if( !device )
+        return false;
+    
+    /* Create the device and rendering window */
+    (*device) = ke_create_audiodevice( device_desc );
+    if( !(*device) )
+        return false;
+    
+    /* Confirm that this device was created successfully */
+    if( !(*device)->confirm_device() )
+        return false;
+    
     return true;
 }
 
@@ -107,7 +120,8 @@ bool ke_create_audio_device( ke_audiodevice_desc_t* device_desc, ke_audiodevice_
  */
 void ke_destroy_audio_device( ke_audiodevice_t* device )
 {
-    
+	/* Destroy the audio device */
+	delete device;
 }
 
 /*
