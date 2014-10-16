@@ -13,9 +13,13 @@
 /*
  * OpenAL extension functions
  */
+#if defined(__APPLE__) && defined(__MOBILE_OS__)
+/* TODO: Extensions for iOS */
+#else
 LPALGENEFFECTS      alGenEffects = NULL;
 LPALDELETEEFFECTS   alDeleteEffects = NULL;
 LPALISEFFECT        alIsEffect = NULL;
+#endif
 
 
 
@@ -41,6 +45,8 @@ ke_al_audiodevice_t::ke_al_audiodevice_t( ke_audiodevice_desc_t* audiodevice_des
     
     DISPDBG( 1, "alcOpenDevice() = OK\n" );
     
+#if defined(__APPLE__) && defined(__MOBILE_OS__)
+#else
     /* Does the user want to initialize EFX? */
     if( audiodevice_desc->aux_sends != 0 )
     {
@@ -59,6 +65,7 @@ ke_al_audiodevice_t::ke_al_audiodevice_t( ke_audiodevice_desc_t* audiodevice_des
         
         /* TODO: More? */
     }
+#endif
     
     /* Create an OpenAL context */
 	context = alcCreateContext( device, audiodevice_desc->aux_sends == 0 ? NULL : attributes );
@@ -81,6 +88,8 @@ ke_al_audiodevice_t::ke_al_audiodevice_t( ke_audiodevice_desc_t* audiodevice_des
 	/* Clear the error bit (why doesn't OpenAL do this for us?) */
 	alGetError();
     
+#if defined(__APPLE__) && defined(__MOBILE_OS__)
+#else
     /* Verify that we get the desired number of auxiliry sends */
     if( audiodevice_desc->aux_sends != 0 )
     {
@@ -92,6 +101,7 @@ ke_al_audiodevice_t::ke_al_audiodevice_t( ke_audiodevice_desc_t* audiodevice_des
         else
             DISPDBG( 1, "Max auxiliary sends: " << sends << "\n" );
     }
+#endif
     
 	/* Print OpenAL driver/implementation details */
     DISPDBG( 1, "\n\tOpenAL Vendor: " << alGetString( AL_VENDOR ) << 

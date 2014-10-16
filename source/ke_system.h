@@ -9,7 +9,7 @@
 #define __ke_system__
 
 #include "ke_platform.h"
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(__MOBILE_OS__)
 #include <SDL2/SDL.h>
 #else
 #include <SDL.h>

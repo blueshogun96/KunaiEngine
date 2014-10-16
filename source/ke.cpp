@@ -7,7 +7,7 @@
 
 #include "ke.h"
 #include "ke_system.h"
-#include "nvdebug.h"
+#include "ke_debug.h"
 
 
 NVDebug* dbg = NULL;

@@ -9,15 +9,23 @@
 #define __ke_al_audiodevice__
 
 #ifdef __APPLE__
+#ifndef __MOBILE_OS__
 #include <OpenAL-Soft/al.h>
 #include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/alext.h>
+#else
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#include <OpenAL/oalMacOSX_OALExtensions.h>
+#include <OpenAL/oalStaticBufferExtension.h>
+#endif
 #else
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alext.h>
 #endif
 #include "ke_audiodevice.h"
+
 
 
 /* 

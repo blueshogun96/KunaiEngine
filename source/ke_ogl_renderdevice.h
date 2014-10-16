@@ -10,10 +10,16 @@
 
 #include "ke_renderdevice.h"
 #ifdef __APPLE__
-#include <SDL2/SDL.h>
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/gl3.h>
-#include <OpenGL/gl3ext.h>
+ #ifdef __MOBILE_OS__
+  #include <SDL.h>
+  #include <OpenGLES/ES2/gl.h>
+  #include <OpenGLES/ES2/glext.h>
+ #else
+  #include <SDL2/SDL.h>
+  #include <OpenGL/OpenGL.h>
+  #include <OpenGL/gl3.h>
+  #include <OpenGL/gl3ext.h>
+ #endif
 #else
 #include <SDL.h>
 #include <GL/glew.h>
