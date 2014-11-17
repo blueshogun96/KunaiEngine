@@ -45,6 +45,10 @@
 #define KE_VA_TEXTURE1          6
 #define KE_VA_TEXTURE2          7
 #define KE_VA_TEXTURE3          8
+#define KE_VA_TEXTURE4          8
+#define KE_VA_TEXTURE5          8
+#define KE_VA_TEXTURE6          8
+#define KE_VA_TEXTURE7          8
 
 
 /*
