@@ -165,9 +165,9 @@ public:
 	virtual void set_pixel_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
 	virtual void set_geometry_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
 	virtual void set_tesselation_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer );
-    virtual bool create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture );
-    virtual bool create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture );
-    virtual bool create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture );
+    virtual bool create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels = NULL );
+    virtual bool create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels = NULL );
+    virtual bool create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels = NULL );
     virtual void delete_texture( ke_texture_t* texture );
     virtual void set_texture_data_1d( int offsetx, int width, int miplevel, void* pixels, ke_texture_t* texture );
     virtual void set_texture_data_2d( int offsetx, int offsety, int width, int height, int miplevel, void* pixels,  ke_texture_t* texture );

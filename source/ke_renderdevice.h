@@ -161,6 +161,7 @@
  */
 #define KE_TEXTUREFORMAT_RGBA   0
 #define KE_TEXTUREFORMAT_BGRA   1
+#define KE_TEXTUREFORMAT_R8		2
 
 
 
@@ -295,9 +296,9 @@ public:
 	virtual void set_pixel_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
 	virtual void set_geometry_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
 	virtual void set_tesselation_shader_constant_buffer( int slot, ke_constantbuffer_t* constant_buffer ) PURE;
-    virtual bool create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture ) PURE;
-    virtual bool create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture ) PURE;
-    virtual bool create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture ) PURE;
+    virtual bool create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels = NULL ) PURE;
+    virtual bool create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels = NULL ) PURE;
+    virtual bool create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels = NULL ) PURE;
     virtual void delete_texture( ke_texture_t* texture ) PURE;
     virtual void set_texture_data_1d( int offsetx, int width, int miplevel, void* pixels, ke_texture_t* texture ) PURE;
     virtual void set_texture_data_2d( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, ke_texture_t* texture ) PURE;
@@ -341,6 +342,7 @@ protected:
     Matrix4                 projection_matrix;
     ke_geometrybuffer_t*    current_geometrybuffer;
     ke_gpu_program_t*       current_gpu_program;
+	ke_texture_t*			current_texture[8];
     ke_vertexattribute_t    current_vertexattribute[32];
 };
 

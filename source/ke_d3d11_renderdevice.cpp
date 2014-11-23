@@ -884,7 +884,7 @@ void ke_d3d11_renderdevice_t::set_tesselation_shader_constant_buffer( int slot, 
 * Name: ke_d3d11_renderdevice::create_texture_1d
 * Desc: Creates a 1D texture.
 */
-bool ke_d3d11_renderdevice_t::create_texture_1d(uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture)
+bool ke_d3d11_renderdevice_t::create_texture_1d(uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels)
 {
 	/* Allocate a new texture */
 	*texture = new ke_d3d11_texture_t;
@@ -905,7 +905,7 @@ bool ke_d3d11_renderdevice_t::create_texture_1d(uint32_t target, int width, int 
 * Name: ke_d3d11_renderdevice::create_texture_2d
 * Desc: Creates a blank 2D texture.
 */
-bool ke_d3d11_renderdevice_t::create_texture_2d(uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture)
+bool ke_d3d11_renderdevice_t::create_texture_2d(uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels)
 {
 	/* Allocate a new texture */
 	(*texture) = new ke_d3d11_texture_t;
@@ -927,7 +927,7 @@ bool ke_d3d11_renderdevice_t::create_texture_2d(uint32_t target, int width, int 
 * Name: ke_d3d11_renderdevice::create_texture_3d
 * Desc: Creates a blank 3D texture.
 */
-bool ke_d3d11_renderdevice_t::create_texture_3d(uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture)
+bool ke_d3d11_renderdevice_t::create_texture_3d(uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels)
 {
 	/* Allocate a new texture */
 	(*texture) = new ke_d3d11_texture_t;

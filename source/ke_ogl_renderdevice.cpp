@@ -114,7 +114,14 @@ uint32_t fill_modes[] =
 uint32_t texture_formats[] =
 {
     GL_RGBA,
-    GL_BGRA
+    GL_BGRA,
+	GL_RED
+};
+uint32_t internal_texture_formats[] = 
+{
+	GL_RGBA,
+	GL_BGRA,
+	GL_R8,
 };
 
 /* OpenGL cull modes */
@@ -339,6 +346,16 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     /* Nullify current geometry buffer */
     current_geometrybuffer = NULL;
     
+	/* Nullify texture stages */
+	current_texture[0] = nullptr;
+	current_texture[1] = nullptr;
+	current_texture[2] = nullptr;
+	current_texture[3] = nullptr;
+	current_texture[4] = nullptr;
+	current_texture[5] = nullptr;
+	current_texture[6] = nullptr;
+	current_texture[7] = nullptr;
+
     /* Mark as initialized */
     initialized = Yes;
     
@@ -910,7 +927,7 @@ void ke_ogl_renderdevice_t::set_tesselation_shader_constant_buffer( int slot, ke
  * Name: ke_ogl_renderdevice::create_texture_1d
  * Desc: Creates a 1D texture.
  */
-bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture )
+bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels )
 {
     GLenum error = glGetError();
     
@@ -920,11 +937,10 @@ bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int m
     
     /* Set texture attributes */
     t->width = width;
-    t->target = target;
+    t->target = texture_targets[target];
     t->data_type = data_types[data_type];
     t->depth_format = texture_formats[format];
-    t->internal_format = texture_formats[format];
-    t->target = target;
+    t->internal_format = internal_texture_formats[format];
     
     /* Use OpenGL to create a new 1D texture */
     glGenTextures( 1, &t->handle );
@@ -932,13 +948,13 @@ bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int m
     error = glGetError();
     
     /* Set the initial texture attributes */
-    glTexImage1D( t->target, 0, texture_formats[format], width, 0, texture_formats[format], data_types[data_type], NULL );
+    glTexImage1D( t->target, 0, internal_texture_formats[format], width, 0, texture_formats[format], data_types[data_type], pixels );
     error = glGetError();
     
     /* Set texture parameters */
-    glTexParameteri( target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     error = glGetError();
-    glTexParameteri( target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     error = glGetError();
     
     return true;
@@ -948,7 +964,7 @@ bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int m
  * Name: ke_ogl_renderdevice::create_texture_2d
  * Desc: Creates a blank 2D texture.
  */
-bool ke_ogl_renderdevice_t::create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture )
+bool ke_ogl_renderdevice_t::create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels )
 {
     GLenum error = glGetError();
     
@@ -959,11 +975,10 @@ bool ke_ogl_renderdevice_t::create_texture_2d( uint32_t target, int width, int h
     /* Set texture attributes */
     t->width = width;
     t->height = height;
-    t->target = target;
+    t->target = texture_targets[target];
     t->data_type = data_types[data_type];
     t->depth_format = texture_formats[format];
-    t->internal_format = texture_formats[format];
-    t->target = target;
+    t->internal_format = internal_texture_formats[format];
     
     /* Use OpenGL to create a new 2D texture */
     glGenTextures( 1, &t->handle );
@@ -971,13 +986,13 @@ bool ke_ogl_renderdevice_t::create_texture_2d( uint32_t target, int width, int h
     error = glGetError();
     
     /* Set the initial texture attributes */
-    glTexImage2D( t->target, 0, texture_formats[format], width, height, 0, texture_formats[format], data_types[data_type], NULL );
+    glTexImage2D( t->target, 0, internal_texture_formats[format], width, height, 0, texture_formats[format], data_types[data_type], pixels );
     error = glGetError();
     
     /* Set texture parameters */
-    glTexParameteri( target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     error = glGetError();
-    glTexParameteri( target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     error = glGetError();
     
     return true;
@@ -987,7 +1002,7 @@ bool ke_ogl_renderdevice_t::create_texture_2d( uint32_t target, int width, int h
  * Name: ke_ogl_renderdevice::create_texture_3d
  * Desc: Creates a blank 3D texture.
  */
-bool ke_ogl_renderdevice_t::create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture )
+bool ke_ogl_renderdevice_t::create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels )
 {
     GLenum error = glGetError();
     
@@ -999,11 +1014,10 @@ bool ke_ogl_renderdevice_t::create_texture_3d( uint32_t target, int width, int h
     t->width = width;
     t->height = height;
     t->depth = depth;
-    t->target = target;
+    t->target = texture_targets[target];
     t->data_type = data_types[data_type];
     t->depth_format = texture_formats[format];
-    t->internal_format = texture_formats[format];
-    t->target = target;
+    t->internal_format = internal_texture_formats[format];
     
     /* Use OpenGL to create a new 3D texture */
     glGenTextures( 1, &t->handle );
@@ -1011,13 +1025,13 @@ bool ke_ogl_renderdevice_t::create_texture_3d( uint32_t target, int width, int h
     error = glGetError();
     
     /* Set the initial texture attributes */
-    glTexImage3D( t->target, 0, texture_formats[format], width, height, depth, 0, texture_formats[format], data_types[data_type], NULL );
+    glTexImage3D( t->target, 0, internal_texture_formats[format], width, height, depth, 0, texture_formats[format], data_types[data_type], pixels );
     error = glGetError();
     
     /* Set texture parameters */
-    glTexParameteri( target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     error = glGetError();
-    glTexParameteri( target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     error = glGetError();
     
     return true;
@@ -1052,19 +1066,23 @@ void ke_ogl_renderdevice_t::set_texture_data_1d( int offsetx, int width, int mip
 
 /*
  * Name: ke_ogl_renderdevice_t::set_texture_data_2d
- * Desc: Sets pixel data for a 1D texture.
+ * Desc: Sets pixel data for a 2D texture.
  */
 void ke_ogl_renderdevice_t::set_texture_data_2d( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, ke_texture_t* texture )
 {
+	GLenum error = glGetError( );
     ke_ogl_texture_t* t = static_cast<ke_ogl_texture_t*>( texture );
     
-    glTexSubImage2D( t->target, miplevel, offsetx, offsety, width, height, t->internal_format, t->data_type, pixels );
-    GLenum error = glGetError();
+	//glEnable( t->target );
+	glBindTexture( t->target, t->handle );
+    glTexSubImage2D( t->target, miplevel, offsetx, offsety, width, height, t->depth_format, t->data_type, pixels );
+	error = glGetError();
+	glBindTexture( t->target, 0 );
 }
 
 /*
  * Name: ke_ogl_renderdevice_t::set_texture_data_3d
- * Desc: Sets pixel data for a 1D texture.
+ * Desc: Sets pixel data for a 3D texture.
  */
 void ke_ogl_renderdevice_t::set_texture_data_3d( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, ke_texture_t* texture )
 {
@@ -1171,6 +1189,9 @@ void ke_ogl_renderdevice_t::set_texture( int stage, ke_texture_t* texture )
 {
     ke_ogl_texture_t* tex = static_cast<ke_ogl_texture_t*>(texture);
     
+	/* Save this texture as the active texture for this unit */
+	current_texture[stage] = tex;
+
     /* Select the currently active texture stage */
     glActiveTexture( GL_TEXTURE0 + stage );
     
@@ -1178,7 +1199,7 @@ void ke_ogl_renderdevice_t::set_texture( int stage, ke_texture_t* texture )
     if( texture )
     {
         glEnable( tex->target );
-        glBindTexture( tex->target, tex->target );
+        glBindTexture( tex->target, tex->handle );
     }
     else
     {
