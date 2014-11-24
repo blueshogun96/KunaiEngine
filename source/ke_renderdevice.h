@@ -103,6 +103,15 @@
 #define KE_RS_BLENDFUNC     9
 
 /*
+ * Texturestate types
+ */
+#define KE_TS_MAGFILTER     1
+#define KE_TS_MINFILTER     2
+#define KE_TS_WRAPU         4
+#define KE_TS_WRAPV         5
+#define KE_TS_WRAPW         6
+
+/*
  * Polygon modes
  */
 #define KE_FRONT            0
@@ -163,6 +172,24 @@
 #define KE_TEXTUREFORMAT_BGRA   1
 #define KE_TEXTUREFORMAT_R8		2
 
+/*
+ * Texture filtering modes
+ */
+#define KE_TEXTUREFILTER_NEAREST                    0
+#define KE_TEXTUREFILTER_LINEAR                     1
+#define KE_TEXTUREFILTER_NEAREST_MIPMAP_NEAREST     2
+#define KE_TEXTUREFILTER_LINEAR_MIPMAP_NEAREST      3
+#define KE_TEXTUREFILTER_NEAREST_MIPMAP_LINEAR      4
+#define KE_TEXTUREFILTER_LINEAR_MIPMAP_LINEAR       5
+
+/*
+ * Texture wrap modes
+ */
+#define KE_REPEAT           0
+#define KE_CLAMP            1
+#define KE_CLAMP_TO_EDGE    2
+#define KE_CLAMP_TO_BORDER  3
+#define KE_MIRRORED_REPEAT  4
 
 
 /*

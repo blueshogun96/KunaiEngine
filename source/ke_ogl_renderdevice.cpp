@@ -149,11 +149,26 @@ uint32_t blend_modes[] =
 	 GL_ONE_MINUS_CONSTANT_COLOR, 
 	 GL_CONSTANT_ALPHA, 
 	 GL_ONE_MINUS_CONSTANT_ALPHA, 
-	 GL_SRC_ALPHA_SATURATE, 
-	 GL_SRC1_COLOR, 
+	 GL_SRC_ALPHA_SATURATE,
+#ifndef __APPLE__
+	 GL_SRC1_COLOR,
 	 GL_ONE_MINUS_SRC1_COLOR, 
 	 GL_SRC1_ALPHA, 
 	 GL_ONE_MINUS_SRC1_ALPHA
+#else
+    0, 0, 0, 0
+#endif
+};
+
+/* OpenGL texture filtering modes */
+uint32_t texture_filter_modes[] =
+{
+    GL_NEAREST,
+    GL_LINEAR,
+    GL_NEAREST_MIPMAP_NEAREST,
+    GL_LINEAR_MIPMAP_NEAREST
+    GL_LINEAR_MIPMAP_NEAREST,
+    GL_LINEAR_MIPMAP_LINEAR
 };
 
 /*
@@ -952,9 +967,9 @@ bool ke_ogl_renderdevice_t::create_texture_1d( uint32_t target, int width, int m
     error = glGetError();
     
     /* Set texture parameters */
-    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     error = glGetError();
-    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     error = glGetError();
     
     return true;
@@ -1029,9 +1044,9 @@ bool ke_ogl_renderdevice_t::create_texture_3d( uint32_t target, int width, int h
     error = glGetError();
     
     /* Set texture parameters */
-    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     error = glGetError();
-    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     error = glGetError();
     
     return true;
@@ -1296,7 +1311,30 @@ void ke_ogl_renderdevice_t::set_render_states( ke_state_t* states )
  */
 void ke_ogl_renderdevice_t::set_sampler_states( ke_state_t* states )
 {
+    int i = 0;
     
+    while( states[i].state != -1 )
+    {
+        switch( states[i].state )
+        {
+            case KE_TS_MAGFILTER:
+                glTexParameteri( texture_targets[states[i].param1], GL_TEXTURE_MAG_FILTER, texture_filter_modes[states[i].param2] );
+                break;
+                
+            case KE_TS_MINFILTER:
+                glTexParameteri( texture_targets[states[i].param1], GL_TEXTURE_MIN_FILTER, texture_filter_modes[states[i].param2] );
+                break;
+                
+            default:
+                DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << states[i].state << "\n"
+                        "param1: " << states[i].param1 << "\n"
+                        "param2: " << states[i].param2 << "\n"
+                        "param3: " << states[i].param3 << "\n"
+                        "fparam: " << states[i].fparam << "\n"
+                        "dparam: " << states[i].dparam << "\n" );
+                break;
+        }
+    }
 }
 
 /*void ke_ogl_renderdevice_t::draw_vertices_im()
