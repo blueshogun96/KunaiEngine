@@ -25,8 +25,10 @@ bool ke_initialize();
 void ke_uninitialize();
 bool ke_create_window_and_device( ke_renderdevice_desc_t* device_desc, ke_renderdevice_t** device );
 void ke_destroy_window_and_device( ke_renderdevice_t* device );
+ke_renderdevice_t* ke_get_render_device( void );
 bool ke_create_audio_device( ke_audiodevice_desc_t* device_desc, ke_audiodevice_t** device );
 void ke_destroy_audio_device( ke_audiodevice_t* device );
+ke_audiodevice_t* ke_get_audio_device( void );
 
 /* 
  * Inhereted resource allocation 

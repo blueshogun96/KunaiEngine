@@ -10,7 +10,10 @@
 #include "ke_debug.h"
 
 
-NVDebug* dbg = NULL;
+NVDebug*			dbg = nullptr;				/* Debug log */
+ke_renderdevice_t*	renderdevice = nullptr;		/* Copy of the rendering device */
+ke_audiodevice_t*	audiodevice = nullptr;		/* Copy of the audio device */
+
 
 
 /*
@@ -79,17 +82,32 @@ bool ke_create_window_and_device( ke_renderdevice_desc_t* device_desc, ke_render
     if( !(*device)->confirm_device() )
         return false;
     
+	/* Save a copy of the rendering device */
+	renderdevice = (*device);
+
     return true;
 }
 
 /*
  * Name: ke_destroy_window_and_device
- * Desc:
+ * Desc: Deletes this render device, uninitializes our window and shuts down the
+ *		 chosen rendering API.
  */
 void ke_destroy_window_and_device( ke_renderdevice_t* device )
 {
     /* Destroy the device and unitialize SDL's video component or Direct3D */
     delete device;
+
+	renderdevice = nullptr;
+}
+
+/*
+ * Name: ke_get_render_device
+ * Desc: Returns a copy of the previously created render device.
+ */
+ke_renderdevice_t* ke_get_render_device( void )
+{
+	return renderdevice;
 }
 
 /*
@@ -111,17 +129,31 @@ bool ke_create_audio_device( ke_audiodevice_desc_t* device_desc, ke_audiodevice_
     if( !(*device)->confirm_device() )
         return false;
     
+	/* Save a copy of the audio device */
+	audiodevice = (*device);
+
     return true;
 }
 
 /*
- * Name:
- * Desc:
+ * Name: ke_destroy_audio_device
+ * Desc: Deletes this audio device and shuts down the chosen audio API.
  */
 void ke_destroy_audio_device( ke_audiodevice_t* device )
 {
 	/* Destroy the audio device */
 	delete device;
+
+	audiodevice = nullptr;
+}
+
+/*
+ * Name: ke_get_audio_device
+ * Desc: Returns a copy of the previously created audio device.
+ */
+ke_audiodevice_t* ke_get_audio_device( void )
+{
+	return audiodevice;
 }
 
 /*
