@@ -377,7 +377,22 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     /* Print OpenGL driver/implementation details */
     DISPDBG( 1, "\n\tOpenGL Vendor: " << glGetString( GL_VENDOR ) << 
 		"\n\tOpenGL Version: " << glGetString( GL_VERSION ) << 
-		"\n\tOpenGL Renderer: " << glGetString( GL_RENDERER ) << "\n" );
+		"\n\tOpenGL Renderer: " << glGetString( GL_RENDERER ) <<
+        "\n\tGLSL Version:" << glGetString( GL_SHADING_LANGUAGE_VERSION ) << "\n" );
+    
+    /* Print a list of available OpenGL extensions for this OpenGL implementation */
+    int extension_count, i = 0;
+    
+    glGetIntegerv( GL_NUM_EXTENSIONS, &extension_count );
+    
+    DISPDBG( 1, "\n\tOpenGL Extensions:\n" );
+    while( i < extension_count )
+    {
+        const char* str = (const char*) glGetStringi( GL_EXTENSIONS, i );
+        DISPDBG( 1, "\t\t" << str << std::endl );
+        
+        i++;
+    }
 }
 
 
@@ -1562,4 +1577,16 @@ void ke_ogl_renderdevice_t::set_swap_interval( int swap_interval )
 int ke_ogl_renderdevice_t::get_swap_interval()
 {
     return SDL_GL_GetSwapInterval();
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::gpu_memory_info
+ * Desc: Returns the amound of available and total video memory of this machine.
+ * NOTE: The OpenGL version of this API is dependent on the availability of certain extensions
+ *       that expose this.  This is not guaranteed to be supported for all platforms.
+ */
+void ke_ogl_renderdevice_t::gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory )
+{
+#ifndef __APPLE__
+#endif
 }

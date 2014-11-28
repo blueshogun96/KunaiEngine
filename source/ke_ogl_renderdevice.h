@@ -197,6 +197,9 @@ public:
     virtual void set_swap_interval( int swap_interval );
     virtual int get_swap_interval();
     
+    /* Misc */
+    virtual void gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory ) PURE;
+    
 protected:
     SDL_GLContext context;
     SDL_Window* window;

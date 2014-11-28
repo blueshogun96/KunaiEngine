@@ -356,6 +356,9 @@ public:
     virtual void set_swap_interval( int swap_interval ) PURE;
     virtual int get_swap_interval() PURE;
     
+    /* Misc */
+    virtual void gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory ) PURE;
+    
 protected:
     bool                    initialized;
     float                   clear_colour[4];
