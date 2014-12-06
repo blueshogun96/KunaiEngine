@@ -192,7 +192,7 @@ ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t()
 * Name: ke_d3d11_renderdevice::ke_d3d11_renderdevice
 * Desc: Appropriate constructor used for initialization of Direct3D and a window via SDL.
 */
-ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t(ke_renderdevice_desc_t* renderdevice_desc)
+ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t( ke_renderdevice_desc_t* renderdevice_desc ) : swap_interval(0)
 {
 	/* Until we are finished initializing, mark this flag as false */
 	initialized = false;
@@ -211,13 +211,13 @@ ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t(ke_renderdevice_desc_t* renderd
 		return;
 
 	/* Initialize SDL video */
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO) != 0)
+	if( SDL_InitSubSystem( SDL_INIT_VIDEO ) != 0 )
 		return;
 
 	/* Initialize the SDL window */
-	window = SDL_CreateWindow("Kunai Engine 0.1a", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		device_desc->width, device_desc->height, SDL_WINDOW_SHOWN);
-	if (!window)
+	window = SDL_CreateWindow( "Kunai Engine 0.1a", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		device_desc->width, device_desc->height, SDL_WINDOW_SHOWN );
+	if( !window )
 		return;
 
 	/* Initialize Direct3D11 */
@@ -280,8 +280,12 @@ ke_d3d11_renderdevice_t::ke_d3d11_renderdevice_t(ke_renderdevice_desc_t* renderd
     vp.TopLeftY = 0;
     d3ddevice_context->RSSetViewports( 1, &vp );
 
-	/* Initialize default OpenGL vertex and fragment program */
-	ke_d3d11_initialize_default_shaders();
+	/* Get DXGI output */
+	if( FAILED( hr = dxgi_swap_chain->GetContainingOutput( &dxgi_output ) ) )
+	{
+		DISPDBG( KE_WARNING, "IDXGISwapChain::GetContainingOutput returned (0x" + hr );
+		dxgi_output = nullptr;
+	}
 
 	/* Set vertex attributes to their defaults */
 	current_vertexattribute[0].index = 0;
@@ -315,6 +319,8 @@ ke_d3d11_renderdevice_t::~ke_d3d11_renderdevice_t()
 	ke_d3d11_uninitialize_default_shaders();
 
 	/* Uninitialize and close Direct3D and SDL */
+	if( dxgi_output )
+		dxgi_output->Release();
 	if( d3ddevice_context )
 		d3ddevice_context->ClearState();
 	if( d3d_render_target_view )
@@ -325,8 +331,9 @@ ke_d3d11_renderdevice_t::~ke_d3d11_renderdevice_t()
 		d3ddevice_context->Release();
 	if( d3ddevice )
 		d3ddevice->Release();
-	SDL_DestroyWindow(window);
-	SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+	SDL_DestroyWindow( window );
+	SDL_QuitSubSystem( SDL_INIT_VIDEO );
 }
 
 
@@ -343,7 +350,7 @@ bool ke_d3d11_renderdevice_t::confirm_device()
 * Name: ke_d3d11_renderdevice_t::get_device_desc
 * Desc: Returns a copy of the device description structure
 */
-void ke_d3d11_renderdevice_t::get_device_desc(ke_renderdevice_desc_t* device_desc)
+void ke_d3d11_renderdevice_t::get_device_desc( ke_renderdevice_desc_t* device_desc )
 {
 	memmove( device_desc, this->device_desc, sizeof( ke_renderdevice_desc_t ) );
 }
@@ -352,7 +359,7 @@ void ke_d3d11_renderdevice_t::get_device_desc(ke_renderdevice_desc_t* device_des
 * Name: ke_d3d11_renderdevice::set_clear_colour_fv
 * Desc: Sets the clear colour
 */
-void ke_d3d11_renderdevice_t::set_clear_colour_fv(float* colour)
+void ke_d3d11_renderdevice_t::set_clear_colour_fv( float* colour )
 {
 	memcpy( this->clear_colour, colour, sizeof(float)*4 );
 }
@@ -362,7 +369,7 @@ void ke_d3d11_renderdevice_t::set_clear_colour_fv(float* colour)
 * Name: ke_d3d11_renderdevice::set_clear_colour_ubv
 * Desc: Same as above.
 */
-void ke_d3d11_renderdevice_t::set_clear_colour_ubv(uint8_t* colour)
+void ke_d3d11_renderdevice_t::set_clear_colour_ubv( uint8_t* colour )
 {
 	this->clear_colour[0] = float(colour[0] / 255);
 	this->clear_colour[1] = float(colour[1] / 255);
@@ -375,7 +382,7 @@ void ke_d3d11_renderdevice_t::set_clear_colour_ubv(uint8_t* colour)
 * Name: ke_d3d11_renderdevice::set_clear_depth
 * Desc:
 */
-void ke_d3d11_renderdevice_t::set_clear_depth(float depth)
+void ke_d3d11_renderdevice_t::set_clear_depth( float depth )
 {
 	//glClearDepth(depth);
 }
@@ -387,9 +394,7 @@ void ke_d3d11_renderdevice_t::set_clear_depth(float depth)
 */
 void ke_d3d11_renderdevice_t::clear_colour_buffer()
 {
-	d3ddevice_context->ClearRenderTargetView(d3d_render_target_view, clear_colour);
-	/*if( FAILED( hr ) )
-		DISPDBG( 1, "ID3D11DeviceContext::ClearRenderTargetView(): Error = 0x" << hr << "\n" );*/
+	d3ddevice_context->ClearRenderTargetView( d3d_render_target_view, clear_colour );
 }
 
 
@@ -399,7 +404,7 @@ void ke_d3d11_renderdevice_t::clear_colour_buffer()
 */
 void ke_d3d11_renderdevice_t::clear_depth_buffer()
 {
-	//d3ddevice_context->ClearDepthStencilView()
+	
 }
 
 
@@ -409,7 +414,7 @@ void ke_d3d11_renderdevice_t::clear_depth_buffer()
 */
 void ke_d3d11_renderdevice_t::clear_stencil_buffer()
 {
-	//glClear(GL_STENCIL_BUFFER_BIT);
+	
 }
 
 
@@ -419,7 +424,7 @@ void ke_d3d11_renderdevice_t::clear_stencil_buffer()
 */
 void ke_d3d11_renderdevice_t::swap()
 {
-	HRESULT hr = dxgi_swap_chain->Present(0, 0);
+	HRESULT hr = dxgi_swap_chain->Present( swap_interval, 0 );
 	if( FAILED( hr ) )
 		DISPDBG( KE_ERROR, "IDXGISwapChain::Present(): Error = 0x" << hr << "\n" );
 }
@@ -431,7 +436,7 @@ void ke_d3d11_renderdevice_t::swap()
 *       buffers are encapsulated into one interface for easy management, however, index data
 *       input is completely optional.  Interleaved vertex data is also supported.
 */
-bool ke_d3d11_renderdevice_t::create_geometry_buffer(void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* va, ke_geometrybuffer_t** geometry_buffer)
+bool ke_d3d11_renderdevice_t::create_geometry_buffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, ke_vertexattribute_t* va, ke_geometrybuffer_t** geometry_buffer )
 {
 	HRESULT hr = S_OK;
 
@@ -479,7 +484,7 @@ bool ke_d3d11_renderdevice_t::create_geometry_buffer(void* vertex_data, uint32_t
 * Name: ke_d3d11_renderdevice_t::create_geometry_buffer
 * Desc:
 */
-void ke_d3d11_renderdevice_t::delete_geometry_buffer(ke_geometrybuffer_t* geometry_buffer)
+void ke_d3d11_renderdevice_t::delete_geometry_buffer( ke_geometrybuffer_t* geometry_buffer )
 {
 	ke_d3d11_geometrybuffer_t* gb = static_cast<ke_d3d11_geometrybuffer_t*>(geometry_buffer);
 
@@ -497,7 +502,7 @@ void ke_d3d11_renderdevice_t::delete_geometry_buffer(ke_geometrybuffer_t* geomet
 * Desc: Sets the current geometry buffer to be used when rendering. Internally, binds the
 *       vertex array object. If NULL, then sets the current vertex array object to 0.
 */
-void ke_d3d11_renderdevice_t::set_geometry_buffer(ke_geometrybuffer_t* geometry_buffer)
+void ke_d3d11_renderdevice_t::set_geometry_buffer( ke_geometrybuffer_t* geometry_buffer )
 {
 	current_geometrybuffer = geometry_buffer;
 }
@@ -512,7 +517,7 @@ void ke_d3d11_renderdevice_t::set_geometry_buffer(ke_geometrybuffer_t* geometry_
 *       (see code below).
 *       TODO: Allow user defined constants.
 */
-bool ke_d3d11_renderdevice_t::create_program(const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program)
+bool ke_d3d11_renderdevice_t::create_program( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, ke_vertexattribute_t* vertex_attributes, ke_gpu_program_t** gpu_program )
 {
 	D3D11_INPUT_ELEMENT_DESC* layout = NULL;
 	int layout_size = 0;
@@ -707,7 +712,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_1fv( const char* location, in
 * Name: ke_d3d11_renderdevice_t::set_program_constant_2fv
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_2fv(const char* location, int count, float* value)
+void ke_d3d11_renderdevice_t::set_program_constant_2fv( const char* location, int count, float* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 
@@ -718,7 +723,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_2fv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::set_program_constant_3fv
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_3fv(const char* location, int count, float* value)
+void ke_d3d11_renderdevice_t::set_program_constant_3fv( const char* location, int count, float* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -727,7 +732,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_3fv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::set_program_constant_4fv
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_4fv(const char* location, int count, float* value)
+void ke_d3d11_renderdevice_t::set_program_constant_4fv( const char* location, int count, float* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -736,7 +741,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_4fv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::set_program_constant
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_1iv(const char* location, int count, int* value)
+void ke_d3d11_renderdevice_t::set_program_constant_1iv( const char* location, int count, int* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -745,7 +750,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_1iv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::set_program_constant
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_2iv(const char* location, int count, int* value)
+void ke_d3d11_renderdevice_t::set_program_constant_2iv( const char* location, int count, int* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -754,7 +759,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_2iv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::set_program_constant
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_3iv(const char* location, int count, int* value)
+void ke_d3d11_renderdevice_t::set_program_constant_3iv( const char* location, int count, int* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -763,7 +768,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_3iv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::set_program_constant
 * Desc: Sets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::set_program_constant_4iv(const char* location, int count, int* value)
+void ke_d3d11_renderdevice_t::set_program_constant_4iv( const char* location, int count, int* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -772,7 +777,7 @@ void ke_d3d11_renderdevice_t::set_program_constant_4iv(const char* location, int
 * Name: ke_d3d11_renderdevice_t::get_program_constant_fv
 * Desc: Gets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::get_program_constant_fv(const char* location, float* value)
+void ke_d3d11_renderdevice_t::get_program_constant_fv( const char* location, float* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -781,7 +786,7 @@ void ke_d3d11_renderdevice_t::get_program_constant_fv(const char* location, floa
 * Name: ke_d3d11_renderdevice_t::get_program_constant_iv
 * Desc: Gets program constants (do your research on GLSL uniforms)
 */
-void ke_d3d11_renderdevice_t::get_program_constant_iv(const char* location, int* value)
+void ke_d3d11_renderdevice_t::get_program_constant_iv( const char* location, int* value )
 {
 	ke_d3d11_gpu_program_t* p = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
 }
@@ -884,7 +889,7 @@ void ke_d3d11_renderdevice_t::set_tesselation_shader_constant_buffer( int slot, 
 * Name: ke_d3d11_renderdevice::create_texture_1d
 * Desc: Creates a 1D texture.
 */
-bool ke_d3d11_renderdevice_t::create_texture_1d(uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels)
+bool ke_d3d11_renderdevice_t::create_texture_1d( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels )
 {
 	/* Allocate a new texture */
 	*texture = new ke_d3d11_texture_t;
@@ -905,7 +910,7 @@ bool ke_d3d11_renderdevice_t::create_texture_1d(uint32_t target, int width, int 
 * Name: ke_d3d11_renderdevice::create_texture_2d
 * Desc: Creates a blank 2D texture.
 */
-bool ke_d3d11_renderdevice_t::create_texture_2d(uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels)
+bool ke_d3d11_renderdevice_t::create_texture_2d( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels )
 {
 	/* Allocate a new texture */
 	(*texture) = new ke_d3d11_texture_t;
@@ -927,7 +932,7 @@ bool ke_d3d11_renderdevice_t::create_texture_2d(uint32_t target, int width, int 
 * Name: ke_d3d11_renderdevice::create_texture_3d
 * Desc: Creates a blank 3D texture.
 */
-bool ke_d3d11_renderdevice_t::create_texture_3d(uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels)
+bool ke_d3d11_renderdevice_t::create_texture_3d( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, ke_texture_t** texture, void* pixels )
 {
 	/* Allocate a new texture */
 	(*texture) = new ke_d3d11_texture_t;
@@ -950,11 +955,11 @@ bool ke_d3d11_renderdevice_t::create_texture_3d(uint32_t target, int width, int 
 * Name: ke_d3d11_renderdevice_t::delete_texture
 * Desc: Deletes a texture from memory.
 */
-void ke_d3d11_renderdevice_t::delete_texture(ke_texture_t* texture)
+void ke_d3d11_renderdevice_t::delete_texture( ke_texture_t* texture )
 {
 	ke_d3d11_texture_t* t = static_cast<ke_d3d11_texture_t*>(texture);
 
-	if (texture)
+	if( texture )
 	{
 		delete texture;
 	}
@@ -965,7 +970,7 @@ void ke_d3d11_renderdevice_t::delete_texture(ke_texture_t* texture)
 * Name: ke_d3d11_renderdevice_t::set_texture_data_1d
 * Desc: Sets pixel data for a 1D texture.
 */
-void ke_d3d11_renderdevice_t::set_texture_data_1d(int offsetx, int width, int miplevel, void* pixels, ke_texture_t* texture)
+void ke_d3d11_renderdevice_t::set_texture_data_1d( int offsetx, int width, int miplevel, void* pixels, ke_texture_t* texture )
 {
 	ke_d3d11_texture_t* t = static_cast<ke_d3d11_texture_t*>(texture);
 }
@@ -974,7 +979,7 @@ void ke_d3d11_renderdevice_t::set_texture_data_1d(int offsetx, int width, int mi
 * Name: ke_d3d11_renderdevice_t::set_texture_data_2d
 * Desc: Sets pixel data for a 1D texture.
 */
-void ke_d3d11_renderdevice_t::set_texture_data_2d(int offsetx, int offsety, int width, int height, int miplevel, void* pixels, ke_texture_t* texture)
+void ke_d3d11_renderdevice_t::set_texture_data_2d( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, ke_texture_t* texture )
 {
 	ke_d3d11_texture_t* t = static_cast<ke_d3d11_texture_t*>(texture);
 }
@@ -983,7 +988,7 @@ void ke_d3d11_renderdevice_t::set_texture_data_2d(int offsetx, int offsety, int 
 * Name: ke_d3d11_renderdevice_t::set_texture_data_3d
 * Desc: Sets pixel data for a 1D texture.
 */
-void ke_d3d11_renderdevice_t::set_texture_data_3d(int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, ke_texture_t* texture)
+void ke_d3d11_renderdevice_t::set_texture_data_3d( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, ke_texture_t* texture )
 {
 	ke_d3d11_texture_t* t = static_cast<ke_d3d11_texture_t*>(texture);
 }
@@ -993,7 +998,7 @@ void ke_d3d11_renderdevice_t::set_texture_data_3d(int offsetx, int offsety, int 
 * Desc: Creates a seperate render target (FBO), typically used for rendering to a texture.
 *       Creates a colour, depth and stencil buffer (if desired) and can be set as a texture.
 */
-bool ke_d3d11_renderdevice_t::create_render_target(int width, int height, int depth, uint32_t flags, ke_rendertarget_t** rendertarget)
+bool ke_d3d11_renderdevice_t::create_render_target( int width, int height, int depth, uint32_t flags, ke_rendertarget_t** rendertarget )
 {
 	ke_d3d11_rendertarget_t* rt = static_cast<ke_d3d11_rendertarget_t*>(*rendertarget);
 
@@ -1004,7 +1009,7 @@ bool ke_d3d11_renderdevice_t::create_render_target(int width, int height, int de
 * Name: ke_d3d11_renderdevice_t::delete_render_target
 * Desc: Deletes the render target resources used.
 */
-void ke_d3d11_renderdevice_t::delete_render_target(ke_rendertarget_t* rendertarget)
+void ke_d3d11_renderdevice_t::delete_render_target( ke_rendertarget_t* rendertarget )
 {
 	ke_d3d11_rendertarget_t* rt = static_cast<ke_d3d11_rendertarget_t*>(rendertarget);
 
@@ -1016,7 +1021,7 @@ void ke_d3d11_renderdevice_t::delete_render_target(ke_rendertarget_t* rendertarg
 * Desc: Binds the render target to OpenGL.  You set the texture to the appropriate  texture
 *       stage yourself using ::set_texture().
 */
-void ke_d3d11_renderdevice_t::bind_render_target(ke_rendertarget_t* rendertarget)
+void ke_d3d11_renderdevice_t::bind_render_target( ke_rendertarget_t* rendertarget )
 {
 	ke_d3d11_rendertarget_t* rt = static_cast<ke_d3d11_rendertarget_t*>(rendertarget);
 }
@@ -1026,7 +1031,7 @@ void ke_d3d11_renderdevice_t::bind_render_target(ke_rendertarget_t* rendertarget
 * Desc: Sets a texture to the desired texture stage.  If NULL, then texturing is disabled on
 *       the selected texture stage.
 */
-void ke_d3d11_renderdevice_t::set_texture(int stage, ke_texture_t* texture)
+void ke_d3d11_renderdevice_t::set_texture( int stage, ke_texture_t* texture )
 {
 	ke_d3d11_texture_t* tex = static_cast<ke_d3d11_texture_t*>(texture);
 }
@@ -1036,22 +1041,22 @@ void ke_d3d11_renderdevice_t::set_texture(int stage, ke_texture_t* texture)
 * Desc: Applies a list of user defined render states.
 * TODO: Allow explicit deferring of render states?
 */
-void ke_d3d11_renderdevice_t::set_render_states(ke_state_t* states)
+void ke_d3d11_renderdevice_t::set_render_states( ke_state_t* states )
 {
 	int i = 0;
 
 	/* Apply each render state in the list */
-	while (states[i].state != -1)
+	while( states[i].state != -1 )
 	{
-		switch (states[i].state)
+		switch( states[i].state )
 		{
 		default:
-			DISPDBG(KE_WARNING, "Bad render state!\nstate: " << states[i].state << "\n"
+			DISPDBG( KE_WARNING, "Bad render state!\nstate: " << states[i].state << "\n"
 				"param1: " << states[i].param1 << "\n"
 				"param2: " << states[i].param2 << "\n"
 				"param3: " << states[i].param3 << "\n"
 				"fparam: " << states[i].fparam << "\n"
-				"dparam: " << states[i].dparam << "\n");
+				"dparam: " << states[i].dparam << "\n" );
 			break;
 		}
 
@@ -1064,7 +1069,7 @@ void ke_d3d11_renderdevice_t::set_render_states(ke_state_t* states)
 * Desc: Applies a list of user defined sampler states.
 * TODO: Allow explicit deferring of sampler states?
 */
-void ke_d3d11_renderdevice_t::set_sampler_states(ke_state_t* states)
+void ke_d3d11_renderdevice_t::set_sampler_states( ke_state_t* states )
 {
 
 }
@@ -1079,7 +1084,7 @@ void ke_d3d11_renderdevice_t::set_sampler_states(ke_state_t* states)
 * Name: ke_d3d11_renderdevice::draw_vertices
 * Desc: Draws vertices from the current vertex buffer
 */
-void ke_d3d11_renderdevice_t::draw_vertices(uint32_t primtype, uint32_t stride, int first, int count)
+void ke_d3d11_renderdevice_t::draw_vertices( uint32_t primtype, uint32_t stride, int first, int count )
 {
 	ke_d3d11_geometrybuffer_t* gb = static_cast<ke_d3d11_geometrybuffer_t*>(current_geometrybuffer);
 	ke_d3d11_gpu_program_t* gp = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
@@ -1094,7 +1099,7 @@ void ke_d3d11_renderdevice_t::draw_vertices(uint32_t primtype, uint32_t stride, 
 * Name: ke_d3d11_renderdevice::draw_indexed_vertices
 * Desc: Draws vertices from the current vertex and index buffer.
 */
-void ke_d3d11_renderdevice_t::draw_indexed_vertices(uint32_t primtype, uint32_t stride, int count)
+void ke_d3d11_renderdevice_t::draw_indexed_vertices( uint32_t primtype, uint32_t stride, int count )
 {
 	ke_d3d11_geometrybuffer_t* gb = static_cast<ke_d3d11_geometrybuffer_t*>(current_geometrybuffer);
 	ke_d3d11_gpu_program_t* gp = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
@@ -1104,7 +1109,7 @@ void ke_d3d11_renderdevice_t::draw_indexed_vertices(uint32_t primtype, uint32_t 
 * Name: ke_d3d11_renderdevice_t::draw_indexed_vertices_range
 * Desc: Same as above, but allows the user to specify the start/end vertex.
 */
-void ke_d3d11_renderdevice_t::draw_indexed_vertices_range(uint32_t primtype, uint32_t stride, int start, int end, int count)
+void ke_d3d11_renderdevice_t::draw_indexed_vertices_range( uint32_t primtype, uint32_t stride, int start, int end, int count )
 {
 	ke_d3d11_geometrybuffer_t* gb = static_cast<ke_d3d11_geometrybuffer_t*>(current_geometrybuffer);
 	ke_d3d11_gpu_program_t* gp = static_cast<ke_d3d11_gpu_program_t*>(current_gpu_program);
@@ -1115,7 +1120,7 @@ void ke_d3d11_renderdevice_t::draw_indexed_vertices_range(uint32_t primtype, uin
 * Desc: Returns a pointer filled with pixels of the given region of the current framebuffer.
 * TODO: Determine bit depth, allow reading from depth buffers, etc.
 */
-bool ke_d3d11_renderdevice_t::get_framebuffer_region(int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels)
+bool ke_d3d11_renderdevice_t::get_framebuffer_region( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels )
 {
 	int buffer_bpp = device_desc->colour_bpp;
 
@@ -1134,7 +1139,7 @@ bool ke_d3d11_renderdevice_t::get_framebuffer_region(int x, int y, int width, in
 * Name: ke_d3d11_renderdevice::set_viewport
 * Desc: Sets the viewport.
 */
-void ke_d3d11_renderdevice_t::set_viewport(int x, int y, int width, int height)
+void ke_d3d11_renderdevice_t::set_viewport( int x, int y, int width, int height )
 {
 	viewport[0] = x;
 	viewport[1] = y;
@@ -1157,10 +1162,10 @@ void ke_d3d11_renderdevice_t::set_viewport(int x, int y, int width, int height)
 * Name: ke_d3d11_renderdevice::set_perspective_matrix
 * Desc: Sets the projection matrix by creating a perspective matrix.
 */
-void ke_d3d11_renderdevice_t::set_perspective_matrix(float fov, float aspect, float near_z, float far_z)
+void ke_d3d11_renderdevice_t::set_perspective_matrix( float fov, float aspect, float near_z, float far_z )
 {
 	/* Set up projection matrix using the perspective method */
-	projection_matrix = M4MakePerspective(fov, aspect, near_z, far_z);
+	projection_matrix = M4MakePerspective( fov, aspect, near_z, far_z );
 }
 
 
@@ -1168,10 +1173,10 @@ void ke_d3d11_renderdevice_t::set_perspective_matrix(float fov, float aspect, fl
 * Name: ke_d3d11_renderdevice::set_view_matrix
 * Desc:
 */
-void ke_d3d11_renderdevice_t::set_view_matrix(const Matrix4* view)
+void ke_d3d11_renderdevice_t::set_view_matrix( const Matrix4* view )
 {
 	/* Copy over the incoming view matrix */
-	memmove(&view_matrix, view, sizeof(Matrix4));
+	memmove( &view_matrix, view, sizeof( Matrix4 ) );
 }
 
 
@@ -1179,10 +1184,10 @@ void ke_d3d11_renderdevice_t::set_view_matrix(const Matrix4* view)
 * Name: ke_d3d11_renderdevice::set_world_matrix
 * Desc:
 */
-void ke_d3d11_renderdevice_t::set_world_matrix(const Matrix4* world)
+void ke_d3d11_renderdevice_t::set_world_matrix( const Matrix4* world )
 {
 	/* Copy over the incoming world matrix */
-	memmove(&world_matrix, world, sizeof(Matrix4));
+	memmove( &world_matrix, world, sizeof( Matrix4 ) );
 }
 
 
@@ -1190,10 +1195,10 @@ void ke_d3d11_renderdevice_t::set_world_matrix(const Matrix4* world)
 * Name: ke_d3d11_renderdevice::set_modelview_matrix
 * Desc:
 */
-void ke_d3d11_renderdevice_t::set_modelview_matrix(const Matrix4* modelview)
+void ke_d3d11_renderdevice_t::set_modelview_matrix( const Matrix4* modelview )
 {
 	/* Copy over the incoming modelview matrix */
-	memmove(&modelview_matrix, modelview, sizeof(Matrix4));
+	memmove( &modelview_matrix, modelview, sizeof( Matrix4 ) );
 }
 
 
@@ -1201,10 +1206,10 @@ void ke_d3d11_renderdevice_t::set_modelview_matrix(const Matrix4* modelview)
 * Name: ke_d3d11_renderdevice::set_projection_matrix
 * Desc:
 */
-void ke_d3d11_renderdevice_t::set_projection_matrix(const Matrix4* projection)
+void ke_d3d11_renderdevice_t::set_projection_matrix( const Matrix4* projection )
 {
 	/* Copy over the incoming projection matrix */
-	memmove(&projection_matrix, projection, sizeof(Matrix4));
+	memmove( &projection_matrix, projection, sizeof( Matrix4 ) );
 }
 
 
@@ -1224,7 +1229,7 @@ void ke_d3d11_renderdevice_t::block_until_vertical_blank()
 	SDL_GetWindowDisplayMode(window, &display_mode);
 
 	/* Stall this thread for 1000/refresh_rate milliseconds */
-	SDL_Delay(1000 / display_mode.refresh_rate);
+	SDL_Delay( 1000 / display_mode.refresh_rate );
 }
 
 
@@ -1235,7 +1240,7 @@ void ke_d3d11_renderdevice_t::block_until_vertical_blank()
 */
 void ke_d3d11_renderdevice_t::set_swap_interval(int swap_interval)
 {
-	//SDL_GL_SetSwapInterval(swap_interval);
+	this->swap_interval = swap_interval;
 }
 
 
@@ -1245,5 +1250,15 @@ void ke_d3d11_renderdevice_t::set_swap_interval(int swap_interval)
 */
 int ke_d3d11_renderdevice_t::get_swap_interval()
 {
-	return 1;// SDL_GL_GetSwapInterval();
+	return swap_interval;
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::gpu_memory_info
+ * Desc: Returns the amound of available and total video memory of this machine.
+ */
+void ke_d3d11_renderdevice_t::gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory )
+{
+
 }

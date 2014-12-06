@@ -173,6 +173,9 @@ public:
 	virtual void set_swap_interval(int swap_interval);
 	virtual int get_swap_interval();
 
+	/* Misc */
+    virtual void gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory );
+
 protected:
 	SDL_Window*				window;
 	D3D_DRIVER_TYPE			driver_type;
@@ -180,8 +183,10 @@ protected:
 	ID3D11Device*			d3ddevice;
 	ID3D11DeviceContext*	d3ddevice_context;
 	IDXGISwapChain*			dxgi_swap_chain; 
+	IDXGIOutput*			dxgi_output;
 	ID3D11RenderTargetView* d3d_render_target_view;
 	DXGI_SWAP_CHAIN_DESC	swapchain_desc;
+	int						swap_interval;
 };
 
 #endif /* defined(__ke_d3d11_renderdevice__) */

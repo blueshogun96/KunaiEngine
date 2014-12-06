@@ -28,13 +28,18 @@ bool ke_initialize()
     
     /* Initial debug logging */
     dbg = new NVDebug( KE_DBG_LEVEL, "debug.txt" );
-    DISPDBG( 1, "Initialization started\n" );
+    DISPDBG( KE_DBGLVL(0), "Initialization started\n" );
     
     /* Initialize SDL and the necessary sub-systems. For now, we only want to initialize 
        timing and events. */
     if( SDL_Init( SDL_INIT_EVENTS | SDL_INIT_TIMER ) != 0 )
-        return false;
-    DISPDBG( 1, "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK\n" );
+	{
+		DISPDBG( KE_ERROR, "Error initializing SDL timer and events!" );
+	}
+	else
+	{
+		DISPDBG( KE_DBGLVL(3), "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK\n" );
+	}
     
     /* Call user specified initialization routine */
     ke_on_initialize( ke_get_context_pointer() );
@@ -54,7 +59,7 @@ void ke_uninitialize()
     /* Call user specified uninitialization routine */
     ke_on_uninitialize( ke_get_context_pointer() );
     
-    DISPDBG( 1, "Uninitializing SDL..." );
+    DISPDBG( KE_DBGLVL(0), "Uninitializing SDL..." );
     
     /* Delete the debug log */
     delete dbg;

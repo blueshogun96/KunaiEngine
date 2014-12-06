@@ -101,4 +101,11 @@ void ke_enter_critical_section( struct ke_critical_section_t* critical_section )
 void ke_leave_critical_section( struct ke_critical_section_t* critical_section );
 bool ke_try_enter_critical_section( struct ke_critical_section_t* critical_section );
 
+
+/*
+ * Misc functionality
+ */
+void ke_message_box( const char* message, const char* title, uint32_t flags );
+void ke_display_last_message( const char* title, uint32_t flags );
+
 #endif /* defined(__ke_system__) */

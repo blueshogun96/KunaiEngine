@@ -107,10 +107,13 @@ public:
 
 	unsigned int GetLevel() const { return m_GlobalDebugLevel; };
 	std::ostringstream& GetStream() { return m_strStream; }
+	std::stringstream& GetLastMessage() { return m_strLastMessage; }
 	void FlushLog() { m_dbgLog.flush(); }
+	void FlushLastMessage() { m_strLastMessage.str(""); m_strLastMessage.clear(); }
 	
 private:
 	std::ostringstream m_strStream;
+	std::stringstream m_strLastMessage;
 	std::ofstream m_dbgLog;
 	unsigned int m_GlobalDebugLevel;
 };
@@ -121,6 +124,8 @@ do																\
 {																\
 	if (NVDebug::GetSingletonPtr() != NULL)						\
 	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
+		NVDebug::GetSingleton().FlushLastMessage();	\
+		NVDebug::GetSingleton().GetLastMessage() << __FUNCTION__ << "(): " << b;	\
 		NVDebug::GetSingleton().GetStream() << __FUNCTION__ << "(): " << b;			\
 		NVDebug::GetSingleton().EndOutput(); }				\
 } while(0)
@@ -148,9 +153,20 @@ do																			\
 } while (0)
 
 #else
-#define DISPDBG(a, b)
+#define DISPDBG(a, b)	\
+do																\
+{																\
+	if (NVDebug::GetSingletonPtr() != NULL)						\
+	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
+		NVDebug::GetSingleton().FlushLastMessage();	\
+		NVDebug::GetSingleton().GetLastMessage() << __FUNCTION__ << "(): " << b;	\
+	}				\
+} while(0)
 #define NVASSERT(a, b)
 #endif
+
+// Return the last message sent to the debug log
+#define GETLASTMSG() NVDebug::GetSingletonPtr() != NULL ? NVDebug::GetSingleton().GetLastMessage().str() : "(nil)"
 
 // Note that the cast ensures that the stream
 // doesn't try to interpret pointers to objects in different ways.

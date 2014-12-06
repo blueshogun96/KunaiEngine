@@ -448,3 +448,26 @@ void ke_process_mouse_event( SDL_Event* event )
         mouse.button[button] = No;
     }
 }
+
+void ke_message_box( const char* message, const char* title, uint32_t flags )
+{
+	uint32_t sdl_flags;
+
+	/* Interpret message type */
+	switch( flags )
+	{
+	case KE_ERROR:		sdl_flags = SDL_MESSAGEBOX_ERROR; break;
+	case KE_WARNING:	sdl_flags = SDL_MESSAGEBOX_WARNING; break;
+	default:			sdl_flags = SDL_MESSAGEBOX_INFORMATION; break;
+	}
+
+	/* Show message box with title and text */
+	SDL_ShowSimpleMessageBox( sdl_flags, title, message, SDL_GL_GetCurrentWindow() );
+}
+
+void ke_display_last_message( const char* title, uint32_t flags )
+{
+	std::string str = GETLASTMSG();
+
+	ke_message_box( str.c_str(), title, flags );
+}
