@@ -11,11 +11,10 @@
 #include "miniz.c"
 
 
-
-ke_zip_resource_archive_t::ke_zip_resource_archive_t( ) : archive(nullptr)
+ke_zip_resource_archive_t::ke_zip_resource_archive_t() : archive(nullptr)
 {
 	opened = No;
-};
+}
 
 ke_zip_resource_archive_t::ke_zip_resource_archive_t( std::string filename ) : archive(nullptr)
 {
@@ -24,16 +23,16 @@ ke_zip_resource_archive_t::ke_zip_resource_archive_t( std::string filename ) : a
 	/* Open the desired archive */
 	ZeroMemory( archive, sizeof( mz_zip_archive ) );
 	opened = (bool) mz_zip_reader_init_file( (mz_zip_archive*) archive, filename.c_str(), 0 );
-};
+}
 
-ke_zip_resource_archive_t::ke_zip_resource_archive_t( char* filename )
+ke_zip_resource_archive_t::ke_zip_resource_archive_t( char* filename ) : archive(nullptr)
 {
-	archive = new mz_zip_archive;
+	archive = malloc( sizeof( mz_zip_archive ) );
 
 	/* Open the desired archive */
 	ZeroMemory( archive, sizeof( mz_zip_archive ) );
 	opened = (bool) mz_zip_reader_init_file( (mz_zip_archive*) archive, filename, 0 );
-};
+}
 
 ke_zip_resource_archive_t::~ke_zip_resource_archive_t()
 {
@@ -47,8 +46,15 @@ bool ke_zip_resource_archive_t::is_open()
 
 void ke_zip_resource_archive_t::close()
 {
-	/* Close the fastfile, if it is open. */
-	mz_zip_reader_end( (mz_zip_archive*) archive );
+    if( archive )
+    {
+        /* Close the fastfile, if it is open. */
+        mz_zip_reader_end( (mz_zip_archive*) archive );
+        
+        /* Delete the archive pointer */
+        free( archive );
+        archive = nullptr;
+    }
 }
 
 bool ke_zip_resource_archive_t::read( std::string filename, void** ptr, size_t* size )

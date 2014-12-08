@@ -18,6 +18,7 @@ struct ke_rigid_body_t
 {
     neRigidBody*    rigid_body;
     neGeometry*     geometry;
+    neSimulator*    parent_simulator;
     uint32_t        rb_id;
 };
 
@@ -26,6 +27,7 @@ struct ke_animated_body_t
 {
     neAnimatedBody* animated_body;
     neGeometry*     geometry;
+    neSimulator*    parent_simulator;
     uint32_t        ab_id;
 };
 

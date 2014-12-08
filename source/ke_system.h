@@ -29,6 +29,11 @@ struct ke_semaphore_t;
 struct ke_critical_section_t;
 
 /*
+ * Thread function pointer
+ */
+typedef int (*ke_thread_pfn)( void* );
+
+/*
  * Input timestamp structure
  */
 struct ke_timestamp_t
@@ -101,6 +106,27 @@ void ke_enter_critical_section( struct ke_critical_section_t* critical_section )
 void ke_leave_critical_section( struct ke_critical_section_t* critical_section );
 bool ke_try_enter_critical_section( struct ke_critical_section_t* critical_section );
 
+
+/*
+ * Mutex
+ */
+bool ke_create_mutex( struct ke_mutex_t** mutex );
+void ke_destroy_mutex( struct ke_mutex_t* mutex );
+void ke_lock_mutex( struct ke_mutex_t* mutex );
+void ke_unlock_mutex( struct ke_mutex_t* mutex );
+bool ke_try_lock_mutex( struct ke_mutext* mutex );
+
+
+/*
+ * Semaphore
+ */
+bool ke_create_semaphore( struct ke_semaphore_t** semaphore );
+void ke_destroy_semaphore( struct ke_semaphore_t* semaphore );
+
+/*
+ * Thread
+ */
+bool ke_create_thread( struct ke_thread_t** thread, ke_thread_pfn pfn, const char* thread_name );
 
 /*
  * Misc functionality
