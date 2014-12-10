@@ -8,7 +8,9 @@
 #include "ke.h"
 #include "ke_system.h"
 #include "nvdebug.h"
+#include <thread>
 
+std::thread th;
 
 /*
  * Globals
@@ -264,59 +266,7 @@ uint32_t ke_get_tick_count()
     return SDL_GetTicks();
 }
 
-/*
- * Name: ke_initialize_critical_section
- * Desc: Initializes a critical section object using POSIX. This is the most portable method
- *       I could find.
- */
-bool ke_initialize_critical_section( struct ke_critical_section_t** critical_section )
-{
-    /* Initialize pthread critical section */
-    (*critical_section) = new ke_critical_section_t;
-    (*critical_section)->mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
-    
-    return true;
-}
 
-/*
- * Name: ke_uninitialize_critical_section
- * Desc: Doesn't really do much, just deletes the object.
- */
-void ke_uninitialize_critical_section( struct ke_critical_section_t* critical_section )
-{
-    /* Delete this critical section object */
-    delete critical_section;
-}
-
-/*
- * Name: ke_enter_critical_section
- * Desc: Simply locks the mutex representing the critical section.
- */
-void ke_enter_critical_section( struct ke_critical_section_t* critical_section )
-{
-    /* Lock this critical section, and lock other threads out. */
-    pthread_mutex_lock( &critical_section->mutex );
-}
-
-/*
- * Name: ke_leave_critical_section
- * Desc: Unlocks the mutex representing the critical section.
- */
-void ke_leave_critical_section( struct ke_critical_section_t* critical_section )
-{
-    /* Unlock this critical section */
-    pthread_mutex_unlock( &critical_section->mutex );
-}
-
-/*
- * Name: ke_try_enter_critical_section
- * Desc: Attempts to lock the mutex representing the critical section, and returns the result.
- */
-bool ke_try_enter_critical_section( struct ke_critical_section_t* critical_section )
-{
-    /* Attempt to lock this critical section. Return the result. */
-    return (bool) pthread_mutex_trylock( &critical_section->mutex );
-}
 
 /*
  * Name: ke_reset_keys
