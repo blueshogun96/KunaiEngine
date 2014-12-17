@@ -20,6 +20,9 @@
 #define OGL_DISPDBG_RB( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
 
 
+#include "ke_ogl_fence.h"
+
+
 /*
  * Globals
  */
@@ -242,6 +245,11 @@ void ke_uninitialize_default_shaders()
 {
     glDeleteProgram( ke_default_program );
 }
+
+
+
+
+
 
 /*
  * Name: ke_ogl_renderdevice::ke_ogl_renderdevice
@@ -1577,6 +1585,94 @@ void ke_ogl_renderdevice_t::set_swap_interval( int swap_interval )
 int ke_ogl_renderdevice_t::get_swap_interval()
 {
     return SDL_GL_GetSwapInterval();
+}
+
+/*
+ * Name: ke_ogl_renderdevice_t::block_until_idle
+ * Desc: Stalls the current thread until the GPU is no longer busy.
+ */
+void ke_ogl_renderdevice_t::block_until_idle()
+{
+	glFinish();
+}
+
+
+/*
+ * Name: ke_ogl_renderdevice_t::kick
+ * Desc: Sends all pending GPU commands to the pipeline.
+ */
+void ke_ogl_renderdevice_t::kick()
+{
+	glFlush();
+}
+
+
+/*
+ * Name: ke_ogl_renderdevice_t::insert_fence
+ * Desc: Creates a new GPU fence object and sets it in place.
+ */
+bool ke_ogl_renderdevice_t::insert_fence( ke_fence_t** fence )
+{
+	/* Sanity check */
+	if( !fence )
+		return false;
+
+	return true;
+}
+
+
+/*
+ * Name: ke_ogl_renderdevice_t::test_fence
+ * Desc: Returns true if this all GPU commands have been completed since
+ *		 this fence was set.  If there are still GPU commands pending,
+ *		 returns false.
+ */
+bool ke_ogl_renderdevice_t::test_fence( ke_fence_t* fence )
+{
+	
+	/* GPU commands all complete */
+	return true;
+}
+
+
+/*
+ * Name: ke_ogl_renderdevice_t::block_on_fence
+ * Desc: Stalls the current thread until the fence has been crossed.
+ */
+void ke_ogl_renderdevice_t::block_on_fence( ke_fence_t* fence )
+{
+	
+}
+
+
+/*
+ * Name: ke_ogl_renderdevice_t::delete_fence
+ * Desc: Deletes a GPU fence object.
+ */
+void ke_ogl_renderdevice_t::delete_fence( ke_fence_t* fence )
+{
+	if( !fence )
+		return;
+
+	ke_ogl_fence_t* f = static_cast<ke_ogl_fence_t*>( fence );
+
+	delete fence;
+}
+
+
+/*
+ * Name: ke_ogl_renderdevice_t::is_fence
+ * Desc: Tests this fence object for a valid fence.
+ */
+bool ke_ogl_renderdevice_t::is_fence( ke_fence_t* fence )
+{
+	if( !fence )
+		return false;
+
+	/* Was this query created already?  If so, assume it's a valid fence. */
+	ke_ogl_fence_t* f = static_cast<ke_ogl_fence_t*>( fence );
+
+	return true;
 }
 
 /*

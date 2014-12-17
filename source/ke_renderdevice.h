@@ -355,6 +355,13 @@ public:
     virtual void block_until_vertical_blank() PURE;
     virtual void set_swap_interval( int swap_interval ) PURE;
     virtual int get_swap_interval() PURE;
+	virtual void block_until_idle() PURE;
+	virtual void kick() PURE;
+	virtual bool insert_fence( ke_fence_t** fence ) PURE;
+	virtual bool test_fence( ke_fence_t* fence ) PURE;
+	virtual void block_on_fence( ke_fence_t* fence ) PURE;
+	virtual void delete_fence( ke_fence_t* fence ) PURE;
+	virtual bool is_fence( ke_fence_t* fence ) PURE;
     
     /* Misc */
     virtual void gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory ) PURE;

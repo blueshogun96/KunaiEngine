@@ -1255,6 +1255,142 @@ int ke_d3d11_renderdevice_t::get_swap_interval()
 
 
 /*
+ * Name: ke_d3d11_renderdevice_t::block_until_idle
+ * Desc: Stalls the current thread until the GPU is no longer busy.
+ */
+void ke_d3d11_renderdevice_t::block_until_idle()
+{
+	/* TODO */
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::kick
+ * Desc: Sends all pending GPU commands to the pipeline.
+ */
+void ke_d3d11_renderdevice_t::kick()
+{
+	/* TODO */
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::insert_fence
+ * Desc: Creates a new GPU fence object and sets it in place.
+ */
+bool ke_d3d11_renderdevice_t::insert_fence( ke_fence_t** fence )
+{
+	/* Sanity check */
+	if( !fence )
+		return false;
+
+	/* Create a query object */
+	HRESULT hr = S_OK;
+    D3D11_QUERY_DESC query_desc;
+    query_desc.Query = D3D11_QUERY_EVENT;
+    query_desc.MiscFlags = 0;
+
+	(*fence) = new ke_d3d11_fence_t;
+	ke_d3d11_fence_t* f = static_cast<ke_d3d11_fence_t*>( *fence );
+
+	hr = d3ddevice->CreateQuery( &query_desc, &f->query );
+	if( FAILED( hr ) )
+	{
+		delete_fence(f);
+		return false;
+	}
+
+	/* Set query object */
+	d3ddevice_context->End( f->query );
+
+	return true;
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::test_fence
+ * Desc: Returns true if this all GPU commands have been completed since
+ *		 this fence was set.  If there are still GPU commands pending,
+ *		 returns false.
+ */
+bool ke_d3d11_renderdevice_t::test_fence( ke_fence_t* fence )
+{
+	/* Test this query object */
+	HRESULT hr = d3ddevice_context->GetData( static_cast<ke_d3d11_fence_t*>( fence )->query, NULL, 0, 0 );
+	if( FAILED( hr ) )
+	{
+		/* Test result */
+		if( hr == S_FALSE )
+		{
+			/* GPU commands are still pending */
+			return false;
+		}
+		else
+		{
+			/* Some other error */
+			return false;
+		}
+	}
+
+	/* GPU commands all complete */
+	return true;
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::block_on_fence
+ * Desc: Stalls the current thread until the fence has been crossed.
+ */
+void ke_d3d11_renderdevice_t::block_on_fence( ke_fence_t* fence )
+{
+	HRESULT hr;
+	do
+	{
+		hr = d3ddevice_context->GetData( static_cast<ke_d3d11_fence_t*>( fence )->query, NULL, 0, 0 );
+	}
+	while( hr == S_FALSE );
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::delete_fence
+ * Desc: Deletes a GPU fence object.
+ */
+void ke_d3d11_renderdevice_t::delete_fence( ke_fence_t* fence )
+{
+	if( !fence )
+		return;
+
+	ke_d3d11_fence_t* f = static_cast<ke_d3d11_fence_t*>( fence );
+
+	if( f->query )
+	{
+		f->query->Release();
+	}
+
+	delete fence;
+}
+
+
+/*
+ * Name: ke_d3d11_renderdevice_t::is_fence
+ * Desc: Tests this fence object for a valid fence.
+ */
+bool ke_d3d11_renderdevice_t::is_fence( ke_fence_t* fence )
+{
+	if( !fence )
+		return false;
+
+	/* Was this query created already?  If so, assume it's a valid fence. */
+	ke_d3d11_fence_t* f = static_cast<ke_d3d11_fence_t*>( fence );
+	if( !f->query )
+		return false;
+
+	return true;
+}
+
+
+/*
  * Name: ke_d3d11_renderdevice_t::gpu_memory_info
  * Desc: Returns the amound of available and total video memory of this machine.
  */

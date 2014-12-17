@@ -112,9 +112,10 @@ struct ke_ogl_palette_t : public ke_palette_t
 /*
  * GPU fence structure 
  */
-struct ke_ogl_fence : public ke_fence_t
+struct ke_ogl_fence_t : public ke_fence_t
 {
-    
+	uint32_t	fence;		/* GL_NV_fence, GL_APPLE_fence */
+	GLsync		sync;		/* GL_ARB_sync, GL_APPLE_sync */
 };
 
 
@@ -193,10 +194,18 @@ public:
     virtual void set_modelview_matrix( const Matrix4* modelview );
     virtual void set_projection_matrix( const Matrix4* projection );
     
+	/* Synchronization */
     virtual void block_until_vertical_blank();
     virtual void set_swap_interval( int swap_interval );
     virtual int get_swap_interval();
-    
+	virtual void block_until_idle();
+	virtual void kick();
+	virtual bool insert_fence( ke_fence_t** fence );
+	virtual bool test_fence( ke_fence_t* fence );
+	virtual void block_on_fence( ke_fence_t* fence );
+	virtual void delete_fence( ke_fence_t* fence );
+    virtual bool is_fence( ke_fence_t* fence );
+
     /* Misc */
     virtual void gpu_memory_info( uint32_t* total_memory, uint32_t* free_memory );
     
