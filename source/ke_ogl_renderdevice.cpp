@@ -20,6 +20,7 @@
 #define OGL_DISPDBG_RB( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
 
 
+/* GPU fencing routines */
 #include "ke_ogl_fence.h"
 
 
@@ -271,7 +272,7 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t()
  * Name: ke_ogl_renderdevice::ke_ogl_renderdevice
  * Desc: Appropriate constructor used for initialization of OpenGL via SDL.
  */
-ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevice_desc )
+ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevice_desc ) : fence_vendor(KE_FENCE_ARB)
 {
     /* Until we are finished initializing, mark this flag as false */
     initialized = false;
@@ -416,6 +417,8 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     }
 
 	DISPDBG( 2, ext_str );
+
+	/* TODO: Determine which fencing version to use based on vendor if needed */
 }
 
 
@@ -918,6 +921,7 @@ void ke_ogl_renderdevice_t::get_program_constant_iv( const char* location, int* 
 bool ke_ogl_renderdevice_t::create_constant_buffer( uint32_t buffer_size, ke_constantbuffer_t** constant_buffer )
 {
 	OGL_DISPDBG_RB( KE_ERROR, "Functionality not yet implemented for core OpenGL!", glGetError() );
+	return false;
 }
 
 /*
@@ -1617,7 +1621,10 @@ bool ke_ogl_renderdevice_t::insert_fence( ke_fence_t** fence )
 	if( !fence )
 		return false;
 
-	return true;
+	/* Allocate and initialize a new fence */
+	(*fence) = new ke_ogl_fence_t;
+
+	return ke_ogl_insert_fence[fence_vendor]( (ke_ogl_fence_t**) fence );
 }
 
 
@@ -1629,9 +1636,10 @@ bool ke_ogl_renderdevice_t::insert_fence( ke_fence_t** fence )
  */
 bool ke_ogl_renderdevice_t::test_fence( ke_fence_t* fence )
 {
-	
-	/* GPU commands all complete */
-	return true;
+	if( !fence )
+		return false;
+
+	return ke_ogl_test_fence[fence_vendor]( static_cast<ke_ogl_fence_t*>(fence) );
 }
 
 
@@ -1641,7 +1649,7 @@ bool ke_ogl_renderdevice_t::test_fence( ke_fence_t* fence )
  */
 void ke_ogl_renderdevice_t::block_on_fence( ke_fence_t* fence )
 {
-	
+	ke_ogl_block_on_fence[fence_vendor]( static_cast<ke_ogl_fence_t*>(fence) );
 }
 
 
@@ -1655,6 +1663,7 @@ void ke_ogl_renderdevice_t::delete_fence( ke_fence_t* fence )
 		return;
 
 	ke_ogl_fence_t* f = static_cast<ke_ogl_fence_t*>( fence );
+	ke_ogl_delete_fence[fence_vendor](f);
 
 	delete fence;
 }
@@ -1669,10 +1678,7 @@ bool ke_ogl_renderdevice_t::is_fence( ke_fence_t* fence )
 	if( !fence )
 		return false;
 
-	/* Was this query created already?  If so, assume it's a valid fence. */
-	ke_ogl_fence_t* f = static_cast<ke_ogl_fence_t*>( fence );
-
-	return true;
+	return ke_ogl_is_fence[fence_vendor]( static_cast<ke_ogl_fence_t*>(fence) );;
 }
 
 /*

@@ -214,6 +214,7 @@ protected:
     SDL_Window* window;
 	int			major_version;
 	int			minor_version;
+	int			fence_vendor;
 };
 
 #endif /* defined(__ke_ogl_renderdevice__) */
