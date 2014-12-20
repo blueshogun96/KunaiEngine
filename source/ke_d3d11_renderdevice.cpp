@@ -1260,7 +1260,21 @@ int ke_d3d11_renderdevice_t::get_swap_interval()
  */
 void ke_d3d11_renderdevice_t::block_until_idle()
 {
-	/* TODO */
+	ke_fence_t* fence = NULL;
+
+	/* Insert a new fence into the pipeline. */
+	if( insert_fence( &fence ) )
+	{
+		/* Wait until the fence has been crossed */
+		block_on_fence( fence );
+
+		/* Delete this fence */
+		delete_fence( fence );
+
+		return;
+	}
+
+	DISPDBG( KE_ERROR, "Unable to create new fence!" );
 }
 
 

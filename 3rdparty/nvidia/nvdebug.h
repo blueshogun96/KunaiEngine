@@ -118,7 +118,7 @@ private:
 	unsigned int m_GlobalDebugLevel;
 };
 
-#ifdef _DEBUG
+#if 1
 #define DISPDBG(a, b)											\
 do																\
 {																\

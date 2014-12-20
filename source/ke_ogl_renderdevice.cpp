@@ -346,10 +346,31 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
 	if( !context )
 		DISPDBG_R( KE_ERROR, "Error creating core OpenGL context!" );
     
+	/* It's not wise to assume that just because we have a valid SDL OpenGL context that we have
+	   an actual core OpenGL context to use.  SDL appears to be just giving us the highest profile
+	   version available if core OpenGL is not supported, so we'll have to check for ourselves if
+	   we have a real core OpenGL context.  If the major/minor version returned is 0, then we have
+	   a legacy OpenGL context. */
+	int real_major_version = 0, real_minor_version = 0;
+	glGetIntegerv( GL_MAJOR_VERSION, &real_major_version );
+	glGetIntegerv( GL_MINOR_VERSION, &real_minor_version );
+
+	if( device_desc->device_type == KE_RENDERDEVICE_OGL4 )
+	{
+		if( real_major_version != 4 )
+			DISPDBG_R( KE_ERROR, "A core OpenGL 4.x context was not created!" );
+	}
+	if( device_desc->device_type == KE_RENDERDEVICE_OGL3 )
+	{
+		if( real_major_version != 3 )
+			DISPDBG_R( KE_ERROR, "A core OpenGL 3.x context was not created!" );
+	}
+
+	/* Initialize GLEW for non-Apple platforms */
 #ifndef __APPLE__
 	glewExperimental = GL_TRUE;
 	GLenum error = glewInit();
-	if (error != GLEW_NO_ERROR)
+	if( error != GLEW_NO_ERROR )
 	{
 		DISPDBG_R( KE_ERROR, "Error initializing glew!\n" );
 	}
@@ -395,7 +416,7 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
     initialized = Yes;
     
     /* Print OpenGL driver/implementation details */
-    DISPDBG( 2, "\n\tOpenGL Vendor: " << glGetString( GL_VENDOR ) << 
+    DISPDBG( KE_DBGLVL(0), "\n\tOpenGL Vendor: " << glGetString( GL_VENDOR ) << 
 		"\n\tOpenGL Version: " << glGetString( GL_VERSION ) << 
 		"\n\tOpenGL Renderer: " << glGetString( GL_RENDERER ) <<
         "\n\tGLSL Version: " << glGetString( GL_SHADING_LANGUAGE_VERSION ) << "\n" );
@@ -416,7 +437,7 @@ ke_ogl_renderdevice_t::ke_ogl_renderdevice_t( ke_renderdevice_desc_t* renderdevi
         i++;
     }
 
-	DISPDBG( 2, ext_str );
+	DISPDBG( KE_DBGLVL(0), ext_str );
 
 	/* TODO: Determine which fencing version to use based on vendor if needed */
 }
