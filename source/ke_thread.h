@@ -25,6 +25,6 @@ struct ke_thread_t
 	ke_thread_t( ke_thread_pfn pfn );
 	virtual ~ke_thread_t();
 
-
+	pthread_attr_t thread_attr;
 	pthread_t thread;
 };
