@@ -239,6 +239,7 @@ struct ke_state_t
  * Constant buffer structure
  */
 struct ke_constantbuffer_t {};
+struct KeConstantBuffer {};
 
 /*
  * Geometry buffer base structure

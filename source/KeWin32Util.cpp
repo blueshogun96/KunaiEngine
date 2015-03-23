@@ -5,22 +5,22 @@
 //  Copyright (c) 2014 Shogun3D. All rights reserved.
 //
 
-#include "ke_platform.h"
-#include "ke_win32_util.h"
+#include "KePlatform.h"
+#include "KeWin32Util.h"
 
 
 /*
-* Name: ke_set_current_path_to_resource_directory
+* Name: KeSetCurrentPathToResourceDirectory
 * Desc: Sets the current path to the resource directory of the app.
 */
-int ke_set_current_path_to_resource_directory()
+int KeSetCurrentPathToResourceDirectory()
 {
 	printf("Resource path redirection not yet supported...\n");
 
 	return 0;
 }
 
-int ke_get_path_to_resource_directory(char* resource_path)
+int KeGetCurrentPathToResourceDirectory(char* resource_path)
 {
 	printf("Resource path redirection not yet supported...\n");
 

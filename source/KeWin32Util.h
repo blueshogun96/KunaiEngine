@@ -12,9 +12,11 @@
 #include <mmsystem.h>
 
 /*
-* Name: ke_set_current_path_to_resource_directory
+* Name: KeSetCurrentPathToResourceDirectory
 * Desc: Sets the current path to the resource directory of the app.
 */
-int ke_set_current_path_to_resource_directory();
+int KeSetCurrentPathToResourceDirectory();
+
+int KeGetCurrentPathToResourceDirectory( char* resource_path );
 
 #endif /* defined(__ke_win32_util__) */

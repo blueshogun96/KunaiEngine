@@ -98,7 +98,7 @@ public:
 			FlushLog();
 		}
 
-		OutputDebugString(m_strStream.str().c_str());
+		OutputDebugStringA(m_strStream.str().c_str());
 
 		//m_strStream.freeze(false);
 		//m_strStream.seekp(0);

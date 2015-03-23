@@ -21,7 +21,7 @@
 /*
  * NVIDIA fencing functions (GL_NV_fence)
  */
-bool ke_ogl_insert_fence_nv( ke_ogl_fence_t** fence )
+bool KeOpenGLInsertFenceNV( IKeOpenGLFence** fence )
 {
 	GLenum error = glGetError();
 
@@ -36,7 +36,7 @@ bool ke_ogl_insert_fence_nv( ke_ogl_fence_t** fence )
 	return true;
 }
 
-bool ke_ogl_test_fence_nv( ke_ogl_fence_t* fence )
+bool KeOpenGLTestFenceNV( IKeOpenGLFence* fence )
 {
 	if( glTestFenceNV( fence->fence ) )
 		return true;
@@ -44,17 +44,17 @@ bool ke_ogl_test_fence_nv( ke_ogl_fence_t* fence )
 	return false;
 }
 
-void ke_ogl_block_on_fence_nv( ke_ogl_fence_t* fence )
+void KeOpenGLBlockOnFenceNV( IKeOpenGLFence* fence )
 {
 	glFinishFenceNV( fence->fence );
 }
 
-void ke_ogl_delete_fence_nv( ke_ogl_fence_t* fence )
+void KeOpenGLDeleteFenceNV( IKeOpenGLFence* fence )
 {
 	glDeleteFencesNV( 1, &fence->fence );
 }
 
-bool ke_ogl_is_fence_nv( ke_ogl_fence_t* fence )
+bool KeOpenGLIsFenceNV( IKeOpenGLFence* fence )
 {
 	if( glTestFenceNV( fence->fence ) )
 		return true;
@@ -66,7 +66,7 @@ bool ke_ogl_is_fence_nv( ke_ogl_fence_t* fence )
 /*
  * APPLE fencing functions (GL_APPLE_fence)
  */
-bool ke_ogl_insert_fence_apple( ke_ogl_fence_t** fence )
+bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 {
 	GLenum error = glGetError();
 
@@ -81,7 +81,7 @@ bool ke_ogl_insert_fence_apple( ke_ogl_fence_t** fence )
 	return true;
 }
 
-bool ke_ogl_test_fence_apple( ke_ogl_fence_t* fence )
+bool KeOpenGLTestFenceAPPLE( IKeOpenGLFence* fence )
 {
 	if( glTestFenceAPPLE( fence->fence ) )
 		return true;
@@ -89,17 +89,17 @@ bool ke_ogl_test_fence_apple( ke_ogl_fence_t* fence )
 	return false;
 }
 
-void ke_ogl_block_on_fence_apple( ke_ogl_fence_t* fence )
+void KeOpenGLBlockOnFenceAPPLE( IKeOpenGLFence* fence )
 {
 	glFinishFenceAPPLE( fence->fence );
 }
 
-void ke_ogl_delete_fence_apple( ke_ogl_fence_t* fence )
+void KeOpenGLDeleteFenceAPPLE( IKeOpenGLFence* fence )
 {
 	glDeleteFencesAPPLE( 1, &fence->fence );
 }
 
-bool ke_ogl_is_fence_apple( ke_ogl_fence_t* fence )
+bool KeOpenGLIsFenceAPPLE( IKeOpenGLFence* fence )
 {
 	if( glTestFenceAPPLE( fence->fence ) )
 		return true;
@@ -111,7 +111,7 @@ bool ke_ogl_is_fence_apple( ke_ogl_fence_t* fence )
 /*
  * ARB synchronization functions (GL_ARB_sync)
  */
-bool ke_ogl_insert_fence_arb( ke_ogl_fence_t** fence )
+bool KeOpenGLInsertFenceARB( IKeOpenGLFence** fence )
 {
 	GLenum error = glGetError();
 
@@ -123,7 +123,7 @@ bool ke_ogl_insert_fence_arb( ke_ogl_fence_t** fence )
 	return true;
 }
 
-bool ke_ogl_test_fence_arb( ke_ogl_fence_t* fence )
+bool KeOpenGLTestFenceARB( IKeOpenGLFence* fence )
 {
 	int signaled = GL_UNSIGNALED;
 
@@ -133,19 +133,19 @@ bool ke_ogl_test_fence_arb( ke_ogl_fence_t* fence )
 	return signaled ? true : false;
 }
 
-void ke_ogl_block_on_fence_arb( ke_ogl_fence_t* fence )
+void KeOpenGLBlockOnFenceARB( IKeOpenGLFence* fence )
 {
 	/* Stall the current thread until this sync object is signaled */
 	//glWaitSync( fence->sync, 0, GL_TIMEOUT_IGNORED );
 	GLenum ret = glClientWaitSync( fence->sync, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED );
 }
 
-void ke_ogl_delete_fence_arb( ke_ogl_fence_t* fence )
+void KeOpenGLDeleteFenceARB( IKeOpenGLFence* fence )
 {
 	glDeleteSync( fence->sync );
 }
 
-bool ke_ogl_is_fence_arb( ke_ogl_fence_t* fence )
+bool KeOpenGLIsFenceARB( IKeOpenGLFence* fence )
 {
 	return glIsSync( fence->sync ) ? true : false;
 }
@@ -158,8 +158,8 @@ bool ke_ogl_is_fence_arb( ke_ogl_fence_t* fence )
 #define KE_FENCE_NV		1
 #define KE_FENCE_APPLE	2
 
-bool ( *ke_ogl_insert_fence[3] )( ke_ogl_fence_t** ) = { ke_ogl_insert_fence_arb, ke_ogl_insert_fence_nv, ke_ogl_insert_fence_apple };
-bool ( *ke_ogl_test_fence[3] )( ke_ogl_fence_t* ) = { ke_ogl_test_fence_arb, ke_ogl_test_fence_nv, ke_ogl_test_fence_apple };
-void ( *ke_ogl_block_on_fence[3] )( ke_ogl_fence_t* ) = { ke_ogl_block_on_fence_arb, ke_ogl_block_on_fence_nv, ke_ogl_block_on_fence_apple };
-void ( *ke_ogl_delete_fence[3] )( ke_ogl_fence_t* ) = { ke_ogl_delete_fence_arb, ke_ogl_delete_fence_nv, ke_ogl_delete_fence_apple };
-bool ( *ke_ogl_is_fence[3] )( ke_ogl_fence_t* ) = { ke_ogl_is_fence_arb, ke_ogl_is_fence_nv, ke_ogl_is_fence_apple };
+bool ( *KeOpenGLInsertFence[3] )( IKeOpenGLFence** ) = { KeOpenGLInsertFenceARB, KeOpenGLInsertFenceNV, KeOpenGLInsertFenceAPPLE };
+bool ( *KeOpenGLTestFence[3] )( IKeOpenGLFence* ) = { KeOpenGLTestFenceARB, KeOpenGLTestFenceNV, KeOpenGLTestFenceAPPLE };
+void ( *KeOpenGLBlockOnFence[3] )( IKeOpenGLFence* ) = { KeOpenGLBlockOnFenceARB, KeOpenGLBlockOnFenceNV, KeOpenGLBlockOnFenceAPPLE };
+void ( *KeOpenGLDeleteFence[3] )( IKeOpenGLFence* ) = { KeOpenGLDeleteFenceARB, KeOpenGLDeleteFenceNV, KeOpenGLDeleteFenceAPPLE };
+bool ( *KeOpenGLIsFence[3] )( IKeOpenGLFence* ) = { KeOpenGLIsFenceARB, KeOpenGLIsFenceNV, KeOpenGLIsFenceAPPLE };
