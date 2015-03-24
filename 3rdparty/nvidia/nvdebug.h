@@ -49,7 +49,9 @@
 /* Non-Windows platforms */
 #ifndef _WIN32
 #define OutputDebugString printf //std::cout << s
+#define OutputDebugStringA OutputDebugString
 #define TEXT(s) s
+#define DWORD unsigned long
 #endif
 
 /* Trap functionality */

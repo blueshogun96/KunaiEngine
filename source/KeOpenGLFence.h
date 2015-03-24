@@ -23,6 +23,7 @@
  */
 bool KeOpenGLInsertFenceNV( IKeOpenGLFence** fence )
 {
+#if GL_NV_fence
 	GLenum error = glGetError();
 
 	/* Generate a new fence */
@@ -34,32 +35,51 @@ bool KeOpenGLInsertFenceNV( IKeOpenGLFence** fence )
 	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!", glGetError() );
 
 	return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_NV_fence not supported!" );
+#endif
 }
 
 bool KeOpenGLTestFenceNV( IKeOpenGLFence* fence )
 {
+#if GL_NV_fence
 	if( glTestFenceNV( fence->fence ) )
 		return true;
 
 	return false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_NV_fence not supported!" );
+#endif
 }
 
 void KeOpenGLBlockOnFenceNV( IKeOpenGLFence* fence )
 {
+#if GL_NV_fence
 	glFinishFenceNV( fence->fence );
+#else
+    DISPDBG( KE_ERROR, "GL_NV_fence not supported!" );
+#endif
 }
 
 void KeOpenGLDeleteFenceNV( IKeOpenGLFence* fence )
 {
+#if GL_NV_fence
 	glDeleteFencesNV( 1, &fence->fence );
+#else
+    DISPDBG( KE_ERROR, "GL_NV_fence not supported!" );
+#endif
 }
 
 bool KeOpenGLIsFenceNV( IKeOpenGLFence* fence )
 {
+#if GL_NV_fence
 	if( glTestFenceNV( fence->fence ) )
 		return true;
 
 	return false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_NV_fence not supported!" );
+#endif
 }
 
 
@@ -68,6 +88,7 @@ bool KeOpenGLIsFenceNV( IKeOpenGLFence* fence )
  */
 bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 {
+#if GL_APPLE_fence
 	GLenum error = glGetError();
 
 	/* Generate a new fence */
@@ -79,32 +100,55 @@ bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!", glGetError() );
 
 	return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_fence not supported!" );
+#endif
 }
 
 bool KeOpenGLTestFenceAPPLE( IKeOpenGLFence* fence )
 {
+#if GL_APPLE_fence
 	if( glTestFenceAPPLE( fence->fence ) )
 		return true;
 
 	return false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_fence not supported!" );
+#endif
+
 }
 
 void KeOpenGLBlockOnFenceAPPLE( IKeOpenGLFence* fence )
 {
+#if GL_APPLE_fence
 	glFinishFenceAPPLE( fence->fence );
+#else
+    DISPDBG( KE_ERROR, "GL_APPLE_fence not supported!" );
+#endif
+
 }
 
 void KeOpenGLDeleteFenceAPPLE( IKeOpenGLFence* fence )
 {
+#if GL_APPLE_fence
 	glDeleteFencesAPPLE( 1, &fence->fence );
+#else
+    DISPDBG( KE_ERROR, "GL_APPLE_fence not supported!" );
+#endif
+
 }
 
 bool KeOpenGLIsFenceAPPLE( IKeOpenGLFence* fence )
 {
+#if GL_APPLE_fence
 	if( glTestFenceAPPLE( fence->fence ) )
 		return true;
 
 	return false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_fence not supported!" );
+#endif
+
 }
 
 
@@ -113,6 +157,7 @@ bool KeOpenGLIsFenceAPPLE( IKeOpenGLFence* fence )
  */
 bool KeOpenGLInsertFenceARB( IKeOpenGLFence** fence )
 {
+#if GL_ARB_fence
 	GLenum error = glGetError();
 
 	/* Create sync object.  It will automatically be set in the unsignaled state
@@ -121,33 +166,53 @@ bool KeOpenGLInsertFenceARB( IKeOpenGLFence** fence )
 	OGL_DISPDBG_RB( KE_ERROR, "Error creating and setting new sync object!", glGetError() );
 
 	return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_ARB_sync not supported!" );
+#endif
 }
 
 bool KeOpenGLTestFenceARB( IKeOpenGLFence* fence )
 {
+#if GL_ARB_sync
 	int signaled = GL_UNSIGNALED;
 
 	/* Test this sync object for it's status and return the result */
 	glGetSynciv( fence->sync, GL_SYNC_STATUS, sizeof( int ), NULL, &signaled );
 
 	return signaled ? true : false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_ARB_sync not supported!" );
+#endif
 }
 
 void KeOpenGLBlockOnFenceARB( IKeOpenGLFence* fence )
 {
+#if GL_ARB_sync
 	/* Stall the current thread until this sync object is signaled */
 	//glWaitSync( fence->sync, 0, GL_TIMEOUT_IGNORED );
 	GLenum ret = glClientWaitSync( fence->sync, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED );
+#else
+    DISPDBG( KE_ERROR, "GL_ARB_sync not supported!" );
+#endif
+
 }
 
 void KeOpenGLDeleteFenceARB( IKeOpenGLFence* fence )
 {
+#if GL_ARB_sync
 	glDeleteSync( fence->sync );
+#else
+    DISPDBG( KE_ERROR, "GL_ARB_sync not supported!" );
+#endif
 }
 
 bool KeOpenGLIsFenceARB( IKeOpenGLFence* fence )
 {
+#if GL_ARB_sync
 	return glIsSync( fence->sync ) ? true : false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_ARB_sync not supported!" );
+#endif
 }
 
 

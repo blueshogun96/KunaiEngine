@@ -59,9 +59,9 @@
  #include "TargetConditionals.h"
  #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
   #define __MOBILE_OS__
-  #include "ke_ios_util.h"
+  #include "KeiOSUtil.h"
  #else
-  #include "ke_osx_util.h"
+  #include "KeOSXUtil.h"
  #endif
 #endif
 
