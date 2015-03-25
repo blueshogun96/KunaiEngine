@@ -237,13 +237,13 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 
 	/* Initialize SDL video */
 	if( SDL_InitSubSystem( SDL_INIT_VIDEO ) != 0 )
-		return;
+		DISPDBG_R( KE_ERROR, "Error initializing SDL video sub system!" );
 
 	/* Initialize the SDL window */
 	window = SDL_CreateWindow( "Kunai Engine 0.1a", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		device_desc->width, device_desc->height, SDL_WINDOW_SHOWN );
 	if( !window )
-		return;
+		 DISPDBG_R( KE_ERROR, "Error creating SDL window!" );
 
 	/* Initialize Direct3D11 */
 	uint32_t flags = 0;
@@ -280,18 +280,18 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 	hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
 		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
 	if( FAILED( hr ) )
-		return;
+		D3D_DISPDBG_R( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
 
 	/* Create our render target view */
 	ID3D11Texture2D* back_buffer = NULL;
     hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
     if( FAILED( hr ) )
-        return;
+        D3D_DISPDBG_R( KE_ERROR, "Error getting back buffer!", hr );
 
     hr = d3ddevice->CreateRenderTargetView( back_buffer, NULL, &d3d_render_target_view );
     back_buffer->Release();
     if( FAILED( hr ) )
-        return;
+        D3D_DISPDBG_R( KE_ERROR, "Error creating render target view!", hr );
 
     d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view, NULL );
 
@@ -473,11 +473,11 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
 
 	/* Sanity check(s) */
     if( !geometry_buffer )
-        return false;
+        DISPDBG_RB( KE_ERROR, "Invalid interface pointer!" );
     //if( !vertex_attributes )
       //  return false;
     if( !vertex_data_size )
-        return false;   /* Temporary? */
+        DISPDBG_RB( KE_ERROR, "(vertex_data_size == 0) condition is currently not allowed..." );   /* Temporary? */
  
     *geometry_buffer = new IKeDirect3D11GeometryBuffer;
     IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>( *geometry_buffer );
@@ -497,7 +497,7 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
 	if( FAILED( hr ) )
 	{
 		delete (*geometry_buffer);
-		return false;
+		D3D_DISPDBG_RB( KE_ERROR, "Error creating vertex buffer!", hr );
 	}
 
 	/* Create index buffer, if desired. */
@@ -505,6 +505,7 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
 	if( index_data_size )
 	{
 		/* TODO */
+		D3D_DISPDBG_RB( KE_ERROR, "Index buffers not yet supported for D3D11!", hr );
 	}
 
 	return true;
@@ -1317,7 +1318,7 @@ void IKeDirect3D11RenderDevice::BlockUntilIdle()
 
 
 /*
- * Name: IKeDirect3D11RenderDevice::kick
+ * Name: IKeDirect3D11RenderDevice::Kick
  * Desc: Sends all pending GPU commands to the pipeline.
  */
 void IKeDirect3D11RenderDevice::Kick()
@@ -1349,7 +1350,7 @@ bool IKeDirect3D11RenderDevice::InsertFence( IKeFence** fence )
 	if( FAILED( hr ) )
 	{
 		DeleteFence(f);
-		return false;
+		D3D_DISPDBG_RB( KE_ERROR, "Error creating GPU fence!", hr );;
 	}
 
 	/* Set query object */
@@ -1380,7 +1381,7 @@ bool IKeDirect3D11RenderDevice::TestFence( IKeFence* fence )
 		else
 		{
 			/* Some other error */
-			return false;
+			D3D_DISPDBG_RB( KE_ERROR, "Unexpected error!", hr );
 		}
 	}
 
