@@ -196,6 +196,7 @@ protected:
 	ID3D11RenderTargetView* d3d_render_target_view;
 	DXGI_SWAP_CHAIN_DESC	swapchain_desc;
 	int						swap_interval;
+	void*					dd;
 };
 
 #endif /* defined(__ke_d3d11_renderdevice__) */

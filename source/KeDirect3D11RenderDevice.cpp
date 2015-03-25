@@ -11,6 +11,24 @@
 #include "KeDirect3D11RenderDevice.h"
 #include "KeDebug.h"
 
+/*
+ * DirectDraw stuff
+ */
+#ifdef _WIN32
+#define USE_DDRAW_VMEM			/* Not guaranteed to be accurate on modern hardware */
+//#define USE_DDRAW_VBLANK		/* Not recommended, but here if you need it... */
+
+#include <ddraw.h>
+#endif
+
+/*
+ * Debugging macros
+ */
+#define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
+#define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
+#define D3D_DISPDBG( a, b, c ) if(FAILED(c)) { DISPDBG( a, b << "\nError code: (" << c << ")" ); }
+#define D3D_DISPDBG_R( a, b, c ) if(FAILED(c)) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return; }
+#define D3D_DISPDBG_RB( a, b, c ) if(FAILED(c)) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
 
 /*
 * Globals
@@ -210,6 +228,13 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 		device_desc->device_type == KE_RENDERDEVICE_OGLES3 || device_desc->device_type == KE_RENDERDEVICE_OGL4 )
 		return;
 
+#if defined(USE_DDRAW_VMEM) || defined(USE_DDRAW_VBLANK)
+	/* Create a DirectDraw object if desired */
+	HRESULT hr = DirectDrawCreateEx( NULL, &dd, IID_IDirectDraw7, NULL );
+	if( FAILED( hr ) )
+		D3D_DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!", hr );
+#endif
+
 	/* Initialize SDL video */
 	if( SDL_InitSubSystem( SDL_INIT_VIDEO ) != 0 )
 		return;
@@ -334,6 +359,12 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 
 	SDL_DestroyWindow( window );
 	SDL_QuitSubSystem( SDL_INIT_VIDEO );
+
+	/* Uninitialize DirectDraw */
+#ifdef _WIN32
+	if( dd )
+		reinterpret_cast<IDirectDraw7*>( dd )->Release();
+#endif
 }
 
 
@@ -1222,6 +1253,13 @@ void IKeDirect3D11RenderDevice::SetProjectionMatrix( const Matrix4* projection )
 */
 void IKeDirect3D11RenderDevice::BlockUntilVerticalBlank()
 {
+#ifdef _WIN32
+ #ifdef USE_DDRAW_VBLANK
+	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+	return;
+ #endif
+#endif
+
 	SDL_DisplayMode display_mode;
 
 	/* Get the current display mode */
@@ -1410,5 +1448,10 @@ bool IKeDirect3D11RenderDevice::IsFence( IKeFence* fence )
  */
 void IKeDirect3D11RenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory )
 {
-
+#ifdef _WIN32
+ #ifdef USE_DDRAW_VMEM
+	DDSCAPS2 caps;
+	reinterpret_cast<IDirectDraw7*>( dd )->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
+ #endif
+#endif
 }

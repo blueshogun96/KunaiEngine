@@ -9,6 +9,15 @@
 #include "KeDebug.h"
 
 
+/*
+ * DirectDraw stuff
+ */
+#ifdef _WIN32
+#define USE_DDRAW_VMEM			/* Not guaranteed to be accurate on modern hardware */
+//#define USE_DDRAW_VBLANK		/* Not recommended, but here if you need it... */
+
+#include <ddraw.h>
+#endif
 
 /*
  * Debugging macros
@@ -272,7 +281,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice()
  * Name: IKeOpenGLRenderDevice::IKeOpenGLRenderDevice
  * Desc: Appropriate constructor used for initialization of OpenGL via SDL.
  */
-IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : fence_vendor(KE_FENCE_ARB)
+IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : fence_vendor( KE_FENCE_ARB ), dd(NULL)
 {
     /* Until we are finished initializing, mark this flag as false */
     initialized = false;
@@ -289,6 +298,13 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     if( device_desc->device_type == KE_RENDERDEVICE_D3D11 || device_desc->device_type == KE_RENDERDEVICE_OGLES2 || device_desc->device_type == KE_RENDERDEVICE_OGLES3 )
         DISPDBG_R( KE_ERROR, "Invalid rendering device type specified!" );
     
+#if defined(USE_DDRAW_VMEM) || defined(USE_DDRAW_VBLANK)
+	/* Create a DirectDraw object if desired */
+	HRESULT hr = DirectDrawCreateEx( NULL, &dd, IID_IDirectDraw7, NULL );
+	if( FAILED( hr ) )
+		DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!" );
+#endif
+
     /* Initialize SDL video */
     if( SDL_InitSubSystem( SDL_INIT_VIDEO ) != 0 )
         DISPDBG_R( KE_ERROR, "Error initializing SDL video sub system!" );
@@ -458,6 +474,12 @@ IKeOpenGLRenderDevice::~IKeOpenGLRenderDevice()
     SDL_GL_DeleteContext( context );
     SDL_DestroyWindow( window );
     SDL_QuitSubSystem( SDL_INIT_VIDEO );
+
+	/* Uninitialize DirectDraw */
+#ifdef _WIN32
+	if( dd )
+		reinterpret_cast<IDirectDraw7*>( dd )->Release();
+#endif
 }
 
 
@@ -1581,6 +1603,13 @@ void IKeOpenGLRenderDevice::SetProjectionMatrix( const Matrix4* projection )
  */
 void IKeOpenGLRenderDevice::BlockUntilVerticalBlank()
 {
+#ifdef _WIN32
+ #ifdef USE_DDRAW_VBLANK
+	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+	return;
+ #endif
+#endif
+
     SDL_DisplayMode display_mode;
     
     /* Get the current display mode */
@@ -1710,6 +1739,13 @@ bool IKeOpenGLRenderDevice::IsFence( IKeFence* fence )
  */
 void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory )
 {
+#ifdef _WIN32
+ #ifdef USE_DDRAW_VMEM
+	DDSCAPS2 caps;
+	reinterpret_cast<IDirectDraw7*>( dd )->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
+ #endif
+#endif
+
 #ifndef __APPLE__
 #endif
 }

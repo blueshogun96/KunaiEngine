@@ -216,6 +216,7 @@ protected:
 	int			major_version;
 	int			minor_version;
 	int			fence_vendor;
+	void*		dd;
 };
 
 #endif /* defined(__IKeOpenGLRenderDevice__) */
