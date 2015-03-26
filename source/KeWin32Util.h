@@ -12,11 +12,24 @@
 #include <mmsystem.h>
 
 /*
-* Name: KeSetCurrentPathToResourceDirectory
-* Desc: Sets the current path to the resource directory of the app.
-*/
+ * Name: KeSetCurrentPathToResourceDirectory
+ * Desc: Sets the current path to the resource directory of the app.
+ */
 int KeSetCurrentPathToResourceDirectory();
 
 int KeGetCurrentPathToResourceDirectory( char* resource_path );
+
+/*
+ * Name: KeIsOnlyInstance
+ * Desc: Returns true if this is the only instance of the application running.
+ * NOTE: This is generally only relevant on desktop OSes.
+ */
+bool KeIsOnlyInstance( const char* title );
+
+/*
+ * Name: KeGetDiskSpace
+ * Desc: Returns the amount of space free on the current disk drive.
+ */
+uint64_t KeGetDiskSpace();
 
 #endif /* defined(__ke_win32_util__) */

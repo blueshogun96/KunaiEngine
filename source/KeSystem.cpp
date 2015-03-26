@@ -57,9 +57,9 @@ struct ke_critical_section_t
 
 
 /* Input functions */
-void ke_update_keys();
-void ke_process_key_event( SDL_Event* event );
-void ke_process_mouse_event( SDL_Event* event );
+void KeUpdateKeys();
+void KeProcessKeyEvent( SDL_Event* event );
+void KeProcessMouseEvent( SDL_Event* event );
 
 /*
  * Name: KeProcessEvents
@@ -81,18 +81,18 @@ void KeProcessEvents()
                 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                ke_process_key_event( &event );
+                KeProcessKeyEvent( &event );
                 KeOnKeyboard( KeGetContextPointer(), &event );
                 break;
                 
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
-                ke_process_mouse_event( &event );
+                KeProcessMouseEvent( &event );
                 KeOnMouse( KeGetContextPointer(), &event );
                 break;
                 
             case SDL_MOUSEMOTION:
-                ke_process_mouse_event( &event );
+                KeProcessMouseEvent( &event );
                 break;
                 
             case SDL_CONTROLLERBUTTONDOWN:
@@ -103,7 +103,7 @@ void KeProcessEvents()
     }
     
     /* Update keys */
-    ke_update_keys();
+    KeUpdateKeys();
 }
 
 /*
@@ -278,10 +278,10 @@ void KeResetKeys()
 }
 
 /* 
- * Name: ke_reset_mouse
+ * Name: KeResetMouse
  * Desc: Resets the mouse state structure
  */
-void ke_reset_mouse()
+void KeResetMouse()
 {
     ZeroMemory( &mouse, sizeof( KeMouse ) );
 }
@@ -312,10 +312,10 @@ bool KeyGotAnyKey()
 }
 
 /*
- * Name: ke_update_keys
+ * Name: KeUpdateKeys
  * Desc: Updates the timestamp values for keyboard keys
  */
-void ke_update_keys()
+void KeUpdateKeys()
 {
     for( int i = 0; i < 256; i++ )
     {
@@ -337,10 +337,10 @@ void KeGetMouseState( KeMouse* _mouse )
 }
 
 /*
- * Name: ke_process_key_event
+ * Name: KeProcessKeyEvent
  * Desc: Processes key events.
  */
-void ke_process_key_event( SDL_Event* event )
+void KeProcessKeyEvent( SDL_Event* event )
 {
     /* Sanity check */
     if( !event )
@@ -366,10 +366,10 @@ void ke_process_key_event( SDL_Event* event )
 }
 
 /*
- * Name: ke_process_mouse_event
+ * Name: KeProcessMouseEvent
  * Desc: 
  */
-void ke_process_mouse_event( SDL_Event* event )
+void KeProcessMouseEvent( SDL_Event* event )
 {
     /* TODO: Figure out why the heck this mofo code isn't working when SDL's documentation tells me this is right */
     

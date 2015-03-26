@@ -26,3 +26,45 @@ int KeGetCurrentPathToResourceDirectory(char* resource_path)
 
 	return 0;
 }
+
+/*
+ * Name: KeIsOnlyInstance
+ * Desc: Returns true if this is the only instance of the application running.
+ * NOTE: This is generally only relevant on desktop OSes.
+ */
+bool KeIsOnlyInstance( const char* title )
+{
+	HANDLE handle = CreateMutex( NULL, TRUE, title );
+
+	if( GetLastError() != ERROR_SUCCESS )
+	{
+		HWND hwnd = FindWindow( title, NULL );
+		if( hwnd )
+		{
+			ShowWindow( hwnd, SW_SHOW );
+			SetFocus( hwnd );
+			SetForegroundWindow( hwnd );
+			SetActiveWindow( hwnd );
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*
+ * Name: KeGetDiskSpace
+ * Desc: Returns the amount of space free on the current disk drive.
+ */
+uint64_t KeGetDiskSpace()
+{
+	int const drive = _getdrive();
+	struct _diskfree_t diskfree;
+
+	_getdiskfree( drive, &diskfree );
+
+	uint64_t free_bytes = uint64_t(diskfree.avail_clusters) * 
+		uint64_t(diskfree.bytes_per_sector) * uint64_t(diskfree.sectors_per_cluster);
+
+	return free_bytes;
+}

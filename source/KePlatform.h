@@ -38,6 +38,7 @@
 #ifdef _WIN32
 #include <conio.h>
 #include <process.h>
+#include <direct.h>
 #else
 #include <sys/time.h>
 #include <sys/stat.h>
