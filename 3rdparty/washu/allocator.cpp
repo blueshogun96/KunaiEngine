@@ -8,7 +8,7 @@ namespace washu {
         struct allocation_node {
             allocation_node * Next;
             allocation_node * Prev;
-            type_info const * Info;
+            std::type_info const * Info;
             char const * From;
             void * Ptr;
             size_t Length;
@@ -23,10 +23,14 @@ namespace washu {
         allocation_node * root = 0;
     }
 
-    void * allocator::allocate (size_t bytes, type_info const & info, char const * from, size_t line) {
+    void * allocator::allocate (size_t bytes, std::type_info const & info, char const * from, size_t line) {
         size_t padding = 16 - sizeof( header );
 
+#ifdef __APPLE__    /* MacOSX guarantees that all memory allocates is 16-byte aligned */
+        void * ptr = malloc (bytes + sizeof(header) +padding);
+#else
         void * ptr = _aligned_malloc (bytes + sizeof(header) +padding, 16);
+#endif
 
         header * header = reinterpret_cast<washu::header *>( ptr );
         header->Length = bytes;
@@ -66,8 +70,11 @@ namespace washu {
         }
 
         free (header->AllocationInfo);
-
+#ifdef __APPLE__
+        free (realPtr);
+#else
         _aligned_free (realPtr);
+#endif
     }
 
     void allocator::print_leaks ( ) {

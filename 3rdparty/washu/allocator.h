@@ -4,7 +4,7 @@
 namespace washu {
     class allocator {
     public:
-        static void * allocate (size_t bytes, type_info const & info, char const * from, size_t line);
+        static void * allocate (size_t bytes, std::type_info const & info, char const * from, size_t line);
         static void release (void * ptr, char const * from, size_t line);
         static void print_leaks ( );
 

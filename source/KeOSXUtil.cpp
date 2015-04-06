@@ -1,5 +1,5 @@
 //
-//  ke_win32_util.cpp
+//  KeOSXUtil.cpp
 //
 //  Created by Shogun3D on 8/21/14.
 //  Copyright (c) 2014 Shogun3D. All rights reserved.
@@ -49,4 +49,6 @@ int KeGetCurrentPathToResourceDirectory( char* resource_path )
     CFRelease(resources_url);
     
     strcpy( resource_path, path );
+    
+    return 1;
 }

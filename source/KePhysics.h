@@ -16,6 +16,11 @@
 /* Rigid body */
 struct KeRigidBody
 {
+/*public:
+    KeRigidBody() {};
+    KeRigidBody( neSimulator* parent_sim );
+    virtual ~KeRigidBody();*/
+    
     neRigidBody*    rigid_body;
     neGeometry*     geometry;
     neSimulator*    parent_simulator;
@@ -25,6 +30,11 @@ struct KeRigidBody
 /* Animated body */
 struct KeAnimatedBody
 {
+/*public:
+    KeAnimatedBody() {};
+    KeAnimatedBody( neSimulator* parent_sim );
+    virtual ~KeAnimatedBody();*/
+    
     neAnimatedBody* animated_body;
     neGeometry*     geometry;
     neSimulator*    parent_simulator;
