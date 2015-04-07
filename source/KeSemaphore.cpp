@@ -8,23 +8,46 @@
 #include "KeSemaphore.h"
 
 
-
-KeSemaphore::KeSemaphore() : semaphore_ptr(NULL), semaphore(-1), named(No), valid(No), last_error(EINVAL)
+KeSemaphore::KeSemaphore() :
+#ifndef _WIN32
+	semaphore_ptr(NULL), semaphore(-1), named(No), valid(No), last_error(EINVAL)
+#else
+	semaphore(NULL), named(No), valid(No), last_error(0)
+#endif
 {
     
 }
 
-KeSemaphore::KeSemaphore( bool shared, uint32_t value ) : semaphore_ptr(NULL), semaphore(-1), named(No), valid(No), last_error(EINVAL)
+KeSemaphore::KeSemaphore( bool shared, uint32_t value ) : 
+#ifndef _WIN32
+	semaphore_ptr(NULL), semaphore(-1), named(No), valid(No), last_error(EINVAL)
+#else
+	semaphore(NULL), named(No), valid(No), last_error(0)
+#endif
 {
+#ifndef _WIN32
     int ret = sem_init( &semaphore, shared ? Yes : No, value );
     if( ret != -1 )
         valid = Yes;
     
     last_error = errno;
+#else
+	/*semaphore = CreateSemaphore( NULL, value, value, NULL );
+	if( semaphore != NULL )
+		valid = Yes;
+
+	last_error = GetLastError();*/
+#endif
 }
 
-KeSemaphore::KeSemaphore( const char* name, uint32_t value ) : semaphore_ptr(NULL), semaphore(-1), named(Yes), valid(No), last_error(EINVAL)
+KeSemaphore::KeSemaphore( const char* name, uint32_t value ) : 
+#ifndef _WIN32
+	semaphore_ptr(NULL), semaphore(-1), named(No), valid(No), last_error(EINVAL)
+#else
+	semaphore(NULL), named(No), valid(No), last_error(0)
+#endif
 {
+#ifndef _WIN32
     semaphore_ptr = sem_open( name, O_CREAT | O_EXCL, 0644, value );
     if( semaphore_ptr != SEM_FAILED )
     {
@@ -33,21 +56,27 @@ KeSemaphore::KeSemaphore( const char* name, uint32_t value ) : semaphore_ptr(NUL
     }
     
     last_error = errno;
+#else
+#endif
 }
 
 bool KeSemaphore::Create( bool shared, uint32_t value )
 {
+#ifndef _WIN32
     int ret = sem_init( &semaphore, shared ? Yes : No, value );
     if( ret != -1 )
         valid = Yes;
     
     last_error = errno;
+#else
+#endif
     
     return valid;
 }
 
 bool KeSemaphore::Open( const char* name, uint32_t value )
 {
+#ifndef _WIN32
     semaphore_ptr = sem_open( name, O_CREAT | O_EXCL, 0644, value );
     if( semaphore_ptr != SEM_FAILED )
     {
@@ -56,12 +85,15 @@ bool KeSemaphore::Open( const char* name, uint32_t value )
     }
     
     last_error = errno;
-    
+#else
+#endif
+
     return valid;
 }
 
 KeSemaphore::~KeSemaphore()
 {
+#ifndef _WIN32
     if( semaphore != -1 )
         sem_destroy( &semaphore );
     
@@ -70,6 +102,8 @@ KeSemaphore::~KeSemaphore()
         sem_unlink( semaphore_name );
         sem_close( semaphore_ptr );
     }
+#else
+#endif
     
     valid = No;
 }

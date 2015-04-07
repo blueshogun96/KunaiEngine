@@ -68,3 +68,57 @@ uint64_t KeGetDiskSpace()
 
 	return free_bytes;
 }
+
+/*
+ * Name: KeGetCpuSpeed
+ * Desc: Returns this machine's current CPU speed.
+ */
+uint64_t KeGetCpuSpeed()
+{
+    uint32_t speed = 0;
+	uint32_t buff_size = sizeof( uint32_t );
+	uint32_t type = REG_DWORD;
+	HKEY key;
+
+	long error = RegOpenKeyExA( HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &key );
+	if( error == ERROR_SUCCESS )
+	{
+		RegQueryValueExA( key, "~MHz", NULL, (DWORD*) &type, (uint8_t*) &speed, (DWORD*) &buff_size );
+	}
+    
+    return (uint64_t) speed;
+}
+
+
+/*
+ * Name: KeGetCpuCount()
+ * Desc: Returns the number of physical CPU cores on this machine.
+ */
+int KeGetCpuCount()
+{
+    /* Source: http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine */
+    
+    SYSTEM_INFO sysinfo;
+	GetSystemInfo( &sysinfo );
+
+	return sysinfo.dwNumberOfProcessors;
+}
+
+/*
+ * Name: KeGetPhysicalMemoryStatus
+ * Desc: Returns the amount of physical memory installed and the amount that is currently used
+ */
+int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free )
+{
+    return 0;
+}
+
+/*
+ * Name: KeGetVirtualMemoryStatus
+ * Desc: Returns the amount of virtual memory installed and the amount that is currently used
+ */
+int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free )
+{
+    return 0;
+}
+

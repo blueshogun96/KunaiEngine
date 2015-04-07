@@ -28,8 +28,12 @@ struct KeSemaphore
     bool        IsValid();
     uint32_t    GetLastError() { return last_error; }
     
+#ifndef _WIN32
 	sem_t* semaphore_ptr;
     sem_t semaphore;
+#else
+	HANDLE semaphore;
+#endif
     bool named, valid;
     uint32_t last_error;
     char semaphore_name[64];

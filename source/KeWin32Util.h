@@ -32,4 +32,28 @@ bool KeIsOnlyInstance( const char* title );
  */
 uint64_t KeGetDiskSpace();
 
+/*
+ * Name: KeGetCpuSpeed
+ * Desc: Returns this machine's current CPU speed.
+ */
+uint64_t KeGetCpuSpeed();
+
+/*
+ * Name: KeGetCpuCount()
+ * Desc: Returns the number of physical CPU cores on this machine.
+ */
+int KeGetCpuCount();
+
+/*
+ * Name: KeGetPhysicalMemoryStatus
+ * Desc: Returns the amount of physical memory installed and the amount that is currently used
+ */
+int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free );
+
+/*
+ * Name: KeGetVirtualMemoryStatus
+ * Desc: Returns the amount of virtual memory installed and the amount that is currently used
+ */
+int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free );
+
 #endif /* defined(__ke_win32_util__) */
