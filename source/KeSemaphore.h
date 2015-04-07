@@ -32,4 +32,5 @@ struct KeSemaphore
     sem_t semaphore;
     bool named, valid;
     uint32_t last_error;
+    char semaphore_name[64];
 };

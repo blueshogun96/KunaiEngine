@@ -412,7 +412,7 @@ void KeMessageBox( const char* message, const char* title, uint32_t flags )
 	}
 
 	/* Show message box with title and text */
-	SDL_ShowSimpleMessageBox( sdl_flags, title, message, SDL_GL_GetCurrentWindow() );
+	SDL_ShowSimpleMessageBox( sdl_flags, title, message, /*SDL_GL_GetCurrentWindow()*/ NULL );
 }
 
 void KeDisplayLastMessage( const char* title, uint32_t flags )

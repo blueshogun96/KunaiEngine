@@ -7,6 +7,7 @@
 
 #include "KePlatform.h"
 #include "KeOSXUtil.h"
+#include "KeDebug.h"
 
 #if 0   /* Linux headers */
 #include <sys/statvfs.h>
@@ -93,6 +94,22 @@ bool KeIsOnlyInstance( const char* title )
         }
     }
 #endif
+    
+    /* Attempt to open a semaphore with this title */
+    if( !semaphore.Open( title, 1 ) )
+    {
+        /* If it failed, check the error to see if it already exists. */
+        if( semaphore.GetLastError() == EEXIST )
+        {
+            DISPDBG( KE_WARNING, "Another instance of \"" << title << "\" appears to be running already!" );
+            return false;   /* There is another instance running */
+        }
+        else
+        {
+            /* Another error occurred */
+            DISPDBG( KE_WARNING, "KeSemaphore::Create() has returned " << semaphore.GetLastError() );
+        }
+    }
     
     return true;
 }

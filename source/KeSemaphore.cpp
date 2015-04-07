@@ -29,6 +29,7 @@ KeSemaphore::KeSemaphore( const char* name, uint32_t value ) : semaphore_ptr(NUL
     if( semaphore_ptr != SEM_FAILED )
     {
         valid = Yes;
+        memcpy( semaphore_name, name, strlen( name ) );
     }
     
     last_error = errno;
@@ -51,6 +52,7 @@ bool KeSemaphore::Open( const char* name, uint32_t value )
     if( semaphore_ptr != SEM_FAILED )
     {
         valid = Yes;
+        memcpy( semaphore_name, name, strlen( name ) );
     }
     
     last_error = errno;
@@ -64,7 +66,10 @@ KeSemaphore::~KeSemaphore()
         sem_destroy( &semaphore );
     
     if( semaphore_ptr != SEM_FAILED )
+    {
+        sem_unlink( semaphore_name );
         sem_close( semaphore_ptr );
+    }
     
     valid = No;
 }
