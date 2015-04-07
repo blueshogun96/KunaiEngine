@@ -18,8 +18,18 @@
  */
 struct KeSemaphore
 {
-	KeSemaphore( uint32_t value );
+    KeSemaphore();
+	KeSemaphore( bool shared, uint32_t value );
+    KeSemaphore( const char* name, uint32_t value );
 	virtual ~KeSemaphore();
 
-	sem_t semaphore;
+    bool        Create( bool shared, uint32_t value );
+    bool        Open( const char* name, uint32_t value );
+    bool        IsValid();
+    uint32_t    GetLastError() { return last_error; }
+    
+	sem_t* semaphore_ptr;
+    sem_t semaphore;
+    bool named, valid;
+    uint32_t last_error;
 };
