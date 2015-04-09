@@ -191,6 +191,11 @@
 #define KE_CLAMP_TO_BORDER  3
 #define KE_MIRRORED_REPEAT  4
 
+/*
+ * Sprite batch settings
+ */
+#define KE_DEFAULT_BATCH_SIZE (32*1024*1024)
+
 
 /*
  * Render device description
@@ -279,7 +284,6 @@ struct IKePalette {};
  * Fence base structure
  */
 struct IKeFence {};
-
 
 /*
  * Render device base class
@@ -390,9 +394,42 @@ protected:
 
 
 /*
+ * Sprite factory class
+ */
+class IKeSpriteFactory
+{
+public:
+    IKeSpriteFactory() {}
+    IKeSpriteFactory( IKeRenderDevice* renderdevice, KeVertexAttribute* vertex_attributes, uint32_t batch_size = KE_DEFAULT_BATCH_SIZE ) {}
+    virtual ~IKeSpriteFactory() {}
+    
+public:
+    virtual bool Initialized() PURE;
+    virtual void SetRenderStates( KeState* state ) PURE;
+    virtual void SetTextureStates( KeState* state ) PURE;
+    virtual void SetProgram( IKeGpuProgram* program ) PURE;
+    virtual void SetTexture( IKeTexture* texture ) PURE;
+    virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size ) PURE;
+    virtual bool Lock( void** data ) PURE;
+    virtual void Unlock( void* data ) PURE;
+    
+    virtual void Draw() PURE;
+    
+protected:
+    IKeRenderDevice*        renderdevice;
+    IKeGeometryBuffer*      dynamic_geometrybuffer;
+    uint32_t                batch_size;
+    bool                    initialized;
+};
+
+/*
  * Render device creation function
  */
 IKeRenderDevice* KeCreateRenderDevice( KeRenderDeviceDesc* renderdevice_desc );
 
+/*
+ * Sprite batch creation function
+ */
+IKeSpriteFactory* KeCreateSpriteFactory( IKeRenderDevice* renderdevice );
 
 #endif /* defined(__ke_renderdevice__) */

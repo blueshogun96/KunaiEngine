@@ -14,7 +14,7 @@
 /*
  * Thread function pointer
  */
-typedef int (*KeThreadPfn)( void* );
+typedef void (*KeThreadPfn)( void* );
 
 
 /*
@@ -22,7 +22,7 @@ typedef int (*KeThreadPfn)( void* );
  */
 struct KeThread
 {
-	KeThread( KeThreadPfn pfn );
+	KeThread( KeThreadPfn pfn, void* context = NULL, bool suspended = No );
 	virtual ~KeThread();
 
 	pthread_attr_t thread_attr;

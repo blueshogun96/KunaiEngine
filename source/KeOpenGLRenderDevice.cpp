@@ -1749,3 +1749,88 @@ void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* fre
 #ifndef __APPLE__
 #endif
 }
+
+
+/*
+ * Name: IKeOpenGLSpriteFactory::IKeOpenGLSpriteFactory
+ * Desc: Default constructor; initializes the sprite factory with a dynamic geometry buffer...
+ */
+IKeOpenGLSpriteFactory::IKeOpenGLSpriteFactory( IKeRenderDevice* renderdevice, KeVertexAttribute* vertex_attributes, uint32_t batch_size )
+{
+    /* Sanity checks */
+    if( !renderdevice )
+        DISPDBG_R( KE_ERROR, "Invalid rendering device!" );
+    if( !vertex_attributes )
+        DISPDBG_R( KE_ERROR, "Invalid vertex attributes!" );
+    
+    /* Create a dynamic geometry buffer */
+    if( !renderdevice->CreateGeometryBuffer( NULL, batch_size, NULL, 0, KE_UNSIGNED_SHORT, KE_USAGE_STREAM_READ_WRITE, vertex_attributes, &this->dynamic_geometrybuffer ) )
+        DISPDBG_R( KE_ERROR, "Error creating dynamic geometry buffer!" );
+    
+    this->renderdevice = reinterpret_cast<IKeRenderDevice*>(renderdevice);
+    this->batch_size = batch_size;
+}
+
+/*
+ * Name: IKeOpenGLSpriteFactory::~IKeOpenGLSpriteFactory
+ * Desc:
+ */
+IKeOpenGLSpriteFactory::~IKeOpenGLSpriteFactory()
+{
+    if( dynamic_geometrybuffer )
+        renderdevice->DeleteGeometryBuffer( dynamic_geometrybuffer );
+}
+
+
+/*
+ * Name: 
+ * Desc: 
+ */
+bool IKeOpenGLSpriteFactory::Initialized()
+{
+    return initialized;
+}
+
+/*
+ * Name:
+ * Desc:
+ */
+void IKeOpenGLSpriteFactory::SetRenderStates( KeState* state )
+{
+    
+}
+
+void IKeOpenGLSpriteFactory::SetTextureStates( KeState* state )
+{
+    
+}
+
+void IKeOpenGLSpriteFactory::SetProgram( IKeGpuProgram* program )
+{
+    
+}
+
+void IKeOpenGLSpriteFactory::SetTexture( IKeTexture* texture )
+{
+    
+}
+
+void IKeOpenGLSpriteFactory::SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size )
+{
+    
+}
+
+bool IKeOpenGLSpriteFactory::Lock( void** data )
+{
+    return false;
+}
+
+void IKeOpenGLSpriteFactory::Unlock( void* data )
+{
+    
+}
+
+void IKeOpenGLSpriteFactory::Draw()
+{
+    
+}

@@ -219,4 +219,28 @@ protected:
 	void*		dd;
 };
 
+
+/*
+ * Sprite factory class
+ */
+class IKeOpenGLSpriteFactory : public IKeSpriteFactory
+{
+public:
+    IKeOpenGLSpriteFactory() {}
+    IKeOpenGLSpriteFactory( IKeRenderDevice* renderdevice, KeVertexAttribute* vertex_attributes, uint32_t batch_size = KE_DEFAULT_BATCH_SIZE );
+    virtual ~IKeOpenGLSpriteFactory();
+    
+public:
+    virtual bool Initialized();
+    virtual void SetRenderStates( KeState* state );
+    virtual void SetTextureStates( KeState* state );
+    virtual void SetProgram( IKeGpuProgram* program );
+    virtual void SetTexture( IKeTexture* texture );
+    virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size );
+    virtual bool Lock( void** data );
+    virtual void Unlock( void* data );
+    
+    virtual void Draw();
+};
+
 #endif /* defined(__IKeOpenGLRenderDevice__) */

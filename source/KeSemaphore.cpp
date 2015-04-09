@@ -91,6 +91,48 @@ bool KeSemaphore::Open( const char* name, uint32_t value )
     return valid;
 }
 
+bool KeSemaphore::Wait()
+{
+#ifndef _WIN32
+    if( semaphore_ptr != SEM_FAILED )
+        sem_wait( semaphore_ptr );
+    
+    if( semaphore != -1 )
+        sem_wait( &semaphore );
+#else
+#endif
+    
+    return true;
+}
+
+bool KeSemaphore::TryWait()
+{
+#ifndef _WIN32
+    if( semaphore_ptr != SEM_FAILED )
+        sem_trywait( semaphore_ptr );
+    
+    if( semaphore != -1 )
+        sem_trywait( &semaphore );
+#else
+#endif
+    
+    return true;
+}
+
+bool KeSemaphore::GetValue( int* value )
+{
+#ifndef _WIN32
+    if( semaphore_ptr != SEM_FAILED )
+        sem_getvalue( semaphore_ptr, value );
+    
+    if( semaphore != -1 )
+        sem_getvalue( &semaphore, value );
+#else
+#endif
+    
+    return true;
+}
+
 KeSemaphore::~KeSemaphore()
 {
 #ifndef _WIN32

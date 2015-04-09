@@ -25,6 +25,9 @@ struct KeSemaphore
 
     bool        Create( bool shared, uint32_t value );
     bool        Open( const char* name, uint32_t value );
+    bool        Wait();
+    bool        TryWait();
+    bool        GetValue( int* value );
     bool        IsValid();
     uint32_t    GetLastError() { return last_error; }
     
