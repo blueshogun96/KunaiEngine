@@ -641,6 +641,8 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
         gb->index_type = index_data_type;
 		OGL_DISPDBG_RB( KE_ERROR, "Error setting index buffer data!", glGetError() );
     }
+    else
+        gb->vbo[1] = 0;
     
     /* Unbind this vertex array object */
     glBindVertexArray(0);

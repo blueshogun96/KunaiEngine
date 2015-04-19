@@ -37,6 +37,8 @@
  */
 struct IKeOpenGLConstantBuffer : public IKeConstantBuffer
 {
+    virtual void Destroy();
+    
     void*       buffer_data;    /* Constant buffer data */
     uint32_t    data_size;      /* Size of the data buffer */
     uint32_t*   locations;      /* Constant locations (for faux constant buffers) */
@@ -50,6 +52,11 @@ struct IKeOpenGLConstantBuffer : public IKeConstantBuffer
  */
 struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
 {
+    virtual void Destroy();
+    
+    virtual void* MapData( uint32_t flags );
+    virtual void UnmapData( void* );
+    
     uint32_t vbo[2];    /* Vertex and index buffer */
     uint32_t vao;       /* Vertex array object */
     uint32_t length;    /* Length of vertex data (in bytes) */
@@ -57,20 +64,12 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
 };
 
 /*
- * Universal shader structure
- */
-struct IKeOpenGLShader : public IKeShader
-{
-    uint32_t handle;        /* A handle to the GLSL shader */
-    uint32_t type;          /* OpenGL shader type */
-    char     version[32];   /* OpenGL shader version */
-};
-
-/*
  * GPU Program structure
  */
 struct IKeOpenGLGpuProgram : public IKeGpuProgram
 {
+    virtual void Destroy();
+    
     uint32_t program;       /* GPU program handle */
     uint32_t matrices[3];   /* Handles to the world, view, and projection matrices (respectively) */
 	KeVertexAttribute* va;	/* Vertex attributes */
@@ -81,6 +80,11 @@ struct IKeOpenGLGpuProgram : public IKeGpuProgram
  */
 struct IKeOpenGLTexture : public IKeTexture
 {
+    virtual void Destroy();
+    
+    virtual void* MapData( uint32_t flags );
+    virtual void UnmapData( void* );
+    
     uint32_t handle;            /* Handle to the OpenGL texture */
     uint32_t width, height;     /* Texture width/height */
     uint32_t depth;             /* Texture depth (for 3D and array textures) */
@@ -95,6 +99,8 @@ struct IKeOpenGLTexture : public IKeTexture
  */
 struct IKeOpenGLRenderTarget : public IKeRenderTarget
 {
+    virtual void Destroy();
+    
     uint32_t    frame_buffer_object;    /* Frame buffer object handle */
     uint32_t    depth_render_buffer;    /* Depth render buffer */
     /* TODO: Stencil? */
@@ -107,7 +113,7 @@ struct IKeOpenGLRenderTarget : public IKeRenderTarget
  */
 struct IKeOpenGLPalette : public IKePalette
 {
-    
+    virtual void Destroy();
 };
 
 /*
@@ -115,8 +121,18 @@ struct IKeOpenGLPalette : public IKePalette
  */
 struct IKeOpenGLFence : public IKeFence
 {
+    virtual void Destroy();
+    
 	uint32_t	fence;		/* GL_NV_fence, GL_APPLE_fence */
 	GLsync		sync;		/* GL_ARB_sync, GL_APPLE_sync */
+};
+
+/*
+ * Render/Texture state structure
+ */
+struct IKeOpenGLState : public IKeState
+{
+    virtual void Destroy();
 };
 
 

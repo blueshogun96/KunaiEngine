@@ -9,6 +9,7 @@
 #define __ke_audiodevice__
 
 #include "KePlatform.h"
+#include "KeUnknown.h"
 
 
 /*
@@ -76,19 +77,28 @@ struct KeAudioFormat
 /* 
  * 3D sound effect structure 
  */
-struct IKeSoundBuffer {};
+struct IKeSoundBuffer : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
 
 
 /* 
  * Sound stream structure 
  */
-struct IKeSoundStream {};
+struct IKeSoundStream : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
 
 
 /*
  * Audio effect structure
  */
-struct IKeAudioEffect {};
+struct IKeAudioEffect : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
 
 
 /*

@@ -33,6 +33,8 @@
  */
 struct IKeOpenALSoundBuffer : public IKeSoundBuffer
 {
+    virtual void Destroy();
+
     uint32_t    buffer;
     uint32_t    source;
 	float       volume;
@@ -47,6 +49,8 @@ struct IKeOpenALSoundBuffer : public IKeSoundBuffer
  */
 struct IKeOpenALSoundStream : public IKeSoundStream
 {
+    virtual void Destroy();
+    
 	uint32_t    source;
 	uint32_t*   buffers;
     uint32_t    buffer_count;
@@ -68,6 +72,8 @@ struct IKeOpenALSoundStream : public IKeSoundStream
  */
 struct IKeOpenALAudioEffect : public IKeAudioEffect
 {
+    virtual void Destroy();
+    
     uint32_t    environment;
     float       environment_size;
     float       environment_diffusion;

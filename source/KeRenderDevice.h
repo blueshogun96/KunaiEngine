@@ -10,6 +10,7 @@
 
 
 #include "KePlatform.h"
+#include "KeUnknown.h"
 #include "vectormath.h"
 #include "NvFoundationMath.h"
 #include "NV/NvMath.h"
@@ -240,50 +241,103 @@ struct KeState
 };
 
 
+
+/*
+ * Resource base structure
+ */
+struct IKeResourceBuffer : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+    
+    virtual void* MapData( uint32_t flags ) PURE;
+    virtual void UnmapData( void* ) PURE;
+};
+
+
 /*
  * Constant buffer structure
  */
-struct IKeConstantBuffer {};
+struct IKeConstantBuffer : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
 
 /*
  * Geometry buffer base structure
  */
-struct IKeGeometryBuffer {};
+struct IKeGeometryBuffer : public IKeResourceBuffer
+{
+    virtual void Destroy() PURE;
+    
+    virtual void* MapData( uint32_t flags ) PURE;
+    virtual void UnmapData( void* ) PURE;
+};
 
 /*
  * Push buffer base structure
  */
-struct IKePushBuffer {};
-
-/*
- * Universal shader base structure
- */
-struct IKeShader {};
+struct IKePushBuffer : public IKeResourceBuffer
+{
+    virtual void Destroy() PURE;
+    
+    virtual void* MapData( uint32_t flags ) PURE;
+    virtual void UnmapData( void* ) PURE;
+};
 
 /*
  * GPU Program base structure
  */
-struct IKeGpuProgram {};
+struct IKeGpuProgram : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
 
 /*
  * Texture base structure
  */
-struct IKeTexture {};
+struct IKeTexture : public IKeResourceBuffer
+{
+    virtual void Destroy() PURE;
+    
+    virtual void* MapData( uint32_t flags ) PURE;
+    virtual void UnmapData( void* ) PURE;
+};
 
 /*
  * Rendertarget base structure
  */
-struct IKeRenderTarget {};
+struct IKeRenderTarget : public IKeResourceBuffer
+{
+    virtual void Destroy() PURE;
+    
+    virtual void* MapData( uint32_t flags ) PURE;
+    virtual void UnmapData( void* ) PURE;
+};
 
 /*
  * Palette base structure
  */
-struct IKePalette {};
+struct IKePalette : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
 
 /*
  * Fence base structure
  */
-struct IKeFence {};
+struct IKeFence : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
+
+/*
+ * Render and texture state structure
+ */
+struct IKeState : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
+
 
 /*
  * Render device base class

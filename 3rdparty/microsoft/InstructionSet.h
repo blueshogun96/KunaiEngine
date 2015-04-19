@@ -10,7 +10,60 @@
 #include <bitset>
 #include <array>
 #include <string>
+#ifdef _WIN32
 #include <intrin.h>
+#endif
+
+
+#ifndef _MSC_VER
+#if defined(__pic__) && defined(__i386__)
+/* https://groups.google.com/a/chromium.org/forum/#!topic/chromium-reviews/LUzmsCMy4IQ */
+
+void __cpuidex(int cpu_info[4], int info_type, int info_index)
+{
+    __asm__ volatile (
+                      "mov %%ebx, %%edi\n"
+                      "cpuid\n"
+                      "xchg %%edi, %%ebx\n"
+                      : "=a"(cpu_info[0]), "=D"(cpu_info[1]), "=c"(cpu_info[2]), "=d"(cpu_info[3])
+                      : "a"(info_type), "c"(info_index)
+                      );
+}
+
+void __cpuid(int cpu_info[4], int info_type)
+{
+    __asm__ volatile (
+                      "mov %%ebx, %%edi\n"
+                      "cpuid\n"
+                      "xchg %%edi, %%ebx\n"
+                      : "=a"(cpu_info[0]), "=D"(cpu_info[1]), "=c"(cpu_info[2]), "=d"(cpu_info[3])
+                      : "a"(info_type)
+                      );
+}
+
+#else
+
+void __cpuidex(int cpu_info[4], int info_type, int info_index)
+{
+    __asm__ volatile (
+                      "cpuid \n\t"
+                      : "=a"(cpu_info[0]), "=b"(cpu_info[1]), "=c"(cpu_info[2]), "=d"(cpu_info[3])
+                      : "a"(info_type), "c"(info_index)
+                      );
+}
+
+void __cpuid(int cpu_info[4], int info_type)
+{
+    __asm__ volatile (
+                      "cpuid \n\t"
+                      : "=a"(cpu_info[0]), "=b"(cpu_info[1]), "=c"(cpu_info[2]), "=d"(cpu_info[3])
+                      : "a"(info_type)
+                      );
+}
+
+#endif
+#endif
+
 
 class InstructionSet
 {
