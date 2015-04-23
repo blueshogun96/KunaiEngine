@@ -18,59 +18,79 @@
 #include <d3d11_2.h>
 #include <D3Dcompiler.h>
 #include <xnamath.h>
+#include <atlbase.h>
 #endif
 
 
 
 /*
-* Constant buffer structure
-*/
+ * Constant buffer structure
+ */
 struct IKeDirect3D11ConstantBuffer : public IKeConstantBuffer
 {
-	ID3D11Buffer*	cb;		/* Constant buffer */
+	virtual void Destroy();
+    
+	CComPtr<ID3D11Buffer>	cb;		/* Constant buffer */
 };
 
 /*
-* Geometry buffer structure
-*/
+ * Geometry buffer structure
+ */
 struct IKeDirect3D11GeometryBuffer : public IKeGeometryBuffer
 {
-	ID3D11Buffer*	vb;		/* Vertex buffer */
-	ID3D11Buffer*	ib;		/* Index buffer */
+	virtual void Destroy();
+    
+    virtual void* MapData( uint32_t flags );
+    virtual void UnmapData( void* );
+
+	CComPtr<ID3D11Buffer>	vb;		/* Vertex buffer */
+	CComPtr<ID3D11Buffer>	ib;		/* Index buffer */
 	uint32_t stride;		/* Length of vertex data (in bytes) */
 	uint32_t index_type;	/* Data type for index data */
 };
 
 /*
-* GPU Program structure
-*/
+ * GPU Program structure
+ */
 struct IKeDirect3D11GpuProgram : public IKeGpuProgram
 {
-	ID3D11VertexShader*		vs;		/* Vertex shader */
-	ID3D11PixelShader*		ps;		/* Pixel shader */
-	ID3D11GeometryShader*	gs;		/* Geometry shader */
-	ID3D11HullShader*		hs;		/* Hull shader */
-	ID3D11DomainShader*		ds;		/* Domain shader */
-	ID3D11ComputeShader*	cs;		/* Compute shader */
-	ID3D11InputLayout*		il;		/* Vertex input layout */
+	virtual void Destroy();
+    
+	CComPtr<ID3D11VertexShader>		vs;		/* Vertex shader */
+	CComPtr<ID3D11PixelShader>		ps;		/* Pixel shader */
+	CComPtr<ID3D11GeometryShader>	gs;		/* Geometry shader */
+	CComPtr<ID3D11HullShader>		hs;		/* Hull shader */
+	CComPtr<ID3D11DomainShader>		ds;		/* Domain shader */
+	CComPtr<ID3D11ComputeShader>	cs;		/* Compute shader */
+	CComPtr<ID3D11InputLayout>		il;		/* Vertex input layout */
 };
 
 /*
-* Texture base structure
-*/
+ * Texture base structure
+ */
 struct IKeDirect3D11Texture : public IKeTexture
 {
-	ID3D11Texture1D*	tex1d;
-	ID3D11Texture2D*	tex2d;
-	ID3D11Texture3D*	tex3d;
+	virtual void Destroy();
+
+    virtual void* MapData( uint32_t flags );
+    virtual void UnmapData( void* );
+
+	CComPtr<ID3D11Texture1D>	tex1d;
+	CComPtr<ID3D11Texture2D>	tex2d;
+	CComPtr<ID3D11Texture3D>	tex3d;
 	uint32_t			flags;
 };
 
 /*
-* Rendertarget base structure
-*/
+ * Rendertarget base structure
+ */
 struct IKeDirect3D11RenderTarget : public IKeRenderTarget
 {
+	virtual void Destroy();
+    
+    virtual void* MapData( uint32_t flags );
+    virtual void UnmapData( void* );
+
 	uint32_t    frame_buffer_object;    /* Frame buffer object handle */
 	uint32_t    depth_render_buffer;    /* Depth render buffer */
 	/* TODO: Stencil? */
@@ -79,25 +99,35 @@ struct IKeDirect3D11RenderTarget : public IKeRenderTarget
 };
 
 /*
-* Palette base structure
-*/
+ * Palette base structure
+ */
 struct IKeDirect3D11Palette : public IKePalette
 {
 
 };
 
 /*
-* GPU fence structure
-*/
+ * GPU fence structure
+ */
 struct IKeDirect3D11Fence : public IKeFence
 {
-	ID3D11Query* query;
+	virtual void Destroy();
+    
+	CComPtr<ID3D11Query> query;
+};
+
+/*
+ * Render/Texture state structure
+ */
+struct IKeDirect3D11State : public IKeState
+{
+    virtual void Destroy();
 };
 
 
 /*
-* Render device base class
-*/
+ * Render device base class
+ */
 class IKeDirect3D11RenderDevice : public IKeRenderDevice
 {
 public:
@@ -165,10 +195,10 @@ public:
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height );
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
-    virtual void SetViewMatrix( const Matrix4* view );
-    virtual void SetWorldMatrix( const Matrix4* world );
-    virtual void SetModelviewMatrix( const Matrix4* modelview );
-    virtual void SetProjectionMatrix( const Matrix4* projection );
+    virtual void SetViewMatrix( const nv::matrix4f* view );
+    virtual void SetWorldMatrix( const nv::matrix4f* world );
+    virtual void SetModelviewMatrix( const nv::matrix4f* modelview );
+    virtual void SetProjectionMatrix( const nv::matrix4f* projection );
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank();
@@ -186,17 +216,17 @@ public:
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory );
 
 protected:
-	SDL_Window*				window;
-	D3D_DRIVER_TYPE			driver_type;
-	D3D_FEATURE_LEVEL		feature_level;
-	ID3D11Device*			d3ddevice;
-	ID3D11DeviceContext*	d3ddevice_context;
-	IDXGISwapChain*			dxgi_swap_chain; 
-	IDXGIOutput*			dxgi_output;
-	ID3D11RenderTargetView* d3d_render_target_view;
-	DXGI_SWAP_CHAIN_DESC	swapchain_desc;
-	int						swap_interval;
-	void*					dd;
+	SDL_Window*						window;
+	D3D_DRIVER_TYPE					driver_type;
+	D3D_FEATURE_LEVEL				feature_level;
+	CComPtr<ID3D11Device>			d3ddevice;
+	CComPtr<ID3D11DeviceContext>	d3ddevice_context;
+	CComPtr<IDXGISwapChain>			dxgi_swap_chain; 
+	CComPtr<IDXGIOutput>			dxgi_output;
+	CComPtr<ID3D11RenderTargetView> d3d_render_target_view;
+	DXGI_SWAP_CHAIN_DESC			swapchain_desc;
+	int								swap_interval;
+	void*							dd;
 };
 
 #endif /* defined(__ke_d3d11_renderdevice__) */

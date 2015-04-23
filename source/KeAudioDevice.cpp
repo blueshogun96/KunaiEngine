@@ -5,8 +5,8 @@
 //  Copyright (c) 2014 Shogun3D. All rights reserved.
 //
 
-#include "keAudioDevice.h"
-#include "keOpenALAudioDevice.h"
+#include "KeAudioDevice.h"
+#include "KeOpenAL/KeOpenALAudioDevice.h"
 #ifdef _WIN32
 /* TODO: XAudio2 */
 #endif

@@ -10,11 +10,11 @@
 #ifdef __MOBILE_OS__
 #include "ke_ogles2_renderdevice.h"
 #else
-#include "KeOpenGLRenderDevice.h"
+#include "KeOpenGL/KeOpenGLRenderDevice.h"
 #endif
 
 #ifdef _WIN32
-#include "KeDirect3D11RenderDevice.h"
+#include "KeDirect3D11//KeDirect3D11RenderDevice.h"
 #endif
 
 

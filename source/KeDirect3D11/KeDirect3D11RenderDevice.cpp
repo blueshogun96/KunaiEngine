@@ -289,7 +289,7 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
         D3D_DISPDBG_R( KE_ERROR, "Error getting back buffer!", hr );
 
     hr = d3ddevice->CreateRenderTargetView( back_buffer, NULL, &d3d_render_target_view );
-    back_buffer->Release();
+    back_buffer = 0;
     if( FAILED( hr ) )
         D3D_DISPDBG_R( KE_ERROR, "Error creating render target view!", hr );
 
@@ -344,18 +344,13 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 	ke_d3d11_uninitialize_default_shaders();
 
 	/* Uninitialize and close Direct3D and SDL */
-	if( dxgi_output )
-		dxgi_output->Release();
-	if( d3ddevice_context )
-		d3ddevice_context->ClearState();
-	if( d3d_render_target_view )
-		d3d_render_target_view->Release();
-	if( dxgi_swap_chain )
-		dxgi_swap_chain->Release();
-	if( d3ddevice_context )
-		d3ddevice_context->Release();
-	if( d3ddevice )
-		d3ddevice->Release();
+	
+	dxgi_output = 0;
+	d3ddevice_context->ClearState();
+	d3d_render_target_view = 0;
+	dxgi_swap_chain = 0;
+	d3ddevice_context = 0;
+	d3ddevice = 0;
 
 	SDL_DestroyWindow( window );
 	SDL_QuitSubSystem( SDL_INIT_VIDEO );
@@ -521,10 +516,8 @@ void IKeDirect3D11RenderDevice::DeleteGeometryBuffer( IKeGeometryBuffer* geometr
 	IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>(geometry_buffer);
 
 	/* Release vertex and index buffers */
-	if( gb->vb )
-		gb->vb->Release();
-	if( gb->ib )
-		gb->ib->Release();
+	gb->vb = 0;
+	gb->ib = 0;
 
 	delete geometry_buffer;
 }
@@ -610,7 +603,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 			{
 				DISPDBG( KE_ERROR, "Error compiling vertex shader source!\n" << (char*)blob_error->GetBufferPointer() << "\n" );
 				delete[] layout;
-				blob_error->Release();
+				blob_error = 0;
 				DeleteProgram(gp);
 			}
 
@@ -621,14 +614,14 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		if( FAILED( hr ) )
 		{
 			delete[] layout;
-			blob_shader->Release();
+			blob_shader = 0;
 			DeleteProgram(gp);
 			DISPDBG( KE_ERROR, "Error creating vertex shader!\n" );
 		}
 
 		/* Create input layout */
 		hr = d3ddevice->CreateInputLayout( layout, layout_size, blob_shader->GetBufferPointer(), blob_shader->GetBufferSize(), &gp->il );
-		blob_shader->Release();
+		blob_shader = 0;
 		delete[] layout;
 		if( FAILED( hr ) )
 		{
@@ -644,7 +637,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 			if( blob_error != NULL )
 			{
 				DISPDBG( KE_ERROR, "Error compiling pixel shader source!\n" << (char*)blob_error->GetBufferPointer() << "\n" );
-				blob_error->Release();
+				blob_error = 0;
 				DeleteProgram(gp);
 			}
 
@@ -654,12 +647,12 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		hr = d3ddevice->CreatePixelShader( blob_shader->GetBufferPointer(), blob_shader->GetBufferSize(), NULL, &gp->ps );
 		if( FAILED( hr ) )
 		{
-			blob_shader->Release();
+			blob_shader = 0;
 			DeleteProgram(gp);
 			DISPDBG( KE_ERROR, "Error creating pixel shader!\n" );
 		}
 
-		blob_shader->Release();
+		blob_shader = 0;
 
 		/* TODO: Geometry, Hull, Compute and Domain shaders */
 		gp->hs = NULL;
@@ -682,13 +675,13 @@ void IKeDirect3D11RenderDevice::DeleteProgram( IKeGpuProgram* gpu_program )
 	/* Deletes the GPU program */
 	if(gp)
 	{
-		if( gp->il ) gp->il->Release();
-		if( gp->hs ) gp->hs->Release();
-		if( gp->cs ) gp->cs->Release();
-		if( gp->ds ) gp->ds->Release();
-		if( gp->gs ) gp->gs->Release();
-		if( gp->ps ) gp->ps->Release();
-		if( gp->vs ) gp->vs->Release();
+		if( gp->il ) gp->il = 0;
+		if( gp->hs ) gp->hs = 0;
+		if( gp->cs ) gp->cs = 0;
+		if( gp->ds ) gp->ds = 0;
+		if( gp->gs ) gp->gs = 0;
+		if( gp->ps ) gp->ps = 0;
+		if( gp->vs ) gp->vs = 0;
 
 		delete gpu_program;
 	}
@@ -861,7 +854,7 @@ void IKeDirect3D11RenderDevice::DeleteConstantBuffer( IKeConstantBuffer* constan
 
 	if( cb )
 	{
-		if( cb->cb ) cb->cb->Release();
+		if( cb->cb ) cb->cb = 0;
 		delete constant_buffer;
 	}
 }
@@ -1197,7 +1190,8 @@ void IKeDirect3D11RenderDevice::SetViewport( int x, int y, int width, int height
 void IKeDirect3D11RenderDevice::SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z )
 {
 	/* Set up projection matrix using the perspective method */
-	projection_matrix = M4MakePerspective( fov, aspect, near_z, far_z );
+	//projection_matrix = M4MakePerspective( fov, aspect, near_z, far_z );
+	nv::perspective( projection_matrix, fov, aspect, near_z, far_z );
 }
 
 
@@ -1205,10 +1199,11 @@ void IKeDirect3D11RenderDevice::SetPerspectiveMatrix( float fov, float aspect, f
 * Name: IKeDirect3D11RenderDevice::set_view_matrix
 * Desc:
 */
-void IKeDirect3D11RenderDevice::SetViewMatrix( const Matrix4* view )
+void IKeDirect3D11RenderDevice::SetViewMatrix( const nv::matrix4f* view )
 {
 	/* Copy over the incoming view matrix */
-	memmove( &view_matrix, view, sizeof( Matrix4 ) );
+	//memmove( &view_matrix, view, sizeof( nv::matrix4f ) );
+	memmove( view_matrix._array, view->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1216,10 +1211,11 @@ void IKeDirect3D11RenderDevice::SetViewMatrix( const Matrix4* view )
 * Name: IKeDirect3D11RenderDevice::set_world_matrix
 * Desc:
 */
-void IKeDirect3D11RenderDevice::SetWorldMatrix( const Matrix4* world )
+void IKeDirect3D11RenderDevice::SetWorldMatrix( const nv::matrix4f* world )
 {
 	/* Copy over the incoming world matrix */
-	memmove( &world_matrix, world, sizeof( Matrix4 ) );
+	//memmove( &world_matrix, world, sizeof( nv::matrix4f ) );
+	memmove( world_matrix._array, world->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1227,10 +1223,11 @@ void IKeDirect3D11RenderDevice::SetWorldMatrix( const Matrix4* world )
 * Name: IKeDirect3D11RenderDevice::set_modelview_matrix
 * Desc:
 */
-void IKeDirect3D11RenderDevice::SetModelviewMatrix( const Matrix4* modelview )
+void IKeDirect3D11RenderDevice::SetModelviewMatrix( const nv::matrix4f* modelview )
 {
 	/* Copy over the incoming modelview matrix */
-	memmove( &modelview_matrix, modelview, sizeof( Matrix4 ) );
+	//memmove( &modelview_matrix, modelview, sizeof( nv::matrix4f ) );
+	memmove( modelview_matrix._array, modelview->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1238,10 +1235,11 @@ void IKeDirect3D11RenderDevice::SetModelviewMatrix( const Matrix4* modelview )
 * Name: IKeDirect3D11RenderDevice::set_projection_matrix
 * Desc:
 */
-void IKeDirect3D11RenderDevice::SetProjectionMatrix( const Matrix4* projection )
+void IKeDirect3D11RenderDevice::SetProjectionMatrix( const nv::matrix4f* projection )
 {
 	/* Copy over the incoming projection matrix */
-	memmove( &projection_matrix, projection, sizeof( Matrix4 ) );
+	//memmove( &projection_matrix, projection, sizeof( nv::matrix4f ) );
+	memmove( projection_matrix._array, projection->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1418,7 +1416,7 @@ void IKeDirect3D11RenderDevice::DeleteFence( IKeFence* fence )
 
 	if( f->query )
 	{
-		f->query->Release();
+		f->query = 0;
 	}
 
 	delete fence;
