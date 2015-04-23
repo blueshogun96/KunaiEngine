@@ -14,43 +14,43 @@
  * Desc: Calculates the current frustum based on the supplied modelview and projection
  *       matrices.
  */
-void KeCalculateFrustum( Matrix4 modelview_matrix, Matrix4 projection_matrix );
+void KeCalculateFrustum( nv::matrix4f modelview_matrix, nv::matrix4f projection_matrix );
 
 /*
  * Name: KePointInFrustum
  * Desc: Returns yes if this point is in the viewing frustum.
  */
-bool KePointInFrustum( VmathVector3 v );
+bool KePointInFrustum( nv::vec3f v );
 
 /*
  * Name: KeSphereInFrustum
  * Desc: Returns the distance between the camera and the sphere if it's within the frustum.
  */
-float KeSphereInFrustum( VmathVector3 v, float radius );
+float KeSphereInFrustum( nv::vec3f v, float radius );
 
 /*
  * Name: KeCubeInFrustum
  * Desc: Checks each corner of the cube if it is within our viewing frustum.
  */
-bool KeCubeInFrustum( VmathVector3 v, float size );
+bool KeCubeInFrustum( nv::vec3f v, float size );
 
 /*
  * Name: KeSphereInFrustum2
  * Desc: Same as the previous, except also capable of telling if the sphere is partly visible.
  */
-int KeSphereInFrustum2( VmathVector3 v, float radius );
+int KeSphereInFrustum2( nv::vec3f v, float radius );
 
 /*
  * Name: KeCubeInFrustum2
  * Desc: Same as the previous, except also capaoble of telling us if the cube is partly visible.
  */
-int KeCubeInFrustum2( VmathVector3 v, float size );
+int KeCubeInFrustum2( nv::vec3f v, float size );
 
 /*
  * Name: KePolygonInFrustum
  * Desc: Tests a polygon for visibility.
  */
-bool KePolygonInFrustum( int num_points, VmathVector3* point_list );
+bool KePolygonInFrustum( int num_points, nv::vec3f* point_list );
 
 /*
  * Name: KeProjectVertex
@@ -60,6 +60,8 @@ bool KePolygonInFrustum( int num_points, VmathVector3* point_list );
  *		 and assumes the depth range is 0.0-1.0f.  Also, if win_coord.z's value is
  *		 greater than 1.0, then the object is behind the camera.
  */
-int KeProjectVertex( VmathVector3* obj, float* modelview, float* projection, int* viewport, VmathVector3* win_coord );
+int KeProjectVertex( nv::vec3f* obj, nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord );
+
+int KeUnProjectVertex( nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord, nv::vec3f* obj );
 
 #endif /* defined(__frustum__) */

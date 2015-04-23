@@ -1432,11 +1432,11 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
     GLenum error = glGetError();
    
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, &world_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
     error = glGetError();
-    glUniformMatrix4fv( gp->matrices[1], 1, No, &view_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
     error = glGetError();
-    glUniformMatrix4fv( gp->matrices[2], 1, No, &projection_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
     error = glGetError();
     
     /* Bind the vertex buffer object, but not the index buffer object */
@@ -1460,9 +1460,9 @@ void IKeOpenGLRenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t str
     GLenum error = glGetError();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, &world_matrix.col0.x );
-    glUniformMatrix4fv( gp->matrices[1], 1, No, &view_matrix.col0.x );
-    glUniformMatrix4fv( gp->matrices[2], 1, No, &projection_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
     
     /* Bind the vertex and index buffer objects */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
@@ -1487,9 +1487,9 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesRange( uint32_t primtype, uint32_
     GLenum error = glGetError();
    
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, &world_matrix.col0.x );
-    glUniformMatrix4fv( gp->matrices[1], 1, No, &view_matrix.col0.x );
-    glUniformMatrix4fv( gp->matrices[2], 1, No, &projection_matrix.col0.x );
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
     
     /* Bind the vertex buffer object, but not the index buffer object */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
@@ -1548,7 +1548,8 @@ void IKeOpenGLRenderDevice::SetViewport( int x, int y, int width, int height )
 void IKeOpenGLRenderDevice::SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z )
 {
     /* Set up projection matrix using the perspective method */
-    projection_matrix = M4MakePerspective( fov, aspect, near_z, far_z );
+//    projection_matrix = M4MakePerspective( fov, aspect, near_z, far_z );
+    nv::perspective( projection_matrix, fov, aspect, near_z, far_z );
 }
 
 
@@ -1556,10 +1557,10 @@ void IKeOpenGLRenderDevice::SetPerspectiveMatrix( float fov, float aspect, float
  * Name: IKeOpenGLRenderDevice::set_view_matrix
  * Desc:
  */
-void IKeOpenGLRenderDevice::SetViewMatrix( const Matrix4* view )
+void IKeOpenGLRenderDevice::SetViewMatrix( const nv::matrix4f* view )
 {
     /* Copy over the incoming view matrix */
-    memmove( &view_matrix, view, sizeof( Matrix4 ) );
+    memmove( view_matrix._array, view->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1567,10 +1568,10 @@ void IKeOpenGLRenderDevice::SetViewMatrix( const Matrix4* view )
  * Name: IKeOpenGLRenderDevice::set_world_matrix
  * Desc:
  */
-void IKeOpenGLRenderDevice::SetWorldMatrix( const Matrix4* world )
+void IKeOpenGLRenderDevice::SetWorldMatrix( const nv::matrix4f* world )
 {
     /* Copy over the incoming world matrix */
-    memmove( &world_matrix, world, sizeof( Matrix4 ) );
+    memmove( world_matrix._array, world->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1578,10 +1579,10 @@ void IKeOpenGLRenderDevice::SetWorldMatrix( const Matrix4* world )
  * Name: IKeOpenGLRenderDevice::set_modelview_matrix
  * Desc:
  */
-void IKeOpenGLRenderDevice::SetModelviewMatrix( const Matrix4* modelview )
+void IKeOpenGLRenderDevice::SetModelviewMatrix( const nv::matrix4f* modelview )
 {
     /* Copy over the incoming modelview matrix */
-    memmove( &modelview_matrix, modelview, sizeof( Matrix4 ) );
+    memmove( modelview_matrix._array, modelview->_array, sizeof( float ) * 16 );
 }
 
 
@@ -1589,10 +1590,10 @@ void IKeOpenGLRenderDevice::SetModelviewMatrix( const Matrix4* modelview )
  * Name: IKeOpenGLRenderDevice::set_projection_matrix
  * Desc:
  */
-void IKeOpenGLRenderDevice::SetProjectionMatrix( const Matrix4* projection )
+void IKeOpenGLRenderDevice::SetProjectionMatrix( const nv::matrix4f* projection )
 {
     /* Copy over the incoming projection matrix */
-    memmove( &projection_matrix, projection, sizeof( Matrix4 ) );
+    memmove( projection_matrix._array, projection->_array, sizeof( float ) * 16 );
 }
 
 

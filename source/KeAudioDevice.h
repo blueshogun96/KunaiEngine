@@ -80,6 +80,16 @@ struct KeAudioFormat
 struct IKeSoundBuffer : public IKeUnknown
 {
     virtual void Destroy() PURE;
+    
+    virtual bool SetBufferData( void* buffer_data, uint32_t buffer_size ) PURE;
+    virtual bool Play( bool looping ) PURE;
+    virtual void Stop() PURE;
+    virtual void Pause() PURE;
+    
+    virtual void SetPosition( float* position ) PURE;
+    virtual void SetVelocity( float* velocity ) PURE;
+    virtual void SetVolume( float volume ) PURE;
+    virtual void SetPitch( float pitch ) PURE;
 };
 
 

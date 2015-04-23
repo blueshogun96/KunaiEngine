@@ -61,6 +61,7 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
     uint32_t vao;       /* Vertex array object */
     uint32_t length;    /* Length of vertex data (in bytes) */
     uint32_t index_type;/* Data type for index data */
+    uint32_t lock_flags;/* Buffer lock flags */
 };
 
 /*
@@ -206,10 +207,10 @@ public:
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height );
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
-    virtual void SetViewMatrix( const Matrix4* view );
-    virtual void SetWorldMatrix( const Matrix4* world );
-    virtual void SetModelviewMatrix( const Matrix4* modelview );
-    virtual void SetProjectionMatrix( const Matrix4* projection );
+    virtual void SetViewMatrix( const nv::matrix4f* view );
+    virtual void SetWorldMatrix( const nv::matrix4f* world );
+    virtual void SetModelviewMatrix( const nv::matrix4f* modelview );
+    virtual void SetProjectionMatrix( const nv::matrix4f* projection );
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank();

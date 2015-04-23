@@ -7,7 +7,7 @@
 
 
 #include "KePlatform.h"
-#include "vectormath.h"
+#include "NV/NvMath.h"
 #include "KeFrustum.h"
 
 
@@ -25,15 +25,15 @@ float frustum[6][4];    /* The frustum created from the supplied modelview and p
  * Desc: Calculates the current frustum based on the supplied modelview and projection
  *       matrices.
  */
-void KeCalculateFrustum( Matrix4 modelview_matrix, Matrix4 projection_matrix )
+void KeCalculateFrustum( nv::matrix4f modelview_matrix, nv::matrix4f projection_matrix )
 {
     float   proj[16];
     float   modl[16];
     float   clip[16];
     float   t;
     
-    memcpy( modl, &modelview_matrix.col0.x, sizeof( float ) * 16 );
-    memcpy( proj, &projection_matrix.col0.x, sizeof( float ) * 16 );
+    memcpy( modl, modelview_matrix._array, sizeof( float ) * 16 );
+    memcpy( proj, projection_matrix._array, sizeof( float ) * 16 );
     
     /* Combine the two matrices (multiply projection by modelview) */
     clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
@@ -140,7 +140,7 @@ void KeCalculateFrustum( Matrix4 modelview_matrix, Matrix4 projection_matrix )
  * Name: KePointInFrustum
  * Desc: Returns yes if this point is in the viewing frustum.
  */
-bool KePointInFrustum( VmathVector3 v )
+bool KePointInFrustum( nv::vec3f v )
 {
     int p;
     
@@ -159,7 +159,7 @@ bool KePointInFrustum( VmathVector3 v )
  * Name: KeSphereInFrustum
  * Desc: Returns the distance between the camera and the sphere if it's within the frustum.
  */
-float KeSphereInFrustum( VmathVector3 v, float radius )
+float KeSphereInFrustum( nv::vec3f v, float radius )
 {
     int p;
     float d;
@@ -182,7 +182,7 @@ float KeSphereInFrustum( VmathVector3 v, float radius )
  * Name: KeCubeInFrustum
  * Desc: Checks each corner of the cube if it is within our viewing frustum.
  */
-bool KeCubeInFrustum( VmathVector3 v, float size )
+bool KeCubeInFrustum( nv::vec3f v, float size )
 {
     int p;
     
@@ -215,7 +215,7 @@ bool KeCubeInFrustum( VmathVector3 v, float size )
  * Name: KeSphereInFrustum2
  * Desc: Same as the previous, except also capable of telling if the sphere is partly visible.
  */
-int KeSphereInFrustum2( VmathVector3 v, float radius )
+int KeSphereInFrustum2( nv::vec3f v, float radius )
 {
     int p;
     int c = 0;
@@ -238,7 +238,7 @@ int KeSphereInFrustum2( VmathVector3 v, float radius )
  * Name: KeCubeInFrustum2
  * Desc: Same as the previous, except also capable of telling us if the cube is partly visible.
  */
-int KeCubeInFrustum2( VmathVector3 v, float size )
+int KeCubeInFrustum2( nv::vec3f v, float size )
 {
     int p;
     int c;
@@ -277,7 +277,7 @@ int KeCubeInFrustum2( VmathVector3 v, float size )
  * Name: KePolygonInFrustum
  * Desc: Tests a polygon for visibility.
  */
-bool KePolygonInFrustum( int num_points, VmathVector3* point_list )
+bool KePolygonInFrustum( int num_points, nv::vec3f* point_list )
 {
     int f, p;
     
@@ -305,21 +305,21 @@ bool KePolygonInFrustum( int num_points, VmathVector3* point_list )
  *		 and assumes the depth range is 0.0-1.0f.  Also, if win_coord.z's value is
  *		 greater than 1.0, then the object is behind the camera.
  */
-int KeProjectVertex( VmathVector3* obj, float* modelview, float* projection, int* viewport, VmathVector3* win_coord )
+int KeProjectVertex( nv::vec3f* obj, nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord )
 {
 	/* Transformation vectors */
-	VmathVector4 tv1, tv2;
+    nv::vec4f tv1, tv2;
     
 	/* Modelview transformation */
-	tv1.x = modelview[0]*obj->x+modelview[4]*obj->y+modelview[8]*obj->z+modelview[12];
-	tv1.y = modelview[1]*obj->x+modelview[5]*obj->y+modelview[9]*obj->z+modelview[13];
-	tv1.z = modelview[2]*obj->x+modelview[6]*obj->y+modelview[10]*obj->z+modelview[14];
-	tv1.w = modelview[3]*obj->x+modelview[7]*obj->y+modelview[11]*obj->z+modelview[15];
+	tv1.x = modelview._array[0]*obj->x+modelview._array[4]*obj->y+modelview._array[8]*obj->z+modelview._array[12];
+	tv1.y = modelview._array[1]*obj->x+modelview._array[5]*obj->y+modelview._array[9]*obj->z+modelview._array[13];
+	tv1.z = modelview._array[2]*obj->x+modelview._array[6]*obj->y+modelview._array[10]*obj->z+modelview._array[14];
+	tv1.w = modelview._array[3]*obj->x+modelview._array[7]*obj->y+modelview._array[11]*obj->z+modelview._array[15];
     
 	/* Projection transformation */
-	tv2.x = projection[0]*tv1.x+projection[4]*tv1.y+projection[8]*tv1.z+projection[12]*tv1.w;
-	tv2.y = projection[1]*tv1.x+projection[5]*tv1.y+projection[9]*tv1.z+projection[13]*tv1.w;
-	tv2.z = projection[2]*tv1.x+projection[6]*tv1.y+projection[10]*tv1.z+projection[14]*tv1.w;
+	tv2.x = projection._array[0]*tv1.x+projection._array[4]*tv1.y+projection._array[8]*tv1.z+projection._array[12]*tv1.w;
+	tv2.y = projection._array[1]*tv1.x+projection._array[5]*tv1.y+projection._array[9]*tv1.z+projection._array[13]*tv1.w;
+	tv2.z = projection._array[2]*tv1.x+projection._array[6]*tv1.y+projection._array[10]*tv1.z+projection._array[14]*tv1.w;
 	tv2.w = -tv1.z;
     
 	/* Normalize result between -1 and 1 */
@@ -340,3 +340,65 @@ int KeProjectVertex( VmathVector3* obj, float* modelview, float* projection, int
     
 	return 1;
 }
+
+
+int KeUnProjectVertex( nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord, nv::vec3f* obj )
+{
+    //Transformation matrices
+    nv::matrix4f m, A;
+    nv::vec4f in, out;
+    
+    //Calculation for inverting a matrix, compute projection x modelview
+    //and store in A[16]
+    A = projection * modelview;
+    
+    //Now compute the inverse of matrix A
+    m = nv::inverse(A);
+    
+    //Transformation of normalized coordinates between -1 and 1
+    in.x = ( win_coord->x - (float)viewport[0] ) / (float)viewport[2] * 2.0 - 1.0;
+    in.y = ( win_coord->y - (float)viewport[1] ) / (float)viewport[3] * 2.0 - 1.0;
+    in.z = 2.0 * win_coord->z - 1.0;
+    in.w = 1.0;
+    
+    //Objects coordinates
+    out = m * in;
+    if( out.w == 0.0 )
+        return 0;
+    
+    out.w = 1.0 / out.w;
+    obj->x = out.x * out.w;
+    obj->y = out.y * out.w;
+    obj->z = out.z * out.w;
+    
+    return 1;
+}
+
+/*
+ int glhUnProjectf(float winx, float winy, float winz, float *modelview, float *projection, int *viewport, float *objectCoordinate)
+ {
+ //Transformation matrices
+ float m[16], A[16];
+ float in[4], out[4];
+ //Calculation for inverting a matrix, compute projection x modelview
+ //and store in A[16]
+ MultiplyMatrices4by4OpenGL_FLOAT(A, projection, modelview);
+ //Now compute the inverse of matrix A
+ if(glhInvertMatrixf2(A, m)==0)
+ return 0;
+ //Transformation of normalized coordinates between -1 and 1
+ in[0]=(winx-(float)viewport[0])/(float)viewport[2]*2.0-1.0;
+ in[1]=(winy-(float)viewport[1])/(float)viewport[3]*2.0-1.0;
+ in[2]=2.0*winz-1.0;
+ in[3]=1.0;
+ //Objects coordinates
+ MultiplyMatrixByVector4by4OpenGL_FLOAT(out, m, in);
+ if(out[3]==0.0)
+ return 0;
+ out[3]=1.0/out[3];
+ objectCoordinate[0]=out[0]*out[3];
+ objectCoordinate[1]=out[1]*out[3];
+ objectCoordinate[2]=out[2]*out[3];
+ return 1;
+ }
+ */

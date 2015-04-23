@@ -5,9 +5,9 @@
 //  Copyright (c) 2014 Shogun3D. All rights reserved.
 //
 
-#include "kePlatform.h"
-#include "keOpenALAudioDevice.h"
-#include "keDebug.h"
+#include "KePlatform.h"
+#include "KeOpenALAudioDevice.h"
+#include "KeDebug.h"
 
 
 /*

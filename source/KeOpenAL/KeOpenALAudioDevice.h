@@ -34,6 +34,16 @@
 struct IKeOpenALSoundBuffer : public IKeSoundBuffer
 {
     virtual void Destroy();
+    
+    virtual bool SetBufferData( void* buffer_data, uint32_t buffer_size );
+    virtual bool Play( bool looping );
+    virtual void Stop();
+    virtual void Pause();
+    
+    virtual void SetPosition( float* position );
+    virtual void SetVelocity( float* velocity );
+    virtual void SetVolume( float volume );
+    virtual void SetPitch( float pitch );
 
     uint32_t    buffer;
     uint32_t    source;

@@ -11,7 +11,7 @@
 
 #include "KePlatform.h"
 #include "KeUnknown.h"
-#include "vectormath.h"
+//#include "vectormath.h"
 #include "NvFoundationMath.h"
 #include "NV/NvMath.h"
 
@@ -88,6 +88,16 @@
 #define KE_USAGE_STREAM_WRITE		6
 #define KE_USAGE_STREAM_READ		7
 #define KE_USAGE_STREAM_READ_WRITE	8
+
+
+/*
+ * Buffer mapping flags
+ */
+#define KE_MAPBUFFER_READONLY       0x0
+#define KE_MAPBUFFER_WRITEONLY      0x1
+#define KE_MAPBUFFER_READWRITE      0x2
+#define KE_MAPBUFFER_VERTEXDATA     0x10
+#define KE_MAPBUFFER_INDEXDATA      0x20
 
 
 /*
@@ -409,10 +419,10 @@ public:
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height ) PURE;
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z ) PURE;
-    virtual void SetViewMatrix( const Matrix4* view ) PURE;
-    virtual void SetWorldMatrix( const Matrix4* world ) PURE;
-    virtual void SetModelviewMatrix( const Matrix4* modelview ) PURE;
-    virtual void SetProjectionMatrix( const Matrix4* projection ) PURE;
+    virtual void SetViewMatrix( const nv::matrix4f* view ) PURE;
+    virtual void SetWorldMatrix( const nv::matrix4f* world ) PURE;
+    virtual void SetModelviewMatrix( const nv::matrix4f* modelview ) PURE;
+    virtual void SetProjectionMatrix( const nv::matrix4f* projection ) PURE;
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank() PURE;
@@ -436,10 +446,10 @@ protected:
 	uint32_t				clear_stencil;
     int                     viewport[4];
     KeRenderDeviceDesc*		device_desc;
-    Matrix4                 world_matrix;
-    Matrix4                 view_matrix;
-    Matrix4                 modelview_matrix;
-    Matrix4                 projection_matrix;
+    nv::matrix4f                 world_matrix;
+    nv::matrix4f                 view_matrix;
+    nv::matrix4f                 modelview_matrix;
+    nv::matrix4f                 projection_matrix;
     IKeGeometryBuffer*		current_geometrybuffer;
     IKeGpuProgram*			current_gpu_program;
 	IKeTexture*				current_texture[8];
