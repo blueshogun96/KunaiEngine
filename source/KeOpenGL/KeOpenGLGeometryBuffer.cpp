@@ -57,8 +57,11 @@ void* IKeOpenGLGeometryBuffer::MapData( uint32_t flags )
        this does not seem ideal (at least to me, it isn't), so for now, be careful of any synchronization 
        issues due to Khronos's API design choices. */
     
+    uint8_t b1 = (flags&0xF0)/16;
+    uint8_t b2 = flags&0x0F;
+    
     /* Which buffer are we asking for? */
-    uint32_t bo_type = buffer_target[flags&0xF0];
+    uint32_t bo_type = buffer_target[b1];
     
     /* Sanity check */
     if( !bo_type )
@@ -68,10 +71,10 @@ void* IKeOpenGLGeometryBuffer::MapData( uint32_t flags )
     }
     
     /* Bind the desired buffer */
-    glBindBuffer( bo_type, this->vbo[bo_type == 1 ? 0 : 1] );
+    glBindBuffer( bo_type, this->vbo[b1-1] );
     
     /* Lock the desired buffer */
-    void* ptr = glMapBuffer( bo_type, access_flags[flags&0x0F] );
+    void* ptr = glMapBuffer( bo_type, access_flags[b2] );
     if( !ptr )
     {
         OGL_DISPDBG( KE_ERROR, "Error mapping buffer data!", glGetError() );
@@ -86,8 +89,10 @@ void* IKeOpenGLGeometryBuffer::MapData( uint32_t flags )
 
 void IKeOpenGLGeometryBuffer::UnmapData( void* data_ptr )
 {
+    uint8_t b1 = (lock_flags&0xF0)/16;
+    
     /* Which buffer are we asking for? */
-    uint32_t bo_type = buffer_target[lock_flags&0xF0];
+    uint32_t bo_type = buffer_target[b1];
     
     /* Unmap this buffer */
     glUnmapBuffer(bo_type);
@@ -96,3 +101,22 @@ void IKeOpenGLGeometryBuffer::UnmapData( void* data_ptr )
     /* TODO: Unbind the buffer? */
 }
 
+bool IKeOpenGLGeometryBuffer::SetVertexData( uint32_t offset, uint32_t size, void* ptr )
+{
+    /* Set our vertex buffer data */
+    glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+    glBufferSubData( GL_ARRAY_BUFFER, offset, size, ptr );
+    OGL_DISPDBG_RB( KE_ERROR, "Error setting vertex buffer data!", glGetError() );
+    
+    return true;
+}
+
+bool IKeOpenGLGeometryBuffer::SetIndexData( uint32_t offset, uint32_t size, void* ptr )
+{
+    /* Set our vertex buffer data */
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
+    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, offset, size, ptr );
+    OGL_DISPDBG_RB( KE_ERROR, "Error setting indexex buffer data!", glGetError() );
+    
+    return true;
+}

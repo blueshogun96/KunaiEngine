@@ -305,16 +305,17 @@ bool KePolygonInFrustum( int num_points, nv::vec3f* point_list )
  *		 and assumes the depth range is 0.0-1.0f.  Also, if win_coord.z's value is
  *		 greater than 1.0, then the object is behind the camera.
  */
-int KeProjectVertex( nv::vec3f* obj, nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord )
+int KeProjectVertex( nv::vec3f obj, nv::matrix4f modelview, nv::matrix4f projection, int* viewport, nv::vec3f* win_coord )
 {
 	/* Transformation vectors */
     nv::vec4f tv1, tv2;
     
+#if 1
 	/* Modelview transformation */
-	tv1.x = modelview._array[0]*obj->x+modelview._array[4]*obj->y+modelview._array[8]*obj->z+modelview._array[12];
-	tv1.y = modelview._array[1]*obj->x+modelview._array[5]*obj->y+modelview._array[9]*obj->z+modelview._array[13];
-	tv1.z = modelview._array[2]*obj->x+modelview._array[6]*obj->y+modelview._array[10]*obj->z+modelview._array[14];
-	tv1.w = modelview._array[3]*obj->x+modelview._array[7]*obj->y+modelview._array[11]*obj->z+modelview._array[15];
+	tv1.x = modelview._array[0]*obj.x+modelview._array[4]*obj.y+modelview._array[8]*obj.z+modelview._array[12];
+	tv1.y = modelview._array[1]*obj.x+modelview._array[5]*obj.y+modelview._array[9]*obj.z+modelview._array[13];
+	tv1.z = modelview._array[2]*obj.x+modelview._array[6]*obj.y+modelview._array[10]*obj.z+modelview._array[14];
+	tv1.w = modelview._array[3]*obj.x+modelview._array[7]*obj.y+modelview._array[11]*obj.z+modelview._array[15];
     
 	/* Projection transformation */
 	tv2.x = projection._array[0]*tv1.x+projection._array[4]*tv1.y+projection._array[8]*tv1.z+projection._array[12]*tv1.w;
@@ -335,8 +336,38 @@ int KeProjectVertex( nv::vec3f* obj, nv::matrix4f& modelview, nv::matrix4f& proj
     
 	/* Calculate window coordinates */
 	win_coord->x = (tv2.x*0.5f+0.5f)*viewport[2]+viewport[0];
-	win_coord->y = (tv2.y*0.5f+0.5f)*viewport[3]+viewport[1];
+	win_coord->y = viewport[3] - ((tv2.y*0.5f+0.5f)*viewport[3]+viewport[1]);
 	win_coord->z = (1.0f+tv2.z)*0.5f;
+#else
+    memmove( tv1._array, obj._array, sizeof(float)*3 );
+    tv1.w = 1.0f;
+    
+    /* Modelview and projeection transformation */
+    tv2 = modelview * tv1;
+    tv1 = projection * tv2;
+    
+    if( tv1.w == 0.0f )
+        return 0;
+    
+    /* Perspective division */
+    tv1.x /= tv1.w;
+    tv1.y /= tv1.w;
+    tv1.z /= tv1.w;
+    
+    /* Map xyz to 0-1 range */
+    tv1.x = tv1.x * 0.5f + 0.5f;
+    tv1.y = tv1.y * 0.5f + 0.5f;
+    tv1.z = tv1.z * 0.5f + 0.5f;
+    
+    /* Map xy to viewport */
+    tv1.x = tv1.x * float(viewport[2]) + float(viewport[0]);
+    tv1.y = viewport[3] - (tv1.y * float(viewport[3]) + float(viewport[1]));
+    
+    /* Final coordinates */
+    win_coord->x = tv1.x;
+    win_coord->y = tv1.y;
+    win_coord->z = tv1.z;
+#endif
     
 	return 1;
 }

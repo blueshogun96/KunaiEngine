@@ -346,6 +346,9 @@ void KeProcessKeyEvent( SDL_Event* event )
     if( !event )
         return;
     
+    if( event->key.keysym.sym > 255 )
+        return;
+    
     /* Determine what key was pressed or released */
     //keys[event->key.keysym.sym].pressed = event->key.state = SDL_PRESSED ? true : false;
     

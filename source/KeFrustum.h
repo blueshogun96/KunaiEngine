@@ -60,7 +60,7 @@ bool KePolygonInFrustum( int num_points, nv::vec3f* point_list );
  *		 and assumes the depth range is 0.0-1.0f.  Also, if win_coord.z's value is
  *		 greater than 1.0, then the object is behind the camera.
  */
-int KeProjectVertex( nv::vec3f* obj, nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord );
+int KeProjectVertex( nv::vec3f obj, nv::matrix4f modelview, nv::matrix4f projection, int* viewport, nv::vec3f* win_coord );
 
 int KeUnProjectVertex( nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord, nv::vec3f* obj );
 

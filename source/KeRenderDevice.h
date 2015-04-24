@@ -281,6 +281,9 @@ struct IKeGeometryBuffer : public IKeResourceBuffer
     
     virtual void* MapData( uint32_t flags ) PURE;
     virtual void UnmapData( void* ) PURE;
+    
+    virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
+    virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
 };
 
 /*
@@ -418,6 +421,9 @@ public:
     
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height ) PURE;
+    //virtual void SetViewportV( int* viewport ) PURE;
+    //virtual void GetViewport( int* x, int* y, int* width, int* height ) PURE;
+    //virtual void GetViewportV( int* viewport ) PURE;
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z ) PURE;
     virtual void SetViewMatrix( const nv::matrix4f* view ) PURE;
     virtual void SetWorldMatrix( const nv::matrix4f* world ) PURE;

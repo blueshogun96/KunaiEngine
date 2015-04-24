@@ -57,6 +57,9 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
     virtual void* MapData( uint32_t flags );
     virtual void UnmapData( void* );
     
+    virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
+    virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
+    
     uint32_t vbo[2];    /* Vertex and index buffer */
     uint32_t vao;       /* Vertex array object */
     uint32_t length;    /* Length of vertex data (in bytes) */
