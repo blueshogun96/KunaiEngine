@@ -1311,7 +1311,7 @@ void IKeOpenGLRenderDevice::SetTexture( int stage, IKeTexture* texture )
  *       does not have an equivalent to Direct3D's state buffer, we have to create a faux state buffer
  *       and save/set each state individually.
  */
-bool IKeOpenGLRenderDevice::CreateState( KeState* state_params, int state_count, IKeStateBuffer** state_buffer )
+bool IKeOpenGLRenderDevice::CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer )
 {
     /* Create a new state buffer interface */
     (*state_buffer) = new IKeOpenGLStateBuffer;
@@ -1327,7 +1327,7 @@ bool IKeOpenGLRenderDevice::CreateState( KeState* state_params, int state_count,
     return true;
 }
 
-bool IKeOpenGLRenderDevice::SetState( IKeStateBuffer* state_buffer )
+bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
 {
     int i = 0;
     

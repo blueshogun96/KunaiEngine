@@ -14,7 +14,7 @@
  * Name: IKeDirect3D11State::Destroy
  * Desc: Handles destruction of this interface instance.
  */
-void IKeDirect3D11State::Destroy()
+void IKeDirect3D11StateBuffer::Destroy()
 {
     /* Delete this instance */
     delete this;

@@ -410,8 +410,8 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget ) PURE;
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget ) PURE;
     virtual void SetTexture( int stage, IKeTexture* texture ) PURE;
-    virtual bool CreateState( KeState* state_params, int state_count, IKeStateBuffer** state_buffer ) PURE;
-    virtual bool SetState( IKeStateBuffer* state_buffer ) PURE;
+    virtual bool CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer ) PURE;
+    virtual bool SetStateBuffer( IKeStateBuffer* state_buffer ) PURE;
     virtual void SetRenderStates( KeState* states ) PURE;
     virtual void SetSamplerStates( KeState* states ) PURE;
 //    virtual void draw_vertices_im() PURE;

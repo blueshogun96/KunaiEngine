@@ -43,6 +43,9 @@ struct IKeDirect3D11GeometryBuffer : public IKeGeometryBuffer
     virtual void* MapData( uint32_t flags );
     virtual void UnmapData( void* );
 
+	virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
+    virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
+
 	CComPtr<ID3D11Buffer>	vb;		/* Vertex buffer */
 	CComPtr<ID3D11Buffer>	ib;		/* Index buffer */
 	uint32_t stride;		/* Length of vertex data (in bytes) */
@@ -119,9 +122,14 @@ struct IKeDirect3D11Fence : public IKeFence
 /*
  * Render/Texture state structure
  */
-struct IKeDirect3D11State : public IKeState
+struct IKeDirect3D11StateBuffer : public IKeStateBuffer
 {
     virtual void Destroy();
+
+	CComPtr<ID3D11BlendState>			bs;
+	CComPtr<ID3D11RasterizerState>		rs;
+	CComPtr<ID3D11DepthStencilState>	dss;
+	CComPtr<ID3D11SamplerState>			ss;
 };
 
 
@@ -183,6 +191,8 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget );
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget );
     virtual void SetTexture( int stage, IKeTexture* texture );
+	virtual bool CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer );
+    virtual bool SetStateBuffer( IKeStateBuffer* state_buffer );
     virtual void SetRenderStates( KeState* states );
     virtual void SetSamplerStates( KeState* states );
 //    virtual void draw_vertices_im();
@@ -194,6 +204,9 @@ public:
     
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height );
+    virtual void SetViewportV( int* viewport );
+    virtual void GetViewport( int* x, int* y, int* width, int* height );
+    virtual void GetViewportV( int* viewport );
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
     virtual void SetViewMatrix( const nv::matrix4f* view );
     virtual void SetWorldMatrix( const nv::matrix4f* world );

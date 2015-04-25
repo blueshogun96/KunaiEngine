@@ -84,6 +84,51 @@ D3D_PRIMITIVE_TOPOLOGY primitive_types[] =
 	D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
 };
 
+/* Direct3D11 depth/alpha test functions */
+D3D11_COMPARISON_FUNC test_funcs[] =
+{
+	D3D11_COMPARISON_NEVER,
+	D3D11_COMPARISON_LESS,
+	D3D11_COMPARISON_EQUAL,
+	D3D11_COMPARISON_LESS_EQUAL,
+	D3D11_COMPARISON_GREATER,
+	D3D11_COMPARISON_NOT_EQUAL,
+	D3D11_COMPARISON_GREATER_EQUAL,
+	D3D11_COMPARISON_ALWAYS
+};
+
+/* Direct3D11 fill modes */
+D3D11_FILL_MODE fill_modes[] =
+{
+	D3D11_FILL_WIREFRAME,	/* Direct3D11 doesn't support point mode */
+	D3D11_FILL_WIREFRAME,
+	D3D11_FILL_SOLID,
+};
+
+/* Direct3D11 blend modes */
+D3D11_BLEND blend_modes[] = 
+{
+	D3D11_BLEND_ZERO,
+	D3D11_BLEND_ONE,
+    D3D11_BLEND_SRC_COLOR,
+    D3D11_BLEND_INV_SRC_COLOR,
+    D3D11_BLEND_SRC_ALPHA,
+    D3D11_BLEND_INV_SRC_ALPHA,
+    D3D11_BLEND_DEST_ALPHA,
+    D3D11_BLEND_INV_DEST_ALPHA,
+    D3D11_BLEND_DEST_COLOR,
+    D3D11_BLEND_INV_DEST_COLOR,
+    D3D11_BLEND_SRC_ALPHA_SAT,
+    D3D11_BLEND_BLEND_FACTOR,
+    D3D11_BLEND_INV_BLEND_FACTOR,
+    D3D11_BLEND_SRC1_COLOR,
+    D3D11_BLEND_INV_SRC1_COLOR,
+    D3D11_BLEND_SRC1_ALPHA,
+    D3D11_BLEND_INV_SRC1_ALPHA
+};
+
+
+
 #if 0
 /* OpenGL data types */
 uint32_t data_types[] =
@@ -98,18 +143,7 @@ uint32_t data_types[] =
 	GL_DOUBLE
 };
 
-/* OpenGL depth/alpha test functions */
-uint32_t test_funcs[] =
-{
-	GL_NEVER,
-	GL_LESS,
-	GL_EQUAL,
-	GL_LEQUAL,
-	GL_GREATER,
-	GL_NOTEQUAL,
-	GL_GEQUAL,
-	GL_ALWAYS
-};
+
 
 /* OpenGL texture targets */
 uint32_t texture_targets[] =
@@ -130,13 +164,7 @@ uint32_t polygon_modes[] =
 	GL_FRONT_AND_BACK
 };
 
-/* OpenGL fill modes */
-uint32_t fill_modes[] =
-{
-	GL_POINT,
-	GL_LINE,
-	GL_FILL,
-};
+
 
 /* OpenGL texture formats */
 uint32_t texture_formats[] =
@@ -1061,6 +1089,146 @@ void IKeDirect3D11RenderDevice::SetTexture( int stage, IKeTexture* texture )
 	IKeDirect3D11Texture* tex = static_cast<IKeDirect3D11Texture*>(texture);
 }
 
+
+/*
+ * Name: IKeDirect3D11RenderDevice::CreateState
+ * Desc: Creates a compiled buffer of render and texture states.  At the time of writing, OpenGL
+ *       does not have an equivalent to Direct3D's state buffer, we have to create a faux state buffer
+ *       and save/set each state individually.
+ */
+bool IKeDirect3D11RenderDevice::CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer )
+{
+	D3D11_BLEND_DESC blend_desc;
+	D3D11_RASTERIZER_DESC raster_desc;
+	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
+	D3D11_SAMPLER_DESC sampler_desc;
+	HRESULT hr;
+	bool use_blend = false, use_raster = false, use_depth_stencil = false, use_sampler = false;
+
+	ZeroMemory( &blend_desc, sizeof( blend_desc ) );
+	ZeroMemory( &raster_desc, sizeof( raster_desc ) );
+	ZeroMemory( &depth_stencil_desc, sizeof( depth_stencil_desc ) );
+	ZeroMemory( &sampler_desc, sizeof( sampler_desc ) );
+
+    /* Create a new state buffer interface */
+    (*state_buffer) = new IKeDirect3D11StateBuffer;
+    IKeDirect3D11StateBuffer* sb = static_cast<IKeDirect3D11StateBuffer*>( *state_buffer );
+    
+	/* Apply each render state in the list */
+	int i = 0;
+    while( i != state_count )
+    {
+        switch( state_params[i].state )
+        {
+            case KE_RS_DEPTHTEST:
+				use_depth_stencil = true;
+				depth_stencil_desc.DepthEnable = state_params[i].param1 ? Yes : No;
+                break;
+                
+            case KE_RS_DEPTHFUNC:
+				use_depth_stencil = true;
+				depth_stencil_desc.DepthFunc = test_funcs[state_params[i].param1];
+                break;
+                
+            case KE_RS_DEPTHMASK:
+				use_depth_stencil = true;
+                depth_stencil_desc.DepthWriteMask = (D3D11_DEPTH_WRITE_MASK) state_params[i].param1;
+                break;
+                
+            /*case KE_RS_CLEARDEPTH:
+                glClearDepth( state_params[i].fparam );
+                break;*/
+                
+            case KE_RS_ALPHABLEND:
+				use_blend = true;
+				blend_desc.RenderTarget[0].BlendEnable = state_params[i].param1;
+                break;
+                
+            case KE_RS_FRONTFACE:
+                /* TODO */
+				//raster_desc.FrontCounterClockwise = FALSE;
+                break;
+                
+            case KE_RS_POLYGONMODE:
+				use_raster = true;
+				raster_desc.FillMode = (state_params[i].param2 == 0) ? (D3D11_FILL_MODE) 1 : fill_modes[state_params[i].param2];
+                //glPolygonMode( polygon_modes[state_params[i].param1], fill_modes[state_params[i].param2] );
+                break;
+                
+            case KE_RS_BLENDFUNC:
+				use_blend = true;
+				blend_desc.RenderTarget[0].SrcBlend = blend_modes[state_params[i].param1];
+				blend_desc.RenderTarget[0].DestBlend = blend_modes[state_params[i].param2];
+                break;
+                
+            case KE_RS_CULLMODE:
+				use_raster = true;
+				raster_desc.CullMode = (D3D11_CULL_MODE) state_params[i].param2;
+                break;
+                
+            default:
+                DISPDBG( KE_WARNING, "Bad render or texture state!\nstate: " << state_params[i].state << "\n"
+                        "param1: " << state_params[i].param1 << "\n"
+                        "param2: " << state_params[i].param2 << "\n"
+                        "param3: " << state_params[i].param3 << "\n"
+                        "fparam: " << state_params[i].fparam << "\n"
+                        "dparam: " << state_params[i].dparam << "\n" );
+                break;
+        }
+        
+        i++;
+    }
+
+	/* Create our state buffers */
+	if( use_blend )
+	{
+		hr = d3ddevice->CreateBlendState( &blend_desc, &sb->bs );
+		D3D_DISPDBG( KE_ERROR, "Error creating blend state!", hr );
+	}
+
+	if( use_depth_stencil )
+	{
+		hr = d3ddevice->CreateDepthStencilState( &depth_stencil_desc, &sb->dss );
+		D3D_DISPDBG( KE_ERROR, "Error creating depth stencil state!", hr );
+	}
+
+	if( use_raster )
+	{
+		hr = d3ddevice->CreateRasterizerState( &raster_desc, &sb->rs );
+		D3D_DISPDBG( KE_ERROR, "Error creating rasterizer state!", hr );
+	}
+
+	if( use_sampler )
+	{
+		hr = d3ddevice->CreateSamplerState( &sampler_desc, &sb->ss );
+		D3D_DISPDBG( KE_ERROR, "Error creating sampler state!", hr );
+	}
+
+    return true;
+}
+
+bool IKeDirect3D11RenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
+{
+    int i = 0;
+	float blend_factor[4] = { 0, 0, 0, 0 };
+	uint32_t sample_mask = 0xFFFFFFFF;
+
+    /* Sanity check */
+    if( !state_buffer )
+        return false;
+    
+	/* Set the state buffers */
+    IKeDirect3D11StateBuffer* sb = static_cast<IKeDirect3D11StateBuffer*>(state_buffer);
+
+	d3ddevice_context->RSSetState( sb->rs );
+	d3ddevice_context->OMSetDepthStencilState( sb->dss, 1 );
+	d3ddevice_context->OMSetBlendState( sb->bs, blend_factor, sample_mask );
+	d3ddevice_context->CSSetSamplers( 0, 1, &sb->ss );
+    
+    return true;
+}
+
+
 /*
 * Name: IKeDirect3D11RenderDevice::set_render_states
 * Desc: Applies a list of user defined render states.
@@ -1182,6 +1350,60 @@ void IKeDirect3D11RenderDevice::SetViewport( int x, int y, int width, int height
     d3ddevice_context->RSSetViewports( 1, &vp );
 }
 
+/*
+ * Name: IKeDirect3D11RenderDevice::set_viewport
+ * Desc: Sets the viewport.
+ */
+void IKeDirect3D11RenderDevice::SetViewportV( int* viewport )
+{
+	/* Setup the viewport */
+    D3D11_VIEWPORT vp;
+    vp.Width = (FLOAT) viewport[2];
+    vp.Height = (FLOAT) viewport[3];
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = (FLOAT) viewport[0];
+    vp.TopLeftY = (FLOAT) viewport[1];
+    d3ddevice_context->RSSetViewports( 1, &vp );
+    
+    memmove( this->viewport, viewport, sizeof(int)*4 );
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::GetViewport
+ * Desc: Gets the viewport.
+ */
+void IKeDirect3D11RenderDevice::GetViewport( int* x, int* y, int* width, int* height )
+{
+	uint32_t viewport_count = 0;
+	D3D11_VIEWPORT vp;
+
+    /* Get the viewport */
+    d3ddevice_context->RSGetViewports( &viewport_count, &vp );
+    
+    *x = vp.TopLeftX;
+    *y = vp.TopLeftY;
+    *width = vp.Width;
+    *height = vp.Height;
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_viewport
+ * Desc: Gets the viewport.
+ */
+void IKeDirect3D11RenderDevice::GetViewportV( int* viewport )
+{
+	uint32_t viewport_count = 0;
+	D3D11_VIEWPORT vp;
+
+    /* Get the viewport */
+    d3ddevice_context->RSGetViewports( &viewport_count, &vp );
+    
+    viewport[0] = vp.TopLeftX;
+	viewport[1] = vp.TopLeftY;
+	viewport[2] = vp.Width;
+	viewport[3] = vp.Height;
+}
 
 /*
 * Name: IKeDirect3D11RenderDevice::set_perspective_matrix

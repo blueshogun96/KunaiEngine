@@ -57,3 +57,12 @@ void IKeDirect3D11GeometryBuffer::UnmapData( void* data_ptr )
     
 }
 
+bool IKeDirect3D11GeometryBuffer::SetVertexData( uint32_t offset, uint32_t size, void* ptr )
+{
+    return true;
+}
+
+bool IKeDirect3D11GeometryBuffer::SetIndexData( uint32_t offset, uint32_t size, void* ptr )
+{
+    return true;
+}
