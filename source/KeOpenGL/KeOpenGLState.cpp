@@ -11,11 +11,14 @@
 
 
 /*
- * Name: IKeOpenGLState::Destroy
+ * Name: IKeOpenGLStateBuffer::Destroy
  * Desc: Handles destruction of this interface instance.
  */
-void IKeOpenGLState::Destroy()
+void IKeOpenGLStateBuffer::Destroy()
 {
+    /* Delete the list of states */
+    delete this->states;
+    
     /* Delete this instance */
     delete this;
 }

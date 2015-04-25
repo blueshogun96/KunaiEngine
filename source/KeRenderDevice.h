@@ -346,7 +346,7 @@ struct IKeFence : public IKeUnknown
 /*
  * Render and texture state structure
  */
-struct IKeState : public IKeUnknown
+struct IKeStateBuffer : public IKeUnknown
 {
     virtual void Destroy() PURE;
 };
@@ -410,6 +410,8 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget ) PURE;
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget ) PURE;
     virtual void SetTexture( int stage, IKeTexture* texture ) PURE;
+    virtual bool CreateState( KeState* state_params, int state_count, IKeStateBuffer** state_buffer ) PURE;
+    virtual bool SetState( IKeStateBuffer* state_buffer ) PURE;
     virtual void SetRenderStates( KeState* states ) PURE;
     virtual void SetSamplerStates( KeState* states ) PURE;
 //    virtual void draw_vertices_im() PURE;
@@ -421,9 +423,9 @@ public:
     
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height ) PURE;
-    //virtual void SetViewportV( int* viewport ) PURE;
-    //virtual void GetViewport( int* x, int* y, int* width, int* height ) PURE;
-    //virtual void GetViewportV( int* viewport ) PURE;
+    virtual void SetViewportV( int* viewport ) PURE;
+    virtual void GetViewport( int* x, int* y, int* width, int* height ) PURE;
+    virtual void GetViewportV( int* viewport ) PURE;
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z ) PURE;
     virtual void SetViewMatrix( const nv::matrix4f* view ) PURE;
     virtual void SetWorldMatrix( const nv::matrix4f* world ) PURE;

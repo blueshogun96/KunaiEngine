@@ -1306,6 +1306,108 @@ void IKeOpenGLRenderDevice::SetTexture( int stage, IKeTexture* texture )
 }
 
 /*
+ * Name: IKeOpenGLRenderDevice::CreateState
+ * Desc: Creates a compiled buffer of render and texture states.  At the time of writing, OpenGL
+ *       does not have an equivalent to Direct3D's state buffer, we have to create a faux state buffer
+ *       and save/set each state individually.
+ */
+bool IKeOpenGLRenderDevice::CreateState( KeState* state_params, int state_count, IKeStateBuffer** state_buffer )
+{
+    /* Create a new state buffer interface */
+    (*state_buffer) = new IKeOpenGLStateBuffer;
+    IKeOpenGLStateBuffer* sb = static_cast<IKeOpenGLStateBuffer*>( *state_buffer );
+    
+    /* Allocate faux state buffer */
+    sb->states = new KeState[state_count];
+    
+    /* Copy the supplied state parameters over */
+    memmove( sb->states, state_params, sizeof( KeState ) * state_count );
+    sb->state_count = state_count;
+    
+    return true;
+}
+
+bool IKeOpenGLRenderDevice::SetState( IKeStateBuffer* state_buffer )
+{
+    int i = 0;
+    
+    /* Sanity check */
+    if( !state_buffer )
+        return false;
+    
+    IKeOpenGLStateBuffer* sb = static_cast<IKeOpenGLStateBuffer*>(state_buffer);
+    
+    /* Apply each render state in the list */
+    while( i != sb->state_count )
+    {
+        switch( sb->states[i].state )
+        {
+            case KE_RS_DEPTHTEST:
+                if( sb->states[i].param1 )
+                    glEnable( GL_DEPTH_TEST );
+                else
+                    glDisable( GL_DEPTH_TEST );
+                break;
+                
+            case KE_RS_DEPTHFUNC:
+                glDepthFunc( test_funcs[sb->states[i].param1] );
+                break;
+                
+            case KE_RS_DEPTHMASK:
+                if( sb->states[i].param1 )
+                    glEnable( GL_DEPTH_WRITEMASK );
+                else
+                    glDisable( GL_DEPTH_WRITEMASK );
+                break;
+                
+            case KE_RS_CLEARDEPTH:
+                glClearDepth( sb->states[i].fparam );
+                break;
+                
+            case KE_RS_ALPHABLEND:
+                if( sb->states[i].param1 )
+                    glEnable( GL_BLEND );
+                else
+                    glDisable( GL_BLEND );
+                break;
+                
+            case KE_RS_FRONTFACE:
+                /* TODO */
+                break;
+                
+            case KE_RS_POLYGONMODE:
+                glPolygonMode( polygon_modes[sb->states[i].param1], fill_modes[sb->states[i].param2] );
+                break;
+                
+            case KE_RS_BLENDFUNC:
+                glBlendFunc( blend_modes[sb->states[i].param1], blend_modes[sb->states[i].param2] );
+                break;
+                
+            case KE_RS_CULLMODE:
+                if( sb->states[i].param1 )
+                    glEnable( GL_CULL_FACE );
+                else
+                    glDisable( GL_CULL_FACE );
+                glCullFace( cull_modes[sb->states[i].param2] );
+                break;
+                
+            default:
+                DISPDBG( KE_WARNING, "Bad render or texture state!\nstate: " << sb->states[i].state << "\n"
+                        "param1: " << sb->states[i].param1 << "\n"
+                        "param2: " << sb->states[i].param2 << "\n"
+                        "param3: " << sb->states[i].param3 << "\n"
+                        "fparam: " << sb->states[i].fparam << "\n"
+                        "dparam: " << sb->states[i].dparam << "\n" );
+                break;
+        }
+        
+        i++;
+    }
+    
+    return true;
+}
+
+/*
  * Name: IKeOpenGLRenderDevice::set_render_states
  * Desc: Applies a list of user defined render states.
  * TODO: Allow explicit deferring of render states?
@@ -1540,6 +1642,44 @@ void IKeOpenGLRenderDevice::SetViewport( int x, int y, int width, int height )
     viewport[3] = height;
 }
 
+/*
+ * Name: IKeOpenGLRenderDevice::set_viewport
+ * Desc: Sets the viewport.
+ */
+void IKeOpenGLRenderDevice::SetViewportV( int* viewport )
+{
+    /* Set the viewport */
+    glViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+    
+    memmove( this->viewport, viewport, sizeof(int)*4 );
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::GetViewport
+ * Desc: Gets the viewport.
+ */
+void IKeOpenGLRenderDevice::GetViewport( int* x, int* y, int* width, int* height )
+{
+    /* Get the viewport */
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    
+    *x = viewport[0];
+    *y = viewport[1];
+    *width = viewport[2];
+    *height = viewport[3];
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_viewport
+ * Desc: Gets the viewport.
+ */
+void IKeOpenGLRenderDevice::GetViewportV( int* viewport )
+{
+    /* Get the viewport */
+    glGetIntegerv( GL_VIEWPORT, this->viewport );
+    
+    memmove( viewport, this->viewport, sizeof(int)*4 );
+}
 
 /*
  * Name: IKeOpenGLRenderDevice::set_perspective_matrix

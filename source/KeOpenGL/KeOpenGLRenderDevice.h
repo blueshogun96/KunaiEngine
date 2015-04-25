@@ -134,9 +134,12 @@ struct IKeOpenGLFence : public IKeFence
 /*
  * Render/Texture state structure
  */
-struct IKeOpenGLState : public IKeState
+struct IKeOpenGLStateBuffer : public IKeStateBuffer
 {
     virtual void Destroy();
+    
+    KeState*    states;         /* OpenGL state values */
+    int         state_count;    /* The number of states in this buffer */
 };
 
 
@@ -198,6 +201,8 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget );
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget );
     virtual void SetTexture( int stage, IKeTexture* texture );
+    virtual bool CreateState( KeState* state_params, int state_count, IKeStateBuffer** state_buffer );
+    virtual bool SetState( IKeStateBuffer* state_buffer );
     virtual void SetRenderStates( KeState* states );
     virtual void SetSamplerStates( KeState* states );
 //    virtual void draw_vertices_im();
@@ -209,7 +214,11 @@ public:
     
     /* Matrix/viewport related */
     virtual void SetViewport( int x, int y, int width, int height );
+    virtual void SetViewportV( int* viewport );
+    virtual void GetViewport( int* x, int* y, int* width, int* height );
+    virtual void GetViewportV( int* viewport );
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
+    //virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
     virtual void SetViewMatrix( const nv::matrix4f* view );
     virtual void SetWorldMatrix( const nv::matrix4f* world );
     virtual void SetModelviewMatrix( const nv::matrix4f* modelview );
