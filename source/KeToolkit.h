@@ -36,19 +36,50 @@ struct KeImage
 
 /*
  * Name: KeImageInitialize
- * Desc: Initialize image loading library via SDL.
+ * Desc: Initialize image loading library via SDL_image.
  */
 bool KeImageInitialize();
 
 /*
  * Name: KeImageUninitialize
- * Desc: 
+ * Desc: Uninitialize SDL_image or whatever applicable image loading component.
  */
 void KeImageUninitialize();
+
+/*
+ * Name: KeImageRead
+ * Desc: Opens an image from disc
+ */
 bool KeImageRead( char* image_path, KeImage* image_out );
+
+/*
+ * Name: KeImageReadFromMemory
+ * Desc: Opens an image from a file in memory.
+ */
 bool KeImageReadFromMemory( void* image_file_ptr, KeImage* image_out );
+
+/*
+ * Name: KeImageClose
+ * Desc: Closes a previously opened image.
+ */
+void KeImageClose( KeImage* image );
+
+/*
+ * Name: KeImageSavePNG
+ * Desc: Saves a pixel buffer as a .png file
+ */
 bool KeImageSavePNG( int width, int height, void* pixels, char* image_path );
+
+/*
+ * Name: KeImageSaveJPG
+ * Desc: Saves a pixel buffer as a .jpg file
+ */
 bool KeImageSaveJPG( int width, int height, void* pixels, char* image_path );
+
+/*
+ * Name: KeImageSaveBMP
+ * Desc: Saves a pixel buffer as a .bmp file
+ */
 bool KeImageSaveBMP( int width, int height, void* pixels, char* image_path );
 
 #endif /* defined(__Aquatic__KeToolkit__) */
