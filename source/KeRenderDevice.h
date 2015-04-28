@@ -19,11 +19,12 @@
 /*
  * Render device types
  */
-#define KE_RENDERDEVICE_D3D11     1
-#define KE_RENDERDEVICE_OGL3      2
-#define KE_RENDERDEVICE_OGL4      3
-#define KE_RENDERDEVICE_OGLES2    4
-#define KE_RENDERDEVICE_OGLES3    5
+#define KE_RENDERDEVICE_D3D11       1
+#define KE_RENDERDEVICE_OGL3        2
+#define KE_RENDERDEVICE_OGL4        3
+#define KE_RENDERDEVICE_OGLES2      4
+#define KE_RENDERDEVICE_OGLES3      5
+#define KE_RENDERDEVICE_METAL       6
 
 
 /*
@@ -106,7 +107,8 @@
 #define KE_RS_DEPTHTEST     1
 #define KE_RS_DEPTHFUNC     2
 #define KE_RS_DEPTHMASK     3
-#define KE_RS_CLEARDEPTH    4
+//#define KE_RS_CLEARDEPTH    4
+#define KE_RS_BLENDEQUATION 4
 #define KE_RS_ALPHABLEND    5
 #define KE_RS_FRONTFACE     6
 #define KE_RS_CULLMODE      7
@@ -121,6 +123,20 @@
 #define KE_TS_WRAPU         4
 #define KE_TS_WRAPV         5
 #define KE_TS_WRAPW         6
+
+
+/*
+ * Comparison types
+ */
+#define KE_NEVER        0
+#define KE_LESS         1
+#define KE_EQUAL        2
+#define KE_LEQUAL       3
+#define KE_GREATER      4
+#define KE_NOTEQUAL     5
+#define KE_GEQUAL       6
+#define KE_ALWAYS       7
+
 
 /*
  * Polygon modes

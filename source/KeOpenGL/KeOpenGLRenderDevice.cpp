@@ -184,6 +184,16 @@ uint32_t blend_modes[] =
 #endif
 };
 
+/* OpenGL blend equations */
+uint32_t blend_equations[]
+{
+    GL_FUNC_ADD,
+    GL_MIN,
+    GL_MAX,
+    GL_FUNC_SUBTRACT,
+    GL_FUNC_REVERSE_SUBTRACT
+};
+
 /* OpenGL texture filtering modes */
 uint32_t texture_filter_modes[] =
 {
@@ -1360,9 +1370,9 @@ bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
                     glDisable( GL_DEPTH_WRITEMASK );
                 break;
                 
-            case KE_RS_CLEARDEPTH:
+            /*case KE_RS_CLEARDEPTH:
                 glClearDepth( sb->states[i].fparam );
-                break;
+                break;*/
                 
             case KE_RS_ALPHABLEND:
                 if( sb->states[i].param1 )
@@ -1439,9 +1449,9 @@ void IKeOpenGLRenderDevice::SetRenderStates( KeState* states )
                     glDisable( GL_DEPTH_WRITEMASK );
                 break;
                 
-            case KE_RS_CLEARDEPTH:
+            /*case KE_RS_CLEARDEPTH:
                 glClearDepth( states[i].fparam );
-                break;
+                break;*/
                 
             case KE_RS_ALPHABLEND:
                 if( states[i].param1 )
