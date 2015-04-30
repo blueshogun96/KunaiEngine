@@ -78,6 +78,8 @@ struct IKeDirect3D11Texture : public IKeTexture
     virtual void* MapData( uint32_t flags );
     virtual void UnmapData( void* );
 
+	virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels );
+
 	CComPtr<ID3D11Texture1D>	tex1d;
 	CComPtr<ID3D11Texture2D>	tex2d;
 	CComPtr<ID3D11Texture3D>	tex3d;
