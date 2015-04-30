@@ -89,6 +89,8 @@ struct IKeOpenGLTexture : public IKeTexture
     virtual void* MapData( uint32_t flags );
     virtual void UnmapData( void* );
     
+    virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels );
+    
     uint32_t handle;            /* Handle to the OpenGL texture */
     uint32_t width, height;     /* Texture width/height */
     uint32_t depth;             /* Texture depth (for 3D and array textures) */

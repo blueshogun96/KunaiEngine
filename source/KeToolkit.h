@@ -23,7 +23,7 @@ struct KePaletteEntry
 /*
  * Image data structure
  */
-struct KeImage
+struct KeImageData
 {
     uint32_t width;
     uint32_t height;
@@ -33,6 +33,16 @@ struct KeImage
     KePaletteEntry palette[256];
 };
 
+/*
+ * Sound data structure
+ */
+struct KeSoundData
+{
+    uint32_t bytes;     /* Length of this buffer in bytes */
+    uint32_t frequency; /* Sound frequency */
+    uint32_t bit_rate;  /* Bit rate */
+    void* ptr;          /* Pointer to raw sound data */
+};
 
 /*
  * Name: KeImageInitialize
@@ -50,19 +60,19 @@ void KeImageUninitialize();
  * Name: KeImageRead
  * Desc: Opens an image from disc
  */
-bool KeImageRead( char* image_path, KeImage* image_out );
+bool KeImageRead( char* image_path, KeImageData* image_out );
 
 /*
  * Name: KeImageReadFromMemory
  * Desc: Opens an image from a file in memory.
  */
-bool KeImageReadFromMemory( void* image_file_ptr, KeImage* image_out );
+bool KeImageReadFromMemory( void* image_file_ptr, KeImageData* image_out );
 
 /*
  * Name: KeImageClose
  * Desc: Closes a previously opened image.
  */
-void KeImageClose( KeImage* image );
+void KeImageClose( KeImageData* image );
 
 /*
  * Name: KeImageSavePNG
@@ -81,5 +91,24 @@ bool KeImageSaveJPG( int width, int height, void* pixels, char* image_path );
  * Desc: Saves a pixel buffer as a .bmp file
  */
 bool KeImageSaveBMP( int width, int height, void* pixels, char* image_path );
+
+/*
+ * Name: KeSoundReadWAV
+ * Desc: Reads a .wav file from disk and returns the sound bytes along with the 
+ *       necessary attributes.
+ */
+bool KeSoundReadWAV( char* wav_path, KeSoundData* sound_data );
+
+/* 
+ * Name: KeSoundReadWAVFromMemory
+ * Desc: Same as above, but reading a .wav file from memory
+ */
+bool KeSoundReadWAVFromMemory( void* wav_file_ptr, KeSoundData* sound_data );
+
+/*
+ * Name: KeSoundClose
+ * Desc: Closes a sound file opened by an above function.
+ */
+void KeSoundClose( KeSoundData* sound_data );
 
 #endif /* defined(__Aquatic__KeToolkit__) */

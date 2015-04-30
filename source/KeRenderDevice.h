@@ -266,6 +266,18 @@ struct KeState
     double   dparam;
 };
 
+/*
+ * Texture data description
+ */
+struct KeTextureDesc
+{
+    uint32_t offsetx, offsety, offsetz;
+    uint32_t width, height;     /* Texture width/height */
+    uint32_t pitch;             /* Buffer pitch */
+    uint32_t depth;             /* Texture depth (for 3D and array textures) */
+    uint32_t mipmap;            /* Mipmap level */
+    uint32_t data_type;         /* Internal data type */
+};
 
 
 /*
@@ -330,7 +342,10 @@ struct IKeTexture : public IKeResourceBuffer
     
     virtual void* MapData( uint32_t flags ) PURE;
     virtual void UnmapData( void* ) PURE;
+    
+    virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels ) PURE;
 };
+
 
 /*
  * Rendertarget base structure

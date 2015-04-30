@@ -34,3 +34,10 @@ void IKeOpenGLTexture::UnmapData( void* data_ptr )
 {
     /* TODO */
 }
+
+bool IKeOpenGLTexture::SetTextureData( KeTextureDesc* texture_data, void* pixels )
+{
+    /* TODO: Set the texture data based on the texture's actual type */
+    
+    return false;
+}
