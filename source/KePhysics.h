@@ -53,6 +53,7 @@ public:
 public:
     void SetGravity( neV3 gravity );
     uint32_t AddRigidBodyBox( neV3 position, neV3 size, float mass );
+    uint32_t AddRigidBodySphere( neV3 position, float radius, float mass );
     uint32_t AddAnimatedBodyBox( neV3 position, neV3 size );
     void RemoveRigidBody( uint32_t rb_id );
     void RemoveAnimatedBody( uint32_t ab_id );

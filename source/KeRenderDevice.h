@@ -241,6 +241,26 @@ struct KeRenderDeviceDesc
 };
 
 /*
+ * Render device capabilities
+ */
+struct KeRenderDeviceCaps
+{
+    /* General capabilities */
+    int primitive_restart_supported;
+    int hardware_command_buffers_supported;
+    int gpu_fencing_supported;
+    int instancing_supported;
+    
+    /* Texture capabilities */
+    int texture_rectangles_supported;
+    
+    /* Shader capabilities */
+    int compute_shaders_supported;
+    int constant_buffers_supported;
+    int single_constants_supported;
+};
+
+/*
  * Vertex attribute structure
  */
 struct KeVertexAttribute
@@ -382,6 +402,14 @@ struct IKeStateBuffer : public IKeUnknown
     virtual void Destroy() PURE;
 };
 
+/*
+ * Occlusion query base structure
+ */
+struct IKeOcclusionQuery : public IKeUnknown
+{
+    virtual void Destroy() PURE;
+};
+
 
 /*
  * Render device base class
@@ -397,6 +425,7 @@ public:
     /* Misc */
     virtual bool ConfirmDevice() PURE;
     virtual void GetDeviceDesc( KeRenderDeviceDesc* device_desc ) PURE;
+    virtual void GetDeviceCaps( KeRenderDeviceCaps* device_caps ) PURE;
     
     /* General rendering stuff */
     virtual void SetClearColourFV( float* colour ) PURE;
@@ -485,10 +514,11 @@ protected:
 	uint32_t				clear_stencil;
     int                     viewport[4];
     KeRenderDeviceDesc*		device_desc;
-    nv::matrix4f                 world_matrix;
-    nv::matrix4f                 view_matrix;
-    nv::matrix4f                 modelview_matrix;
-    nv::matrix4f                 projection_matrix;
+    KeRenderDeviceCaps*		device_caps;
+    nv::matrix4f            world_matrix;
+    nv::matrix4f            view_matrix;
+    nv::matrix4f            modelview_matrix;
+    nv::matrix4f            projection_matrix;
     IKeGeometryBuffer*		current_geometrybuffer;
     IKeGpuProgram*			current_gpu_program;
 	IKeTexture*				current_texture[8];
@@ -508,8 +538,7 @@ public:
     
 public:
     virtual bool Initialized() PURE;
-    virtual void SetRenderStates( KeState* state ) PURE;
-    virtual void SetTextureStates( KeState* state ) PURE;
+    virtual void SetStates( IKeStateBuffer* state ) PURE;
     virtual void SetProgram( IKeGpuProgram* program ) PURE;
     virtual void SetTexture( IKeTexture* texture ) PURE;
     virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size ) PURE;

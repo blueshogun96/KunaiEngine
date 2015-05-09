@@ -159,6 +159,7 @@ public:
     /* Misc */
     virtual bool ConfirmDevice();
     virtual void GetDeviceDesc( KeRenderDeviceDesc* device_desc );
+    virtual void GetDeviceCaps( KeRenderDeviceCaps* device_caps );
     
     /* General rendering stuff */
     virtual void SetClearColourFV( float* colour );
@@ -263,8 +264,7 @@ public:
     
 public:
     virtual bool Initialized();
-    virtual void SetRenderStates( KeState* state );
-    virtual void SetTextureStates( KeState* state );
+    virtual void SetStates( IKeStateBuffer* state );
     virtual void SetProgram( IKeGpuProgram* program );
     virtual void SetTexture( IKeTexture* texture );
     virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size );

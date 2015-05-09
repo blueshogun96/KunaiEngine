@@ -102,6 +102,39 @@ uint32_t KePhysicsSimulator::AddRigidBodyBox( neV3 position, neV3 size, float ma
 }
 
 /*
+ * Name: KePhysicsSimulator::AddRigidBodyBox
+ * Desc:
+ */
+uint32_t KePhysicsSimulator::AddRigidBodySphere( neV3 position, float radius, float mass )
+{
+    static uint32_t rb_id = 0;
+    
+    /* Add a new rigid body box to the simulator */
+    KeRigidBody* rigid_body = new KeRigidBody;
+    rigid_body->rigid_body = simulator->CreateRigidBody();
+    
+    /* Create box geometry */
+    rigid_body->geometry = rigid_body->rigid_body->AddGeometry();
+    rigid_body->geometry->SetSphereDiameter( radius * 2 );
+    rigid_body->rigid_body->UpdateBoundingInfo();
+    
+    /* Set mass and intertia tensor */
+    rigid_body->rigid_body->SetInertiaTensor( neSphereInertiaTensor( radius * 2, mass ) );
+    rigid_body->rigid_body->SetMass( mass );
+    
+    /* Set position */
+    rigid_body->rigid_body->SetPos( position );
+    
+    /* Give this rigid body a unique ID number */
+    rigid_body->rb_id = ++rb_id;
+    
+    /* Add this to the list of rigit bodies */
+    list_add_end<KeRigidBody*>( &rigid_bodies, rigid_body );
+    
+    return rb_id;
+}
+
+/*
  * Name: KePhysicsSimulator::AddAnimatedBodyBox
  * Desc:
  */
