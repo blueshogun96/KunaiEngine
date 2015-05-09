@@ -31,3 +31,8 @@ void IKeDirect3D11Texture::UnmapData( void* data_ptr )
 {
     /* TODO */
 }
+
+bool IKeDirect3D11Texture::SetTextureData( KeTextureDesc* texture_data, void* pixels )
+{
+	return false;
+}
