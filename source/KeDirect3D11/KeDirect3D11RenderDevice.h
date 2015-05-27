@@ -18,7 +18,7 @@
 #include <d3d11_2.h>
 #include <D3Dcompiler.h>
 #include <xnamath.h>
-#include <atlbase.h>
+//#include <atlbase.h>
 #endif
 
 
