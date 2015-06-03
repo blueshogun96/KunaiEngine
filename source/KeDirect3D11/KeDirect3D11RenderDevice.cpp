@@ -410,6 +410,15 @@ void IKeDirect3D11RenderDevice::GetDeviceDesc( KeRenderDeviceDesc* device_desc )
 }
 
 /*
+ * Name: IKeDirect3D11RenderDevice::GetDeviceCaps
+ * Desc: Returns a copy of the device capabilities structure
+ */
+void IKeDirect3D11RenderDevice::GetDeviceCaps( KeRenderDeviceCaps* device_caps )
+{
+    memmove( device_caps, this->device_caps, sizeof( KeRenderDeviceCaps ) );
+}
+
+/*
 * Name: IKeDirect3D11RenderDevice::set_clear_colour_fv
 * Desc: Sets the clear colour
 */
@@ -1402,7 +1411,7 @@ void IKeDirect3D11RenderDevice::GetViewportV( int* viewport )
     viewport[0] = vp.TopLeftX;
 	viewport[1] = vp.TopLeftY;
 	viewport[2] = vp.Width;
-	viewport[3] = vp.Height;
+  	viewport[3] = vp.Height;
 }
 
 /*

@@ -18,9 +18,35 @@
 #include <d3d11_2.h>
 #include <D3Dcompiler.h>
 #include <xnamath.h>
-//#include <atlbase.h>
+#include <comip.h>
+#include <comdef.h>
 #endif
 
+
+/*
+ * Non-ATL based smart COM pointer types
+ */
+typedef _com_ptr_t<_com_IIID<ID3D11Device, &IID_ID3D11Device>>							CD3D11Device;
+typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext, &IID_ID3D11DeviceContext>>			CD3D11DeviceContext;
+typedef _com_ptr_t<_com_IIID<IDXGISwapChain, &IID_IDXGISwapChain>>						CDXGISwapChain;
+typedef _com_ptr_t<_com_IIID<IDXGIOutput, &IID_IDXGIOutput>>							CDXGIOutput;
+typedef _com_ptr_t<_com_IIID<ID3D11RenderTargetView, &IID_ID3D11RenderTargetView>>		CD3D11RenderTargetView;
+typedef _com_ptr_t<_com_IIID<ID3D11Buffer, &IID_ID3D11Buffer>>							CD3D11Buffer;
+typedef _com_ptr_t<_com_IIID<ID3D11VertexShader, &IID_ID3D11VertexShader>>				CD3D11VertexShader;
+typedef _com_ptr_t<_com_IIID<ID3D11PixelShader, &IID_ID3D11PixelShader>>				CD3D11PixelShader;
+typedef _com_ptr_t<_com_IIID<ID3D11GeometryShader, &IID_ID3D11GeometryShader>>			CD3D11GeometryShader;
+typedef _com_ptr_t<_com_IIID<ID3D11HullShader, &IID_ID3D11HullShader>>					CD3D11HullShader;
+typedef _com_ptr_t<_com_IIID<ID3D11DomainShader, &IID_ID3D11DomainShader>>				CD3D11DomainShader;
+typedef _com_ptr_t<_com_IIID<ID3D11ComputeShader, &IID_ID3D11ComputeShader>>			CD3D11ComputeShader;
+typedef _com_ptr_t<_com_IIID<ID3D11InputLayout, &IID_ID3D11InputLayout>>				CD3D11InputLayout;
+typedef _com_ptr_t<_com_IIID<ID3D11Texture1D, &IID_ID3D11Texture1D>>					CD3D11Texture1D;
+typedef _com_ptr_t<_com_IIID<ID3D11Texture2D, &IID_ID3D11Texture2D>>					CD3D11Texture2D;
+typedef _com_ptr_t<_com_IIID<ID3D11Texture3D, &IID_ID3D11Texture3D>>					CD3D11Texture3D;
+typedef _com_ptr_t<_com_IIID<ID3D11BlendState, &IID_ID3D11BlendState>>					CD3D11BlendState;
+typedef _com_ptr_t<_com_IIID<ID3D11RasterizerState, &IID_ID3D11RasterizerState>>		CD3D11RasterizerState;
+typedef _com_ptr_t<_com_IIID<ID3D11DepthStencilState, &IID_ID3D11DepthStencilState>>	CD3D11DepthStencilState;
+typedef _com_ptr_t<_com_IIID<ID3D11SamplerState, &IID_ID3D11SamplerState>>				CD3D11SamplerState;
+typedef _com_ptr_t<_com_IIID<ID3D11Query, &IID_ID3D11Query>>							CD3D11Query;
 
 
 /*
@@ -30,7 +56,7 @@ struct IKeDirect3D11ConstantBuffer : public IKeConstantBuffer
 {
 	virtual void Destroy();
     
-	CComPtr<ID3D11Buffer>	cb;		/* Constant buffer */
+	CD3D11Buffer	cb;		/* Constant buffer */
 };
 
 /*
@@ -46,8 +72,8 @@ struct IKeDirect3D11GeometryBuffer : public IKeGeometryBuffer
 	virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
 
-	CComPtr<ID3D11Buffer>	vb;		/* Vertex buffer */
-	CComPtr<ID3D11Buffer>	ib;		/* Index buffer */
+	CD3D11Buffer	vb;		/* Vertex buffer */
+	CD3D11Buffer	ib;		/* Index buffer */
 	uint32_t stride;		/* Length of vertex data (in bytes) */
 	uint32_t index_type;	/* Data type for index data */
 };
@@ -59,13 +85,13 @@ struct IKeDirect3D11GpuProgram : public IKeGpuProgram
 {
 	virtual void Destroy();
     
-	CComPtr<ID3D11VertexShader>		vs;		/* Vertex shader */
-	CComPtr<ID3D11PixelShader>		ps;		/* Pixel shader */
-	CComPtr<ID3D11GeometryShader>	gs;		/* Geometry shader */
-	CComPtr<ID3D11HullShader>		hs;		/* Hull shader */
-	CComPtr<ID3D11DomainShader>		ds;		/* Domain shader */
-	CComPtr<ID3D11ComputeShader>	cs;		/* Compute shader */
-	CComPtr<ID3D11InputLayout>		il;		/* Vertex input layout */
+	CD3D11VertexShader		vs;		/* Vertex shader */
+	CD3D11PixelShader		ps;		/* Pixel shader */
+	CD3D11GeometryShader	gs;		/* Geometry shader */
+	CD3D11HullShader		hs;		/* Hull shader */
+	CD3D11DomainShader		ds;		/* Domain shader */
+	CD3D11ComputeShader		cs;		/* Compute shader */
+	CD3D11InputLayout		il;		/* Vertex input layout */
 };
 
 /*
@@ -80,9 +106,9 @@ struct IKeDirect3D11Texture : public IKeTexture
 
 	virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels );
 
-	CComPtr<ID3D11Texture1D>	tex1d;
-	CComPtr<ID3D11Texture2D>	tex2d;
-	CComPtr<ID3D11Texture3D>	tex3d;
+	CD3D11Texture1D		tex1d;
+	CD3D11Texture2D		tex2d;
+	CD3D11Texture3D		tex3d;
 	uint32_t			flags;
 };
 
@@ -118,7 +144,7 @@ struct IKeDirect3D11Fence : public IKeFence
 {
 	virtual void Destroy();
     
-	CComPtr<ID3D11Query> query;
+	CD3D11Query query;
 };
 
 /*
@@ -128,10 +154,10 @@ struct IKeDirect3D11StateBuffer : public IKeStateBuffer
 {
     virtual void Destroy();
 
-	CComPtr<ID3D11BlendState>			bs;
-	CComPtr<ID3D11RasterizerState>		rs;
-	CComPtr<ID3D11DepthStencilState>	dss;
-	CComPtr<ID3D11SamplerState>			ss;
+	CD3D11BlendState			bs;
+	CD3D11RasterizerState		rs;
+	CD3D11DepthStencilState		dss;
+	CD3D11SamplerState			ss;
 };
 
 
@@ -149,6 +175,7 @@ public:
 	/* Misc */
     virtual bool ConfirmDevice();
     virtual void GetDeviceDesc( KeRenderDeviceDesc* device_desc );
+	virtual void GetDeviceCaps( KeRenderDeviceCaps* device_caps );
     
     /* General rendering stuff */
     virtual void SetClearColourFV( float* colour );
@@ -234,11 +261,11 @@ protected:
 	SDL_Window*						window;
 	D3D_DRIVER_TYPE					driver_type;
 	D3D_FEATURE_LEVEL				feature_level;
-	CComPtr<ID3D11Device>			d3ddevice;
-	CComPtr<ID3D11DeviceContext>	d3ddevice_context;
-	CComPtr<IDXGISwapChain>			dxgi_swap_chain; 
-	CComPtr<IDXGIOutput>			dxgi_output;
-	CComPtr<ID3D11RenderTargetView> d3d_render_target_view;
+	CD3D11Device					d3ddevice;
+	CD3D11DeviceContext				d3ddevice_context;
+	CDXGISwapChain					dxgi_swap_chain; 
+	CDXGIOutput						dxgi_output;
+	CD3D11RenderTargetView			d3d_render_target_view;
 	DXGI_SWAP_CHAIN_DESC			swapchain_desc;
 	int								swap_interval;
 	void*							dd;
