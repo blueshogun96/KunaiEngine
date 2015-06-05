@@ -7,6 +7,8 @@
 
 /* DirectX Error naming collisions in dxgitype.h and winerror.h */
 #pragma warning(disable:4005)
+/* Annoying conversion warnings */
+#pragma warning(disable:4244)
 
 #include "KeDirect3D11RenderDevice.h"
 #include "KeDebug.h"
@@ -258,7 +260,7 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 
 #if defined(USE_DDRAW_VMEM) || defined(USE_DDRAW_VBLANK)
 	/* Create a DirectDraw object if desired */
-	HRESULT hr = DirectDrawCreateEx( NULL, &dd, IID_IDirectDraw7, NULL );
+	HRESULT hr = DirectDrawCreateEx( NULL, (void**) &dd, IID_IDirectDraw7, NULL );
 	if( FAILED( hr ) )
 		D3D_DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!", hr );
 #endif
@@ -385,8 +387,7 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 
 	/* Uninitialize DirectDraw */
 #ifdef _WIN32
-	if( dd )
-		reinterpret_cast<IDirectDraw7*>( dd )->Release();
+	dd = 0;
 #endif
 }
 
@@ -1485,7 +1486,7 @@ void IKeDirect3D11RenderDevice::BlockUntilVerticalBlank()
 {
 #ifdef _WIN32
  #ifdef USE_DDRAW_VBLANK
-	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+	dd->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
 	return;
  #endif
 #endif
@@ -1681,7 +1682,7 @@ void IKeDirect3D11RenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t*
 #ifdef _WIN32
  #ifdef USE_DDRAW_VMEM
 	DDSCAPS2 caps;
-	reinterpret_cast<IDirectDraw7*>( dd )->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
+	dd->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
  #endif
 #endif
 }

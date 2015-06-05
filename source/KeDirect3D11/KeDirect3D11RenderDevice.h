@@ -20,12 +20,14 @@
 #include <xnamath.h>
 #include <comip.h>
 #include <comdef.h>
+#include <ddraw.h>
 #endif
 
 
 /*
  * Non-ATL based smart COM pointer types
  */
+typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>							CDirectDraw7;
 typedef _com_ptr_t<_com_IIID<ID3D11Device, &IID_ID3D11Device>>							CD3D11Device;
 typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext, &IID_ID3D11DeviceContext>>			CD3D11DeviceContext;
 typedef _com_ptr_t<_com_IIID<IDXGISwapChain, &IID_IDXGISwapChain>>						CDXGISwapChain;
@@ -268,7 +270,7 @@ protected:
 	CD3D11RenderTargetView			d3d_render_target_view;
 	DXGI_SWAP_CHAIN_DESC			swapchain_desc;
 	int								swap_interval;
-	void*							dd;
+	CDirectDraw7					dd;
 };
 
 #endif /* defined(__ke_d3d11_renderdevice__) */

@@ -7,6 +7,8 @@
 
 #include "KePlatform.h"
 #include "KeWin32Util.h"
+#include <ShlObj.h>
+#include <tchar.h>
 
 
 /*
@@ -110,7 +112,15 @@ int KeGetCpuCount()
  */
 int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free )
 {
-    return 0;
+	MEMORYSTATUSEX status;
+
+	if( !GlobalMemoryStatusEx( &status ) )
+		return 0;
+
+	*total = status.ullTotalPhys;
+	*free = status.ullAvailPhys;
+
+    return 1;
 }
 
 /*
@@ -119,6 +129,88 @@ int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free )
  */
 int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free )
 {
-    return 0;
+	MEMORYSTATUSEX status;
+
+	if( !GlobalMemoryStatusEx( &status ) )
+		return 0;
+
+	*total = status.ullTotalVirtual;
+	*free = status.ullAvailVirtual;
+
+    return 1;
 }
+
+const char* KeGetSaveGameDirectory( const char* game_app_directory )
+{
+	HRESULT hr;
+	char user_data_path[MAX_PATH];
+	char save_game_directory[MAX_PATH];
+
+	/* Build our game save directory */
+	hr = SHGetSpecialFolderPath( GetActiveWindow(), user_data_path, CSIDL_APPDATA, Yes );
+
+	strcpy( save_game_directory, user_data_path );
+	strcat( save_game_directory, "\\" );
+	strcat( save_game_directory, game_app_directory );
+
+	/* Does this directory already exist? */
+	if( 0xFFFFFFFF == GetFileAttributesA( save_game_directory ) )
+	{
+		/* If not, attempt to create it*/
+		if( SHCreateDirectoryEx( GetActiveWindow(), save_game_directory, NULL ) != ERROR_SUCCESS )
+			return NULL;
+	}
+
+	/* Return the directory */
+	strcat( save_game_directory, "\\" );
+
+	return save_game_directory;
+}
+
+void KeRequestUserAttention()
+{
+	HWND hwnd = GetActiveWindow();
+	if( !hwnd )
+		return;
+
+	/* Blink until the app is no longer minimized */
+	if( IsIconic( hwnd ) )
+	{
+		DWORD now = timeGetTime();
+		DWORD then = now;
+		MSG msg;
+
+		FlashWindow( hwnd, Yes );
+
+		while( Yes )
+		{
+			if( PeekMessage( &msg, NULL, 0, 0, 0 ) )
+			{
+				if( msg.message != WM_SYSCOMMAND && msg.wParam != SC_CLOSE )
+				{
+					TranslateMessage( &msg );
+					DispatchMessage( &msg );
+				}
+
+				/* Are we done yet? */
+				if( !IsIconic( hwnd ) )
+				{
+					FlashWindow( hwnd, No );
+					break;
+				}
+			}
+			else
+			{
+				now = timeGetTime();
+				DWORD time_span = now > then ? ( now - then ) : ( then  - now );
+				if( time_span > 1000 )
+				{
+					then = now;
+					FlashWindow( hwnd, Yes );
+				}
+			}
+		}
+	}
+}
+
 
