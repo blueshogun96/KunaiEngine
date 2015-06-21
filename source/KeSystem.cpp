@@ -9,25 +9,43 @@
 #include "KeSystem.h"
 #include "nvdebug.h"
 #include <thread>
+#include <vector>
 
-std::thread th;
+
+/*
+ * Display information structure
+ */
+struct KeDisplayInfo
+{
+    int display_number;
+    char display_name[256];
+    std::vector<KeDisplayMode> display_modes;
+};
 
 /*
  * Globals
  */
 SDL_Event   event;
-KeButton keys[256];
-KeMouse  mouse;
+KeButton    keys[256];
+KeMouse     mouse;
+int         display_count = 1;
+std::vector<KeDisplayInfo> displays;
 
 /*uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
 uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;*/
 
-void (*ke_pfn_initialize)( void* ) = NULL;
-void (*ke_pfn_uninitialize)( void* ) = NULL;
-void (*ke_pfn_mouse)( void*, void* ) = NULL;
-void (*ke_pfn_keyboard)( void*, void*  ) = NULL;
-void (*ke_pfn_gamepad)( void*, void* ) = NULL;
-void* ke_context_ptr = NULL;
+void (*pfnKeInitialize)( void* ) = NULL;
+void (*pfnKeUninitialize)( void* ) = NULL;
+void (*pfnKeMouse)( void*, void* ) = NULL;
+void (*pfnKeKeyboard)( void*, void* ) = NULL;
+void (*pfnKeGamepad)( void*, void* ) = NULL;
+void (*pfnKeAppTerminating)( void* ) = NULL;
+void (*pfnKeAppLowMemory)( void* ) = NULL;
+void (*pfnKeAppWillEnterBackground)( void* ) = NULL;
+void (*pfnKeAppDidEnterBackground)( void* ) = NULL;
+void (*pfnKeAppWillEnterForeground)( void* ) = NULL;
+void (*pfnKeAppDidEnterForeground)( void* ) = NULL;
+void* pKeContext = NULL;
 
 
 /* Thread structure */
@@ -106,6 +124,69 @@ void KeProcessEvents()
     KeUpdateKeys();
 }
 
+
+/*
+ * Name: KeProcessAppEvents
+ * Desc: Processes special events for mobile apps.
+ */
+int KeProcessAppEvents( void *userdata, SDL_Event *event )
+{
+#ifdef __MOBILE_OS__
+    switch( event->type )
+    {
+        case SDL_APP_TERMINATING:
+            /* Terminate the app.
+             Shut everything down before returning from this function.
+             */
+            if( pfnKeAppTerminating )
+                pfnKeAppTerminating( userdata );
+            return 0;
+        case SDL_APP_LOWMEMORY:
+            /* You will get this when your app is paused and iOS wants more memory.
+             Release as much memory as possible.
+             */
+            if( pfnKeAppLowMemory )
+                pfnKeAppLowMemory( userdata );
+            return 0;
+        case SDL_APP_WILLENTERBACKGROUND:
+            /* Prepare your app to go into the background.  Stop loops, etc.
+             This gets called when the user hits the home button, or gets a call.
+             */
+            if( pfnKeAppWillEnterBackground )
+                pfnKeAppWillEnterBackground( userdata );
+            return 0;
+        case SDL_APP_DIDENTERBACKGROUND:
+            /* This will get called if the user accepted whatever sent your app to the background.
+             If the user got a phone call and canceled it, you'll instead get an    SDL_APP_DIDENTERFOREGROUND event and restart your loops.
+             When you get this, you have 5 seconds to save all your state or the app will be terminated.
+             Your app is NOT active at this point.
+             */
+            if( pfnKeAppDidEnterBackground )
+                pfnKeAppDidEnterBackground( userdata );
+            return 0;
+        case SDL_APP_WILLENTERFOREGROUND:
+            /* This call happens when your app is coming back to the foreground.
+             Restore all your state here.
+             */
+            if( pfnKeAppWillEnterForeground )
+                pfnKeAppWillEnterForeground( userdata );
+            return 0;
+        case SDL_APP_DIDENTERFOREGROUND:
+            /* Restart your loops here.
+             Your app is interactive and getting CPU again.
+             */
+            if( pfnKeAppDidEnterForeground )
+                pfnKeAppDidEnterForeground( userdata );
+            return 0;
+        default:
+            /* No special processing, add it to the event queue */
+            return 1;
+    }
+#else
+    return 0;
+#endif
+}
+
 /*
  * Name: KeQuitRequested
  * Desc: Returns true if there is a quit request.
@@ -122,7 +203,7 @@ bool KeQuitRequested()
  */
 void KeSetContextPointer( void* context_pointer )
 {
-    ke_context_ptr = context_pointer;
+    pKeContext = context_pointer;
 }
 
 /*
@@ -131,7 +212,7 @@ void KeSetContextPointer( void* context_pointer )
  */
 void* KeGetContextPointer()
 {
-    return ke_context_ptr;
+    return pKeContext;
 }
 
 /*
@@ -140,7 +221,7 @@ void* KeGetContextPointer()
  */
 void KeSetInitializeCallback(void (*callback)(void*))
 {
-    ke_pfn_initialize = callback;
+    pfnKeInitialize = callback;
 }
 
 /*
@@ -149,7 +230,7 @@ void KeSetInitializeCallback(void (*callback)(void*))
  */
 void KeSetUnitializeCallback(void (*callback)(void*))
 {
-    ke_pfn_uninitialize = callback;
+    pfnKeUninitialize = callback;
 }
 
 /*
@@ -158,7 +239,7 @@ void KeSetUnitializeCallback(void (*callback)(void*))
  */
 void KeSetKeyboardCallback(void (*callback)(void*, void*))
 {
-    ke_pfn_keyboard = callback;
+    pfnKeKeyboard = callback;
 }
 
 /*
@@ -167,7 +248,7 @@ void KeSetKeyboardCallback(void (*callback)(void*, void*))
  */
 void KeSetMouseCallBack(void (*callback)(void*, void*))
 {
-    ke_pfn_mouse = callback;
+    pfnKeMouse = callback;
 }
 
 /*
@@ -176,7 +257,61 @@ void KeSetMouseCallBack(void (*callback)(void*, void*))
  */
 void KeSetGamepadCallback(void (*callback)(void*, void*))
 {
-    ke_pfn_gamepad = callback;
+    pfnKeGamepad = callback;
+}
+
+/*
+ * Name: KeSetAppTerminateCallback
+ * Desc:
+ */
+void KeSetAppTerminateCallback( void (*callback)(void*) )
+{
+    pfnKeAppTerminating = callback;
+}
+
+/*
+ * Name: KeSetAppLowMemoryCallback
+ * Desc:
+ */
+void KeSetAppLowMemoryCallback( void (*callback)(void*) )
+{
+    pfnKeAppLowMemory = callback;
+}
+
+/*
+ * Name: KeSetAppWillEnterBackgroundCallback
+ * Desc:
+ */
+void KeSetAppWillEnterBackgroundCallback( void (*callback)(void*) )
+{
+    pfnKeAppWillEnterBackground = callback;
+}
+
+/*
+ * Name: KeSetAppDidEnterBackgroundCallback
+ * Desc:
+ */
+void KeSetAppDidEnterBackgroundCallback( void (*callback)(void*) )
+{
+    pfnKeAppDidEnterBackground = callback;
+}
+
+/*
+ * Name: KeSetAppWillEnterForegroundCallback
+ * Desc:
+ */
+void KeSetAppWillEnterForegroundCallback( void (*callback)(void*) )
+{
+    pfnKeAppWillEnterForeground = callback;
+}
+
+/*
+ * Name: KeSetAppDidEnterForegroundCallback
+ * Desc:
+ */
+void KeSetAppDidEnterForegroundCallback( void (*callback)(void*) )
+{
+    pfnKeAppDidEnterForeground = callback;
 }
 
 /*
@@ -185,8 +320,8 @@ void KeSetGamepadCallback(void (*callback)(void*, void*))
  */
 void KeOnInitialize( void* context )
 {
-    if( ke_pfn_initialize )
-        ke_pfn_initialize( context );
+    if( pfnKeInitialize )
+        pfnKeInitialize( context );
 }
 
 /*
@@ -195,8 +330,8 @@ void KeOnInitialize( void* context )
  */
 void KeOnUnintialize( void* context )
 {
-    if( ke_pfn_uninitialize )
-        ke_pfn_uninitialize( context );
+    if( pfnKeUninitialize )
+        pfnKeUninitialize( context );
 }
 
 /*
@@ -205,8 +340,8 @@ void KeOnUnintialize( void* context )
  */
 void KeOnKeyboard( void* context, void* input_context )
 {
-    if( ke_pfn_keyboard )
-        ke_pfn_keyboard( context, input_context );
+    if( pfnKeKeyboard )
+        pfnKeKeyboard( context, input_context );
 }
 
 /*
@@ -215,8 +350,8 @@ void KeOnKeyboard( void* context, void* input_context )
  */
 void KeOnMouse( void* context, void* input_context )
 {
-    if( ke_pfn_mouse )
-        ke_pfn_mouse( context, input_context );
+    if( pfnKeMouse )
+        pfnKeMouse( context, input_context );
 }
 
 /*
@@ -225,8 +360,8 @@ void KeOnMouse( void* context, void* input_context )
  */
 void KeOnGamepad( void* context, void* input_context )
 {
-    if( ke_pfn_gamepad )
-        ke_pfn_gamepad( context, input_context );
+    if( pfnKeGamepad )
+        pfnKeGamepad( context, input_context );
 }
 
 /*
@@ -400,6 +535,105 @@ void KeProcessMouseEvent( SDL_Event* event )
         
         mouse.button[button] = No;
     }
+}
+
+/*
+ * Name: KeGatherAllDisplayInformation
+ * Desc: Gathers information about this user's available displays, such as
+ *       the number of monitors, and the resolutions supported for each.
+ *
+ * NOTE: This is an internal function that should only be called ONCE in
+ *       KeInitialize.  The user should never have to access this function
+ *       directly!
+ */
+int KeGatherAllDisplayInformation()
+{
+    /* Initialize the video subsystem for a minute */
+    int res = SDL_InitSubSystem( SDL_INIT_VIDEO );
+    if( res == -1 )
+        return No;
+    
+    /* Get the number of displays available for this platform */
+    display_count = SDL_GetNumVideoDisplays();
+    
+    /* Gather display information for each display supported by SDL */
+    for( int i = 0; i < display_count; i++ )
+    {
+        KeDisplayInfo disp_info;
+        strcpy( disp_info.display_name, SDL_GetDisplayName(i) );
+        disp_info.display_number = i;
+        
+        /* Gather the supported resolutions for this display mode */
+        for( int j = 0; j < SDL_GetNumDisplayModes(i); j++ )
+        {
+            KeDisplayMode disp_mode;
+            SDL_DisplayMode disp;
+            
+            SDL_GetDisplayMode( i, j, &disp );
+            disp_mode.width = disp.w;
+            disp_mode.height = disp.h;
+            disp_mode.pixel_format = disp.format;
+            disp_mode.landscape = ( disp.w > disp.h );
+            
+            /* Save this display mode */
+            disp_info.display_modes.push_back( disp_mode );
+        }
+        
+        /* Save the display info */
+        displays.push_back( disp_info );
+    }
+    
+    /* Close the video subsystem */
+    SDL_QuitSubSystem( SDL_INIT_VIDEO );
+    
+    return Yes;
+}
+
+/*
+ * Name: KeDisplayCount
+ * Desc: Returns the number of display adapters (i.e. monitors) this machine supports.
+ */
+int KeGetDisplayCount()
+{
+    return display_count;
+}
+
+/*
+ * Name: KeGetDisplayModeCount
+ * Desc: Returns the number of display modes (resolutions) available on this display adapter.
+ */
+int KeGetDisplayModeCount( int display )
+{
+    return displays[display].display_modes.size();
+}
+
+/*
+ * Name: KeGetDisplayModes
+ * Desc: Returns a list of display modes available on the specified display adapter number.
+ */
+void KeGetDisplayModes( int display, KeDisplayMode* modes )
+{
+    memcpy( modes, displays[display].display_modes.data(), sizeof( KeDisplayMode ) * displays[display].display_modes.size() );
+    
+    /*for( int i = 0; i < SDL_GetNumDisplayModes( display ); i++ )
+    {
+        SDL_DisplayMode disp;
+        
+        SDL_GetDisplayMode( display, i, &disp );
+        modes[i].width = disp.w;
+        modes[i].height = disp.h;
+        modes[i].pixel_format = disp.format;
+        modes[i].landscape = disp.w > disp.h ? Yes : No;
+    }*/
+}
+
+/*
+ * Name: KeGetDisplayName
+ * Desc: Returns the name of this display adapter, assuming it even has one...
+ */
+const char* KeGetDisplayName( int display )
+{
+    return (const char*) displays[display].display_name;
 }
 
 void KeMessageBox( const char* message, const char* title, uint32_t flags )

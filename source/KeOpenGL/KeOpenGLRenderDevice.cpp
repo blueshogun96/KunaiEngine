@@ -383,12 +383,12 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 
 	if( device_desc->device_type == KE_RENDERDEVICE_OGL4 )
 	{
-		if( real_major_version != 4 )
+		if( real_major_version < 4 )
 			DISPDBG_R( KE_ERROR, "A core OpenGL 4.x context was not created!" );
 	}
 	if( device_desc->device_type == KE_RENDERDEVICE_OGL3 )
 	{
-		if( real_major_version != 3 )
+		if( real_major_version < 3 )
 			DISPDBG_R( KE_ERROR, "A core OpenGL 3.x context was not created!" );
 	}
 
@@ -773,6 +773,8 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
 	glAttachShader( p, f );
     
 	glLinkProgram(p);
+    OGL_DISPDBG( KE_ERROR, "Error linking GPU program!", glGetError() );
+    
 	glUseProgram(p);
     
     glDeleteShader(v);

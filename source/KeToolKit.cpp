@@ -8,7 +8,7 @@
 #include "KeToolkit.h"
 
 /* SDL2_image */
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(__MOBILE_OS__)
 #include <SDL2_image/SDL_image.h>
 #else
 #include <SDL_image.h>

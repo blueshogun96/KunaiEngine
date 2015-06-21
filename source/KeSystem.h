@@ -49,6 +49,18 @@ struct KeMouse
     int button[3];  /* Mouse buttons 1=Down, 0=Up */
 };
 
+/*
+ * Display mode structure
+ */
+struct KeDisplayMode
+{
+    int width, height;
+    uint32_t pixel_format;
+    int landscape;
+};
+
+
+
 
 /*
  * Application lifetime
@@ -60,6 +72,12 @@ void KeSetUnitializeCallback(void (*callback)(void*));
 void KeSetKeyboardCallback(void (*callback)(void*, void*));
 void KeSetMouseCallBack(void (*callback)(void*, void*));
 void KeSetGamepadCallback(void (*callback)(void*, void*));
+void KeSetAppTerminateCallback( void (*callback)(void*) );
+void KeSetAppLowMemoryCallback( void (*callback)(void*) );
+void KeSetAppWillEnterBackgroundCallback( void (*callback)(void*) );
+void KeSetAppDidEnterBackgroundCallback( void (*callback)(void*) );
+void KeSetAppWillEnterForegroundCallback( void (*callback)(void*) );
+void KeSetAppDidEnterForegroundCallback( void (*callback)(void*) );
 
 void KeSetContextPointer( void* context_pointer );
 void* KeGetContextPointer();
@@ -83,6 +101,15 @@ void KeDelay( uint32_t milliseconds );
 uint64_t KeGetPerformanceCounter();
 uint64_t KeGetPerformanceFrequency();
 uint32_t KeGetTickCount();
+
+
+/*
+ * Display
+ */
+int KeGetDisplayCount();
+int KeGetDisplayModeCount( int display );
+void KeGetDisplayModes( int display, KeDisplayMode* modes );
+const char* KeGetDisplayName( int display );
 
 
 /*

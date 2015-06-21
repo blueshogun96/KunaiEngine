@@ -25,15 +25,6 @@ KeZipResourceArchive::KeZipResourceArchive( std::string filename ) : archive(nul
 	opened = (bool) mz_zip_reader_init_file( (mz_zip_archive*) archive, filename.c_str(), 0 );
 }
 
-KeZipResourceArchive::KeZipResourceArchive( char* filename ) : archive(nullptr)
-{
-	archive = malloc( sizeof( mz_zip_archive ) );
-
-	/* Open the desired archive */
-	ZeroMemory( archive, sizeof( mz_zip_archive ) );
-	opened = (bool) mz_zip_reader_init_file( (mz_zip_archive*) archive, filename, 0 );
-}
-
 KeZipResourceArchive::~KeZipResourceArchive()
 {
 	Close();
@@ -66,11 +57,4 @@ bool KeZipResourceArchive::Read( std::string filename, void** ptr, size_t* size 
 	return true;
 }
 
-bool KeZipResourceArchive::Read( char* filename, void** ptr, size_t* size )
-{
-	*ptr = mz_zip_reader_extract_file_to_heap( (mz_zip_archive*) archive, filename, size, 0 );
-	if( !(*ptr ) )
-		return false;
-    
-	return true;
-}
+

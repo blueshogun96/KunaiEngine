@@ -8,7 +8,7 @@
 #include "KeRenderDevice.h"
 
 #ifdef __MOBILE_OS__
-#include "ke_ogles2_renderdevice.h"
+#include "KeOpenGLES/KeOpenGLESRenderDevice.h"
 #else
 #include "KeOpenGL/KeOpenGLRenderDevice.h"
 #endif
@@ -30,7 +30,7 @@ IKeRenderDevice* KeCreateRenderDevice( KeRenderDeviceDesc* renderdevice_desc )
         return new IKeOpenGLRenderDevice( renderdevice_desc );
 #else
     if( renderdevice_desc->device_type == KE_RENDERDEVICE_OGLES2 )
-       return new ke_ogles2_renderdevice_t( renderdevice_desc );
+       return new IKeOpenGLESRenderDevice( renderdevice_desc );
 #endif
     
 #ifdef _WIN32

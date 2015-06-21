@@ -23,7 +23,6 @@ public:
 	virtual bool	IsOpen() PURE;
 	virtual void	Close() PURE;
 	virtual bool	Read( std::string filename, void** ptr, size_t* size ) PURE;
-	virtual bool	Read( char* filename, void** ptr, size_t* size ) PURE;
 
 protected:
 	bool	opened;
@@ -38,15 +37,13 @@ class KeZipResourceArchive : public KeResourceArchive
 public:
 	KeZipResourceArchive();
 	KeZipResourceArchive( std::string filename );
-	KeZipResourceArchive( char* filename );
-	virtual ~KeZipResourceArchive();
+    virtual ~KeZipResourceArchive();
 
 public:
 	virtual bool	IsOpen();
 	virtual void	Close();
 	virtual bool	Read( std::string filename, void** ptr, size_t* size );
-	virtual bool	Read( char* filename, void** ptr, size_t* size );
-
+    
 protected:
 	void*	archive;
 };

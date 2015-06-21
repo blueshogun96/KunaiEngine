@@ -41,6 +41,14 @@ bool KeInitialize()
 		DISPDBG( KE_DBGLVL(3), "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK\n" );
 	}
     
+    /* Gather display modes */
+    extern int KeGatherAllDisplayInformation();
+    KeGatherAllDisplayInformation();
+    
+    /* Insert event handler for mobile/embedded platforms */
+    extern int KeProcessAppEvents( void *userdata, SDL_Event *event );
+    SDL_SetEventFilter( KeProcessAppEvents, KeGetContextPointer() );
+    
     /* Call user specified initialization routine */
     KeOnInitialize( KeGetContextPointer() );
     
