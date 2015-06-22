@@ -24,9 +24,9 @@
  */
 #define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
 #define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
-#define OGL_DISPDBG( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); }
-#define OGL_DISPDBG_R( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return; }
-#define OGL_DISPDBG_RB( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
+#define OGL_DISPDBG( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
+#define OGL_DISPDBG_R( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
+#define OGL_DISPDBG_RB( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
 
 
 /* GPU fencing routines */
@@ -349,7 +349,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     }
     
     /* Initialize the SDL window */
-    window = SDL_CreateWindow( "Kunai Engine 0.1a",  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    window = SDL_CreateWindow( "Kunai Engine",  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               device_desc->width, device_desc->height, SDL_WINDOW_OPENGL );
     if( !window )
         DISPDBG_R( KE_ERROR, "Error creating SDL window!" );
@@ -721,13 +721,8 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
 	f = glCreateShader( GL_FRAGMENT_SHADER );
     g = glCreateShader( GL_GEOMETRY_SHADER );
     
-	const char* vv = vertex_shader;
-	const char* ff = fragment_shader;
-    const char* gg = geometry_shader;
-    const char* tt = tesselation_shader;
-    
-	glShaderSource( v, 1, &vv, NULL );
-	glShaderSource( f, 1, &ff, NULL );
+	glShaderSource( v, 1, &vertex_shader, NULL );
+	glShaderSource( f, 1, &fragment_shader, NULL );
     
 	GLint compiled;
     
@@ -772,8 +767,28 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
 	glAttachShader( p, v );
 	glAttachShader( p, f );
     
+	GLint status = 0;
 	glLinkProgram(p);
-    OGL_DISPDBG( KE_ERROR, "Error linking GPU program!", glGetError() );
+	glGetProgramiv( p, GL_LINK_STATUS, &status );
+	if (status == GL_FALSE)
+	{
+		char str[2048];
+		int len = 0;
+
+		glGetProgramInfoLog( p, 2048, &len, str );
+		DISPDBG( KE_ERROR, "Error linking program.\n" << str << "\n" );
+	}
+
+	glValidateProgram( p );
+	glGetProgramiv( p, GL_VALIDATE_STATUS, &status );
+	if (status == GL_FALSE)
+	{
+		char str[2048];
+		int len = 0;
+
+		glGetProgramInfoLog( p, 2048, &len, str );
+		DISPDBG( KE_ERROR, "Error validating program.\n" << str << "\n" );
+	}
     
 	glUseProgram(p);
     
@@ -791,8 +806,11 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     GLuint uniform_tex7 = glGetUniformLocation( p, "tex7" );
     
     gp->matrices[0] = glGetUniformLocation( p, "world" );
+	OGL_DISPDBG( KE_WARNING, "Could not find the world matrix uniform location...", glGetError() );
     gp->matrices[1] = glGetUniformLocation( p, "view" );
+	OGL_DISPDBG( KE_WARNING, "Could not find the view matrix uniform location...", glGetError() );
     gp->matrices[2] = glGetUniformLocation( p, "proj" );
+	OGL_DISPDBG( KE_WARNING, "Could not find the projection matrix uniform location...", glGetError() );
     
     glUniform1i( uniform_tex0, 0 );
     glUniform1i( uniform_tex1, 1 );
@@ -986,8 +1004,7 @@ void IKeOpenGLRenderDevice::GetProgramConstantIV( const char* location, int* val
  */
 bool IKeOpenGLRenderDevice::CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer )
 {
-	OGL_DISPDBG_RB( KE_ERROR, "Functionality not yet implemented for core OpenGL!", glGetError() );
-	return false;
+	DISPDBG_RB( KE_ERROR, "Functionality not yet implemented for core OpenGL!" );
 }
 
 /*

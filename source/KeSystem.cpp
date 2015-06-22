@@ -30,6 +30,7 @@ KeButton    keys[256];
 KeMouse     mouse;
 int         display_count = 1;
 std::vector<KeDisplayInfo> displays;
+int			quitting = No;
 
 /*uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
 uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;*/
@@ -95,6 +96,7 @@ void KeProcessEvents()
         switch( event.type )
         {
             case SDL_QUIT:
+				quitting = Yes;
                 break;
                 
             case SDL_KEYDOWN:
