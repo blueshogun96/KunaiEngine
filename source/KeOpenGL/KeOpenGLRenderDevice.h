@@ -208,7 +208,7 @@ public:
     virtual bool SetStateBuffer( IKeStateBuffer* state_buffer );
     virtual void SetRenderStates( KeState* states );
     virtual void SetSamplerStates( KeState* states );
-//    virtual void draw_vertices_im();
+    virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data );
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count );
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count );
     virtual void DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count );

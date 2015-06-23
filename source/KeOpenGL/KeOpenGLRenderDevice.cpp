@@ -1555,10 +1555,41 @@ void IKeOpenGLRenderDevice::SetSamplerStates( KeState* states )
     }
 }
 
-/*void IKeOpenGLRenderDevice::draw_vertices_im()
+void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data )
 {
+    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
-}*/
+    /* Set the vertex attributes for this geometry buffer */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Draw the vertices */
+    glDrawArrays( primitive_types[primtype], first, count );
+    OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!", glGetError() );
+}
 
 
 /*

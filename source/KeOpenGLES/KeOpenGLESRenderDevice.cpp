@@ -14,9 +14,9 @@
  */
 #define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
 #define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
-#define OGL_DISPDBG( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); }
-#define OGL_DISPDBG_R( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return; }
-#define OGL_DISPDBG_RB( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
+#define OGL_DISPDBG( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
+#define OGL_DISPDBG_R( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
+#define OGL_DISPDBG_RB( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
 
 
 /* GPU fencing routines */
@@ -314,7 +314,36 @@ IKeOpenGLESRenderDevice::IKeOpenGLESRenderDevice( KeRenderDeviceDesc* renderdevi
             "\n\tOpenGL Version: " << glGetString( GL_VERSION ) <<
             "\n\tOpenGL Renderer: " << glGetString( GL_RENDERER ) << "\n" );
 
-
+    /* Print a list of available OpenGL extensions for this OpenGL implementation */
+    int extension_count = 0, i = 0;
+    char* extension_string = (char*) glGetString( GL_EXTENSIONS );
+    size_t length = strlen( extension_string );
+    
+    while( i < length )
+    {
+        if( extension_string[i] == ' ' )
+        {
+            extension_string[i] = '\n';
+            extension_count++;
+        }
+        
+        i++;
+    }
+    
+    std::stringstream sstr;
+    sstr << extension_count;
+    std::string ext_str = "\n\tOpenGL Extensions (" + sstr.str() + "):\n";
+    
+    /*while( i < extension_count )
+    {
+        ext_str += "\t\t";
+        ext_str += (const char*) glGetStringi( GL_EXTENSIONS, i );
+        ext_str += "\n";
+        i++;
+    }*/
+    
+    DISPDBG( KE_DBGLVL(0), extension_string );
+    
 	/* TODO: Determine which fencing version to use based on vendor if needed */
 }
 
@@ -567,45 +596,40 @@ bool IKeOpenGLESRenderDevice::CreateProgram( const char* vertex_shader, const ch
     IKeOpenGLESGpuProgram* gp = static_cast<IKeOpenGLESGpuProgram*>( *gpu_program );
     GLenum error = glGetError();
     
-	v = glCreateShader( GL_VERTEX_SHADER );
-	f = glCreateShader( GL_FRAGMENT_SHADER );
-    //g = glCreateShader( GL_GEOMETRY_SHADER );
+    v = glCreateShader( GL_VERTEX_SHADER );
+    f = glCreateShader( GL_FRAGMENT_SHADER );
+//    g = glCreateShader( GL_GEOMETRY_SHADER );
     
-	const char* vv = vertex_shader;
-	const char* ff = fragment_shader;
-    const char* gg = geometry_shader;
-    const char* tt = tesselation_shader;
+    glShaderSource( v, 1, &vertex_shader, NULL );
+    glShaderSource( f, 1, &fragment_shader, NULL );
     
-	glShaderSource( v, 1, &vv, NULL );
-	glShaderSource( f, 1, &ff, NULL );
+    GLint compiled;
     
-	GLint compiled;
-    
-	glCompileShader(v);
-	glGetShaderiv( v, GL_COMPILE_STATUS, &compiled );
-	if( !compiled )
-	{
+    glCompileShader(v);
+    glGetShaderiv( v, GL_COMPILE_STATUS, &compiled );
+    if( !compiled )
+    {
         char str[2048];
         int len = 0;
         
         glGetShaderInfoLog( v, 2048, &len, str );
-		printf("Vertex shader not compiled.\n%s\n", str);
-	}
+        printf("Vertex shader not compiled.\n%s\n", str);
+    }
     
-	glCompileShader(f);
-	glGetShaderiv( f, GL_COMPILE_STATUS, &compiled );
-	if( !compiled )
-	{
+    glCompileShader(f);
+    glGetShaderiv( f, GL_COMPILE_STATUS, &compiled );
+    if( !compiled )
+    {
         char str[2048];
         int len = 0;
         
         glGetShaderInfoLog( f, 2048, &len, str );
-		printf("Fragment shader not compiled.\n%s\n", str);
-	}
+        printf("Fragment shader not compiled.\n%s\n", str);
+    }
     
-	p = glCreateProgram();
+    p = glCreateProgram();
     
-	glBindAttribLocation( p, 0, "in_pos" );
+    glBindAttribLocation( p, 0, "in_pos" );
     glBindAttribLocation( p, 1, "in_normal" );
     glBindAttribLocation( p, 2, "in_tangent" );
     glBindAttribLocation( p, 3, "in_bitangent" );
@@ -614,16 +638,38 @@ bool IKeOpenGLESRenderDevice::CreateProgram( const char* vertex_shader, const ch
     glBindAttribLocation( p, 6, "in_tex1" );
     glBindAttribLocation( p, 7, "in_tex2" );
     glBindAttribLocation( p, 8, "in_tex3" );
-	glBindAttribLocation( p, 9, "in_tex4" );
+    glBindAttribLocation( p, 9, "in_tex4" );
     glBindAttribLocation( p, 10, "in_tex5" );
     glBindAttribLocation( p, 11, "in_tex6" );
     glBindAttribLocation( p, 12, "in_tex7" );
     
-	glAttachShader( p, v );
-	glAttachShader( p, f );
+    glAttachShader( p, v );
+    glAttachShader( p, f );
     
-	glLinkProgram(p);
-	glUseProgram(p);
+    GLint status = 0;
+    glLinkProgram(p);
+    glGetProgramiv( p, GL_LINK_STATUS, &status );
+    if (status == GL_FALSE)
+    {
+        char str[2048];
+        int len = 0;
+        
+        glGetProgramInfoLog( p, 2048, &len, str );
+        DISPDBG( KE_ERROR, "Error linking program.\n" << str << "\n" );
+    }
+    
+    glValidateProgram( p );
+    glGetProgramiv( p, GL_VALIDATE_STATUS, &status );
+    if (status == GL_FALSE)
+    {
+        char str[2048];
+        int len = 0;
+        
+        glGetProgramInfoLog( p, 2048, &len, str );
+        DISPDBG( KE_ERROR, "Error validating program.\n" << str << "\n" );
+    }
+    
+    glUseProgram(p);
     
     glDeleteShader(v);
     glDeleteShader(f);
@@ -633,14 +679,18 @@ bool IKeOpenGLESRenderDevice::CreateProgram( const char* vertex_shader, const ch
     GLuint uniform_tex1 = glGetUniformLocation( p, "tex1" );
     GLuint uniform_tex2 = glGetUniformLocation( p, "tex2" );
     GLuint uniform_tex3 = glGetUniformLocation( p, "tex3" );
-	GLuint uniform_tex4 = glGetUniformLocation( p, "tex4" );
+    GLuint uniform_tex4 = glGetUniformLocation( p, "tex4" );
     GLuint uniform_tex5 = glGetUniformLocation( p, "tex5" );
     GLuint uniform_tex6 = glGetUniformLocation( p, "tex6" );
     GLuint uniform_tex7 = glGetUniformLocation( p, "tex7" );
     
+    error = glGetError();
     gp->matrices[0] = glGetUniformLocation( p, "world" );
+    OGL_DISPDBG( KE_WARNING, "Could not find the world matrix uniform location...", glGetError() );
     gp->matrices[1] = glGetUniformLocation( p, "view" );
+    OGL_DISPDBG( KE_WARNING, "Could not find the view matrix uniform location...", glGetError() );
     gp->matrices[2] = glGetUniformLocation( p, "proj" );
+    OGL_DISPDBG( KE_WARNING, "Could not find the projection matrix uniform location...", glGetError() );
     
     glUniform1i( uniform_tex0, 0 );
     glUniform1i( uniform_tex1, 1 );
@@ -834,8 +884,7 @@ void IKeOpenGLESRenderDevice::GetProgramConstantIV( const char* location, int* v
  */
 bool IKeOpenGLESRenderDevice::CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer )
 {
-	OGL_DISPDBG_RB( KE_ERROR, "Functionality not supported for OpenGL ES 2.0!", glGetError() );
-	return false;
+	DISPDBG_RB( KE_ERROR, "Functionality not supported for OpenGL ES 2.0!" );
 }
 
 /*
@@ -1332,10 +1381,41 @@ void IKeOpenGLESRenderDevice::SetSamplerStates( KeState* states )
     }
 }
 
-/*void IKeOpenGLESRenderDevice::draw_vertices_im()
+void IKeOpenGLESRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data )
 {
+    IKeOpenGLESGpuProgram* gp = static_cast<IKeOpenGLESGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
-}*/
+    /* Set the vertex attributes for this geometry buffer */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Draw the vertices */
+    glDrawArrays( primitive_types[primtype], first, count );
+    OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!", glGetError() );
+}
 
 
 /*
