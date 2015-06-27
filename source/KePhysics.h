@@ -9,8 +9,11 @@
 #define __ke_physics__
 
 #include <iostream>
+#include <vector>
+#include <map>
+#include <unordered_map>
 #include <tokamak.h>
-#include "linkedlist.h"
+//#include "linkedlist.h"
 
 
 /* Rigid body */
@@ -60,8 +63,8 @@ public:
     bool SetAnimatedBodyPosition( uint32_t id, neV3 position );
     bool SetAnimatedBodyRotation( uint32_t id, neV3 rotation );
     
-    KeRigidBody* GetRigidBody( uint32_t id );
-    KeAnimatedBody* GetAnimatedBody( uint32_t id );
+    bool GetRigidBody( uint32_t id, KeRigidBody* rigid_body );
+    bool GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_body );
     
     void RemoveAllRigidBodies();
     void RemoveAllAnimatedBodies();
@@ -70,8 +73,10 @@ public:
     
 protected:
     neSimulator*                    simulator;          /* Tokamak physics simualtor */
-    node_t<KeRigidBody*>*			rigid_bodies;       /* A list of rigid bodies */
-    node_t<KeAnimatedBody*>*		animated_bodies;    /* A list of animated bodies */
+    std::vector<KeRigidBody>		rigid_bodies;       /* A list of rigid bodies */
+    std::vector<KeAnimatedBody>		animated_bodies;    /* A list of animated bodies */
+    std::unordered_map<uint32_t, std::unique_ptr<KeRigidBody>> rb_map;
+    std::unordered_map<uint32_t, std::unique_ptr<KeAnimatedBody>> ab_map;
     neSimulatorSizeInfo             size_info;          /* Information about this physics simulator */
     uint64_t                        start_time, end_time; /* Start and end time */
     float                           time_since_last_update;

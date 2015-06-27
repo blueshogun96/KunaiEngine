@@ -77,26 +77,27 @@ uint32_t KePhysicsSimulator::AddRigidBodyBox( neV3 position, neV3 size, float ma
     static uint32_t rb_id = 0;
     
     /* Add a new rigid body box to the simulator */
-    KeRigidBody* rigid_body = new KeRigidBody;
-    rigid_body->rigid_body = simulator->CreateRigidBody();
+    KeRigidBody rigid_body;
+    rigid_body.rigid_body = simulator->CreateRigidBody();
     
     /* Create box geometry */
-    rigid_body->geometry = rigid_body->rigid_body->AddGeometry();
-    rigid_body->geometry->SetBoxSize( size );
-    rigid_body->rigid_body->UpdateBoundingInfo();
+    rigid_body.geometry = rigid_body.rigid_body->AddGeometry();
+    rigid_body.geometry->SetBoxSize( size );
+    rigid_body.rigid_body->UpdateBoundingInfo();
     
     /* Set mass and intertia tensor */
-    rigid_body->rigid_body->SetInertiaTensor( neBoxInertiaTensor( size, mass ) );
-    rigid_body->rigid_body->SetMass( mass );
+    rigid_body.rigid_body->SetInertiaTensor( neBoxInertiaTensor( size, mass ) );
+    rigid_body.rigid_body->SetMass( mass );
     
     /* Set position */
-    rigid_body->rigid_body->SetPos( position );
+    rigid_body.rigid_body->SetPos( position );
     
     /* Give this rigid body a unique ID number */
-    rigid_body->rb_id = ++rb_id;
+    rigid_body.rb_id = ++rb_id;
     
     /* Add this to the list of rigit bodies */
-    list_add_end<KeRigidBody*>( &rigid_bodies, rigid_body );
+//    list_add_end<KeRigidBody*>( &rigid_bodies, rigid_body );
+    rigid_bodies.push_back( rigid_body );
     
     return rb_id;
 }
@@ -110,26 +111,26 @@ uint32_t KePhysicsSimulator::AddRigidBodySphere( neV3 position, float radius, fl
     static uint32_t rb_id = 0;
     
     /* Add a new rigid body box to the simulator */
-    KeRigidBody* rigid_body = new KeRigidBody;
-    rigid_body->rigid_body = simulator->CreateRigidBody();
+    KeRigidBody rigid_body;
+    rigid_body.rigid_body = simulator->CreateRigidBody();
     
     /* Create box geometry */
-    rigid_body->geometry = rigid_body->rigid_body->AddGeometry();
-    rigid_body->geometry->SetSphereDiameter( radius * 2 );
-    rigid_body->rigid_body->UpdateBoundingInfo();
+    rigid_body.geometry = rigid_body.rigid_body->AddGeometry();
+    rigid_body.geometry->SetSphereDiameter( radius * 2 );
+    rigid_body.rigid_body->UpdateBoundingInfo();
     
     /* Set mass and intertia tensor */
-    rigid_body->rigid_body->SetInertiaTensor( neSphereInertiaTensor( radius * 2, mass ) );
-    rigid_body->rigid_body->SetMass( mass );
+    rigid_body.rigid_body->SetInertiaTensor( neSphereInertiaTensor( radius * 2, mass ) );
+    rigid_body.rigid_body->SetMass( mass );
     
     /* Set position */
-    rigid_body->rigid_body->SetPos( position );
+    rigid_body.rigid_body->SetPos( position );
     
     /* Give this rigid body a unique ID number */
-    rigid_body->rb_id = ++rb_id;
+    rigid_body.rb_id = ++rb_id;
     
     /* Add this to the list of rigit bodies */
-    list_add_end<KeRigidBody*>( &rigid_bodies, rigid_body );
+    rigid_bodies.push_back( rigid_body );
     
     return rb_id;
 }
@@ -143,22 +144,23 @@ uint32_t KePhysicsSimulator::AddAnimatedBodyBox( neV3 position, neV3 size )
     static uint32_t ab_id = 0;
     
     /* Create a new animated body box */
-    KeAnimatedBody* animated_body = new KeAnimatedBody;
-    animated_body->animated_body = simulator->CreateAnimatedBody();
+    KeAnimatedBody animated_body;
+    animated_body.animated_body = simulator->CreateAnimatedBody();
     
     /* Create box geometry */
-    animated_body->geometry = animated_body->animated_body->AddGeometry();
-    animated_body->geometry->SetBoxSize( size );
-    animated_body->animated_body->UpdateBoundingInfo();
+    animated_body.geometry = animated_body.animated_body->AddGeometry();
+    animated_body.geometry->SetBoxSize( size );
+    animated_body.animated_body->UpdateBoundingInfo();
     
     /* Set animated body position */
-    animated_body->animated_body->SetPos( position );
+    animated_body.animated_body->SetPos( position );
     
     /* Give this animated body a unique ID */
-    animated_body->ab_id = ++ab_id;
+    animated_body.ab_id = ++ab_id;
     
     /* Add this animated body to the list */
-    list_add_end<KeAnimatedBody*>( &animated_bodies, animated_body );
+//    list_add_end<KeAnimatedBody*>( &animated_bodies, animated_body );
+    animated_bodies.push_back( animated_body );
     
     return ab_id;
 }
@@ -169,6 +171,7 @@ uint32_t KePhysicsSimulator::AddAnimatedBodyBox( neV3 position, neV3 size )
  */
 void KePhysicsSimulator::RemoveRigidBody( uint32_t rb_id )
 {
+#if 0
     node_t<KeRigidBody*>* n = rigid_bodies;
     
     /* Search for a rigid body with this id number */
@@ -192,6 +195,26 @@ void KePhysicsSimulator::RemoveRigidBody( uint32_t rb_id )
             }
         }
     }
+#else
+    std::vector<KeRigidBody>::iterator i = rigid_bodies.begin();
+    
+    while( i != rigid_bodies.end() )
+    {
+        /* Does this id match? */
+        if( i->rb_id == rb_id )
+        {
+            /* If so, delete the geometry and free the rigid body */
+            i->rigid_body->RemoveGeometry( i->geometry );
+            simulator->FreeRigidBody( i->rigid_body );
+            
+            /* Now remove it from the list */
+            rigid_bodies.erase(i);
+            break;
+        }
+        
+        ++i;
+    }
+#endif
 }
 
 /*
@@ -200,6 +223,7 @@ void KePhysicsSimulator::RemoveRigidBody( uint32_t rb_id )
  */
 void KePhysicsSimulator::RemoveAnimatedBody( uint32_t ab_id )
 {
+#if 0
     node_t<KeAnimatedBody*>* n = animated_bodies;
     
     /* Search for a animated body with this id number */
@@ -223,6 +247,26 @@ void KePhysicsSimulator::RemoveAnimatedBody( uint32_t ab_id )
             }
         }
     }
+#else
+    std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
+    
+    while( i != rigid_bodies.end() )
+    {
+        /* Does this id match? */
+        if( i->ab_id == ab_id )
+        {
+            /* If so, delete the geometry and free the rigid body */
+            i->animated_body->RemoveGeometry( i->geometry );
+            simulator->FreeAnimatedBody( i->animated_body );
+            
+            /* Now remove it from the list */
+            animated_bodies.erase(i);
+            break;
+        }
+        
+        ++i;
+    }
+#endif
 }
 
 /*
@@ -231,6 +275,7 @@ void KePhysicsSimulator::RemoveAnimatedBody( uint32_t ab_id )
  */
 bool KePhysicsSimulator::SetAnimatedBodyPosition( uint32_t id, neV3 position )
 {
+#if 0
     node_t<KeAnimatedBody*>* n = animated_bodies;
     
     /* Search for a animated body with this id number */
@@ -250,6 +295,22 @@ bool KePhysicsSimulator::SetAnimatedBodyPosition( uint32_t id, neV3 position )
             }
         }
     }
+#else
+    std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
+    
+    while( i != rigid_bodies.end() )
+    {
+        /* Does this id match? */
+        if( i->ab_id == id )
+        {
+            /* Set the position and return success */
+            i->animated_body->SetPos( position );
+            return true;
+        }
+        
+        ++i;
+    }
+#endif
     
     /* Animated body id not found */
     return false;
@@ -261,6 +322,7 @@ bool KePhysicsSimulator::SetAnimatedBodyPosition( uint32_t id, neV3 position )
  */
 bool KePhysicsSimulator::SetAnimatedBodyRotation( uint32_t id, neV3 rotation )
 {
+#if 0
     node_t<KeAnimatedBody*>* n = animated_bodies;
     
     /* Search for a animated body with this id number */
@@ -282,13 +344,32 @@ bool KePhysicsSimulator::SetAnimatedBodyRotation( uint32_t id, neV3 rotation )
             }
         }
     }
+#else
+    std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
+    
+    while( i != rigid_bodies.end() )
+    {
+        /* Does this id match? */
+        if( i->ab_id == id )
+        {
+            /* Set the rotation and return success */
+            neT3 matrix;
+            matrix.rot.RotateXYZ( rotation );
+            i->animated_body->SetRotation( matrix.rot );
+            return true;
+        }
+        
+        ++i;
+    }
+#endif
     
     /* Animated body id not found */
     return false;
 }
 
-KeRigidBody* KePhysicsSimulator::GetRigidBody( uint32_t id )
+bool KePhysicsSimulator::GetRigidBody( uint32_t id, KeRigidBody* rigid_body )
 {
+#if 0
     node_t<KeRigidBody*>* n = rigid_bodies;
     
     /* Traverse though the list in search for a rigid body with a matching id number */
@@ -307,13 +388,31 @@ KeRigidBody* KePhysicsSimulator::GetRigidBody( uint32_t id )
             }
         }
     }
+#else
+    std::vector<KeRigidBody>::iterator i = rigid_bodies.begin();
+    
+    while( i != rigid_bodies.end() )
+    {
+        /* Does this id match? */
+        if( i->rb_id == id )
+        {
+            rigid_body = i;
+            return true;
+        }
+        
+        ++i;
+    }
+    
+    return false;
+#endif
     
     /* Did not find a match */
     return NULL;
 }
 
-KeAnimatedBody* KePhysicsSimulator::GetAnimatedBody( uint32_t id )
+bool KePhysicsSimulator::GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_body )
 {
+#if 0
     node_t<KeAnimatedBody*>* n = animated_bodies;
     
     /* Traverse though the list in search for an animated body with a matching id number */
@@ -335,6 +434,21 @@ KeAnimatedBody* KePhysicsSimulator::GetAnimatedBody( uint32_t id )
     
     /* Did not find a match */
     return NULL;
+#else
+    std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
+    
+    while( i != rigid_bodies.end() )
+    {
+        /* Does this id match? */
+        if( i->ab_id == id )
+        {
+            animated_body = i;
+            return true;
+        }
+        
+        ++i;
+    }
+#endif
 }
 
 void KePhysicsSimulator::RemoveAllRigidBodies()
