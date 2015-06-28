@@ -335,14 +335,11 @@ struct IKeGeometryBuffer : public IKeResourceBuffer
 };
 
 /*
- * Push buffer base structure
+ * Command list base structure
  */
-struct IKePushBuffer : public IKeResourceBuffer
+struct IKeCommandList : public IKeUnknown
 {
     virtual void Destroy() PURE;
-    
-    virtual void* MapData( uint32_t flags ) PURE;
-    virtual void UnmapData( void* ) PURE;
 };
 
 /*

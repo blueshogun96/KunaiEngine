@@ -68,6 +68,14 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
 };
 
 /*
+ * Command list structure
+ */
+struct IKeOpenGLCommandList : public IKeCommandList 
+{
+	virtual void Destroy();
+};
+
+/*
  * GPU Program structure
  */
 struct IKeOpenGLGpuProgram : public IKeGpuProgram

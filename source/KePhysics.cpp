@@ -250,7 +250,7 @@ void KePhysicsSimulator::RemoveAnimatedBody( uint32_t ab_id )
 #else
     std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
     
-    while( i != rigid_bodies.end() )
+    while( i != animated_bodies.end() )
     {
         /* Does this id match? */
         if( i->ab_id == ab_id )
@@ -298,7 +298,7 @@ bool KePhysicsSimulator::SetAnimatedBodyPosition( uint32_t id, neV3 position )
 #else
     std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
     
-    while( i != rigid_bodies.end() )
+    while( i != animated_bodies.end() )
     {
         /* Does this id match? */
         if( i->ab_id == id )
@@ -347,7 +347,7 @@ bool KePhysicsSimulator::SetAnimatedBodyRotation( uint32_t id, neV3 rotation )
 #else
     std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
     
-    while( i != rigid_bodies.end() )
+    while( i != animated_bodies.end() )
     {
         /* Does this id match? */
         if( i->ab_id == id )
@@ -396,7 +396,7 @@ bool KePhysicsSimulator::GetRigidBody( uint32_t id, KeRigidBody* rigid_body )
         /* Does this id match? */
         if( i->rb_id == id )
         {
-            rigid_body = i;
+            rigid_body = &(*i);
             return true;
         }
         
@@ -437,12 +437,12 @@ bool KePhysicsSimulator::GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_
 #else
     std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
     
-    while( i != rigid_bodies.end() )
+    while( i != animated_bodies.end() )
     {
         /* Does this id match? */
         if( i->ab_id == id )
         {
-            animated_body = i;
+            animated_body = &(*i);
             return true;
         }
         
@@ -453,6 +453,7 @@ bool KePhysicsSimulator::GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_
 
 void KePhysicsSimulator::RemoveAllRigidBodies()
 {
+#if 0
     node_t<KeRigidBody*>* n = rigid_bodies;
     
     while( n != NULL )
@@ -470,10 +471,25 @@ void KePhysicsSimulator::RemoveAllRigidBodies()
             list_delete<KeRigidBody*>( &rigid_bodies, rb );
         }
     }
+#else
+	std::vector<KeRigidBody>::iterator i = rigid_bodies.begin();
+
+	while( i != rigid_bodies.end() )
+	{
+		/* Delete the geometry and free the animated body */
+		i->rigid_body->RemoveGeometry( i->geometry );
+		simulator->FreeRigidBody( i->rigid_body );
+
+		++i;
+	}
+
+	animated_bodies.clear();
+#endif
 }
 
 void KePhysicsSimulator::RemoveAllAnimatedBodies()
 {
+#if 0
     node_t<KeAnimatedBody*>* n = animated_bodies;
     
     while( n != NULL )
@@ -491,6 +507,20 @@ void KePhysicsSimulator::RemoveAllAnimatedBodies()
             list_delete<KeAnimatedBody*>( &animated_bodies, ab );
         }
     }
+#else
+	std::vector<KeAnimatedBody>::iterator i = animated_bodies.begin();
+
+	while (i != animated_bodies.end())
+	{
+		/* Delete the geometry and free the animated body */
+		i->animated_body->RemoveGeometry( i->geometry );
+		simulator->FreeAnimatedBody( i->animated_body );
+		
+		++i;
+	}
+
+	animated_bodies.clear();
+#endif
 }
 
 /*

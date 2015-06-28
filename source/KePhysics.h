@@ -75,8 +75,8 @@ protected:
     neSimulator*                    simulator;          /* Tokamak physics simualtor */
     std::vector<KeRigidBody>		rigid_bodies;       /* A list of rigid bodies */
     std::vector<KeAnimatedBody>		animated_bodies;    /* A list of animated bodies */
-    std::unordered_map<uint32_t, std::unique_ptr<KeRigidBody>> rb_map;
-    std::unordered_map<uint32_t, std::unique_ptr<KeAnimatedBody>> ab_map;
+//    std::unordered_map<uint32_t, std::unique_ptr<KeRigidBody>> rb_map;
+//    std::unordered_map<uint32_t, std::unique_ptr<KeAnimatedBody>> ab_map;
     neSimulatorSizeInfo             size_info;          /* Information about this physics simulator */
     uint64_t                        start_time, end_time; /* Start and end time */
     float                           time_since_last_update;

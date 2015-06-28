@@ -143,7 +143,7 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( KeAudioFormat* audio_format, IKeSo
     error = alGetError();
 	if( error != AL_NO_ERROR )
 	{
-		ReleaseSoundBuffer( sb );
+		sb->Destroy();
 		DISPDBG( KE_ERROR, "Error creating buffer (0x" << error << ")!\n" );
 		return false;
 	}
@@ -152,7 +152,7 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( KeAudioFormat* audio_format, IKeSo
     error = alGetError();
 	if( error != AL_NO_ERROR )
 	{
-		ReleaseSoundBuffer( sb );
+		sb->Destroy();
 		DISPDBG( KE_ERROR, "Error creating source (0x" << error << ")!\n" );
 		return false;
 	}

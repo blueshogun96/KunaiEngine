@@ -1277,10 +1277,10 @@ void IKeDirect3D11RenderDevice::SetSamplerStates( KeState* states )
 
 }
 
-/*void IKeDirect3D11RenderDevice::draw_vertices_im()
+void IKeDirect3D11RenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data )
 {
-
-}*/
+	DISPDBG( KE_ERROR, "Functionality not yet implemented!" );
+}
 
 
 /*
