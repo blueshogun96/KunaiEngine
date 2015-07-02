@@ -46,8 +46,10 @@ bool KeInitialize()
     KeGatherAllDisplayInformation();
     
     /* Insert event handler for mobile/embedded platforms */
+#ifdef __MOBILE_OS__
     extern int KeProcessAppEvents( void *userdata, SDL_Event *event );
     SDL_SetEventFilter( KeProcessAppEvents, KeGetContextPointer() );
+#endif
     
     /* Call user specified initialization routine */
     KeOnInitialize( KeGetContextPointer() );

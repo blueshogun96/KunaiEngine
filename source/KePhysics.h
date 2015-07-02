@@ -63,8 +63,8 @@ public:
     bool SetAnimatedBodyPosition( uint32_t id, neV3 position );
     bool SetAnimatedBodyRotation( uint32_t id, neV3 rotation );
     
-    bool GetRigidBody( uint32_t id, KeRigidBody* rigid_body );
-    bool GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_body );
+    bool GetRigidBody( uint32_t id, KeRigidBody** rigid_body );
+    bool GetAnimatedBody( uint32_t id, KeAnimatedBody** animated_body );
     
     void RemoveAllRigidBodies();
     void RemoveAllAnimatedBodies();

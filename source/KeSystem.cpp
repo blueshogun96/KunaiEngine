@@ -25,7 +25,6 @@ struct KeDisplayInfo
 /*
  * Globals
  */
-SDL_Event   event;
 KeButton    keys[256];
 KeMouse     mouse;
 int         display_count = 1;
@@ -88,6 +87,7 @@ void KeProcessMouseEvent( SDL_Event* event );
 void KeProcessEvents()
 {
     //ke_rdtsc();
+	SDL_Event   event;
     
     /* Check for any SDL supported events */
     while( SDL_PollEvent( &event ) )
@@ -196,7 +196,7 @@ int KeProcessAppEvents( void *userdata, SDL_Event *event )
 bool KeQuitRequested()
 {
     /* Was a quit event processed? */
-    return ( event.type == SDL_QUIT );
+    return ( quitting == Yes );
 }
 
 /*

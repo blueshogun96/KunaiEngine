@@ -367,28 +367,8 @@ bool KePhysicsSimulator::SetAnimatedBodyRotation( uint32_t id, neV3 rotation )
     return false;
 }
 
-bool KePhysicsSimulator::GetRigidBody( uint32_t id, KeRigidBody* rigid_body )
+bool KePhysicsSimulator::GetRigidBody( uint32_t id, KeRigidBody** rigid_body )
 {
-#if 0
-    node_t<KeRigidBody*>* n = rigid_bodies;
-    
-    /* Traverse though the list in search for a rigid body with a matching id number */
-    while( n != NULL )
-    {
-        KeRigidBody* rb = n->data;
-        n = n->next;
-        
-        if( rb != NULL )
-        {
-            /* Does this id match? */
-            if( rb->rb_id == id )
-            {
-                /* If so, return with this pointer as a match */
-                return rb;
-            }
-        }
-    }
-#else
     std::vector<KeRigidBody>::iterator i = rigid_bodies.begin();
     
     while( i != rigid_bodies.end() )
@@ -396,7 +376,7 @@ bool KePhysicsSimulator::GetRigidBody( uint32_t id, KeRigidBody* rigid_body )
         /* Does this id match? */
         if( i->rb_id == id )
         {
-            rigid_body = &(*i);
+            *rigid_body = &(*i);
             return true;
         }
         
@@ -404,13 +384,9 @@ bool KePhysicsSimulator::GetRigidBody( uint32_t id, KeRigidBody* rigid_body )
     }
     
     return false;
-#endif
-    
-    /* Did not find a match */
-    return NULL;
 }
 
-bool KePhysicsSimulator::GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_body )
+bool KePhysicsSimulator::GetAnimatedBody( uint32_t id, KeAnimatedBody** animated_body )
 {
 #if 0
     node_t<KeAnimatedBody*>* n = animated_bodies;
@@ -442,12 +418,14 @@ bool KePhysicsSimulator::GetAnimatedBody( uint32_t id, KeAnimatedBody* animated_
         /* Does this id match? */
         if( i->ab_id == id )
         {
-            animated_body = &(*i);
+            *animated_body = &(*i);
             return true;
         }
         
         ++i;
     }
+
+	return false;
 #endif
 }
 
