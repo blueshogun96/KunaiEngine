@@ -126,7 +126,7 @@ bool IKeOpenALAudioDevice::ConfirmDevice()
     return initialized;
 }
 
-bool IKeOpenALAudioDevice::CreateSoundBuffer( KeAudioFormat* audio_format, IKeSoundBuffer** sound_buffer )
+bool IKeOpenALAudioDevice::CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer** sound_buffer )
 {
     IKeOpenALSoundBuffer* sb;
     ALenum error = alGetError();
@@ -136,7 +136,7 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( KeAudioFormat* audio_format, IKeSo
     sb = static_cast<IKeOpenALSoundBuffer*>( *sound_buffer );
     
     /* Save audio format */
-    memmove( &sb->audio_format, audio_format, sizeof( KeAudioFormat ) );
+    memmove( &sb->wfx, wfx, sizeof( WAVEFORMATEX ) );
     
     /* Generate a sound buffer and source */
     alGenBuffers( 1, &sb->buffer );
@@ -172,52 +172,7 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( KeAudioFormat* audio_format, IKeSo
     return true;
 }
 
-void IKeOpenALAudioDevice::ReleaseSoundBuffer( IKeSoundBuffer* sound_buffer )
-{
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    /* Delete the OpenAL buffer and sources */
-    if( sound_buffer )
-    {
-        alDeleteBuffers( 1, &sb->buffer );
-        alDeleteSources( 1, &sb->source );
-    }
-}
 
-bool IKeOpenALAudioDevice::SetBufferData( IKeSoundBuffer* sound_buffer, void* buffer_data, uint32_t buffer_size )
-{
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    /* Set buffer data */
-    alBufferData( sb->source, sb->audio_format.format, buffer_data, buffer_size, sb->audio_format.frequency );
-    
-    return true;
-}
-
-bool IKeOpenALAudioDevice::PlaySoundBuffer( IKeSoundBuffer* sound_buffer, bool looping )
-{
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    /* Play the sound effect */
-    alSourcei( sb->source, AL_LOOPING, looping );
-	alSourcePlay( sb->source );
-    
-    return true;
-}
-
-void IKeOpenALAudioDevice::StopSoundBuffer( IKeSoundBuffer* sound_buffer )
-{
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    alSourceStop( sb->source );
-}
-
-void IKeOpenALAudioDevice::PauseSoundBuffer( IKeSoundBuffer* sound_buffer )
-{
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    alSourcePause( sb->source );
-}
 
 void IKeOpenALAudioDevice::SetListenerPosition( float* position )
 {
@@ -242,46 +197,4 @@ void IKeOpenALAudioDevice::SetListenerOrientation( float* at, float* up )
     alListenerfv( AL_ORIENTATION, orientation );
 }
 
-void IKeOpenALAudioDevice::SetBufferPosition( IKeSoundBuffer* sound_buffer, float* position )
-{
-    if( !sound_buffer )
-        return;
-    
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    alSourcefv( sb->source, AL_POSITION, position );
-    memmove( sb->position, position, sizeof( float ) * 3 );
-}
 
-void IKeOpenALAudioDevice::SetBufferVelocity( IKeSoundBuffer* sound_buffer, float* velocity )
-{
-    if( !sound_buffer )
-        return;
-    
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    alSourcefv( sb->source, AL_VELOCITY, velocity );
-    memmove( sb->velocity, velocity, sizeof( float ) * 3 );
-}
-
-void IKeOpenALAudioDevice::SetBufferVolume( IKeSoundBuffer* sound_buffer, float volume )
-{
-    if( !sound_buffer )
-        return;
-    
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    alSourcef( sb->source, AL_GAIN, volume );
-    sb->volume = volume;
-}
-
-void IKeOpenALAudioDevice::SetBufferPitch( IKeSoundBuffer* sound_buffer, float pitch )
-{
-    if( !sound_buffer )
-        return;
-    
-    IKeOpenALSoundBuffer* sb = static_cast<IKeOpenALSoundBuffer*>( sound_buffer );
-    
-    alSourcef( sb->source, AL_PITCH, pitch );
-    sb->pitch = pitch;
-}

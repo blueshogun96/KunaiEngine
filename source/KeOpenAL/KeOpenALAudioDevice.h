@@ -51,7 +51,6 @@ struct IKeOpenALSoundBuffer : public IKeSoundBuffer
 	float       pitch;
     float       position[3];
     float       velocity[3];
-    KeAudioFormat audio_format;
 };
 
 /*
@@ -122,21 +121,11 @@ public:
     
 public:
     virtual bool ConfirmDevice();
-    virtual bool CreateSoundBuffer( KeAudioFormat* audio_format, IKeSoundBuffer** sound_buffer );
-    virtual void ReleaseSoundBuffer( IKeSoundBuffer* sound_buffer );
-    virtual bool SetBufferData( IKeSoundBuffer* sound_buffer, void* buffer_data, uint32_t buffer_size );
-    virtual bool PlaySoundBuffer( IKeSoundBuffer* sound_buffer, bool looping );
-    virtual void StopSoundBuffer( IKeSoundBuffer* sound_buffer );
-    virtual void PauseSoundBuffer( IKeSoundBuffer* sound_buffer );
+    virtual bool CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer** sound_buffer );
     
     virtual void SetListenerPosition( float* position );
     virtual void SetListenerVelocity( float* velocity );
     virtual void SetListenerOrientation( float* at, float* up );
-    
-    void SetBufferPosition( IKeSoundBuffer* sound_buffer, float* position );
-    void SetBufferVelocity( IKeSoundBuffer* sound_buffer, float* velocity );
-    void SetBufferVolume( IKeSoundBuffer* sound_buffer, float volume );
-    void SetBufferPitch( IKeSoundBuffer* sound_buffer, float pitch );
     
 private:
     ALCcontext* context;

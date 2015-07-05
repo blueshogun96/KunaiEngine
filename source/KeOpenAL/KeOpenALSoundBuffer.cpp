@@ -15,10 +15,30 @@
  */
 #define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
 #define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
-#define OAL_DISPDBG( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); }
-#define OAL_DISPDBG_R( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return; }
-#define OAL_DISPDBG_RB( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
+#define OAL_DISPDBG( a, b ) error = alGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
+#define OAL_DISPDBG_R( a, b ) error = alGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
+#define OAL_DISPDBG_RB( a, b ) error = alGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
 
+
+
+ALenum KeGetFormat_AL( WAVEFORMATEX* wfx )
+{
+	ALenum format = 0;
+
+	if( wfx->nChannels == 8 )
+	{
+		if( wfx->wBitsPerSample == 8 ) format = AL_FORMAT_MONO8;
+		if( wfx->wBitsPerSample == 16 ) format = AL_FORMAT_MONO16;
+	}
+
+	if( wfx->nChannels == 16 )
+	{
+		if( wfx->wBitsPerSample == 8 ) format = AL_FORMAT_STEREO8;
+		if( wfx->wBitsPerSample == 16 ) format = AL_FORMAT_STEREO16;
+	}
+
+	return format;
+}
 
 /*
  * Name: IKeOpenALSoundBuffer::Destroy
@@ -36,33 +56,41 @@ void IKeOpenALSoundBuffer::Destroy()
 
 bool IKeOpenALSoundBuffer::SetBufferData( void* buffer_data, uint32_t buffer_size )
 {
+	ALenum error;
+
     /* Set buffer data */
-    alBufferData( source, audio_format.format, buffer_data, buffer_size, audio_format.frequency );
-    OAL_DISPDBG_RB( KE_ERROR, "Error setting sound buffer data!", alGetError() );
+    alBufferData( source, KeGetFormat_AL( &wfx ), buffer_data, buffer_size, wfx.nSamplesPerSec );
+    OAL_DISPDBG_RB( KE_ERROR, "Error setting sound buffer data!" );
     
     return true;
 }
 
 bool IKeOpenALSoundBuffer::Play( bool looping )
 {
+	ALenum error;
+
     /* Play the sound effect */
     alSourcei( source, AL_LOOPING, looping );
     alSourcePlay( source );
-    OAL_DISPDBG_RB( KE_ERROR, "Error playing sound buffer!", alGetError() );
+    OAL_DISPDBG_RB( KE_ERROR, "Error playing sound buffer!" );
     
     return true;
 }
 
 void IKeOpenALSoundBuffer::Stop()
 {
+	ALenum error;
+
     alSourceStop( source );
-    OAL_DISPDBG( KE_ERROR, "Error stopping sound buffer!", alGetError() );
+    OAL_DISPDBG( KE_ERROR, "Error stopping sound buffer!" );
 }
 
 void IKeOpenALSoundBuffer::Pause()
 {
+	ALenum error;
+
     alSourcePause( source );
-    OAL_DISPDBG( KE_ERROR, "Error pausing sound buffer!", alGetError() );
+    OAL_DISPDBG( KE_ERROR, "Error pausing sound buffer!" );
 }
 
 void IKeOpenALSoundBuffer::SetPosition( float* position )

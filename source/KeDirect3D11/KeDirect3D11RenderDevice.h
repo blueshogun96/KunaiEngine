@@ -87,6 +87,8 @@ struct IKeDirect3D11GeometryBuffer : public IKeGeometryBuffer
 struct IKeDirect3D11CommandList : public IKeCommandList
 {
 	virtual void Destroy();
+
+	CD3D11CommandList cl;
 };
 
 /*

@@ -63,7 +63,7 @@ struct KeAudioDeviceDesc
 /*
  * Audio format structure
  */
-struct KeAudioFormat
+/*struct KeAudioFormat
 {
     uint32_t    wave_format;
     uint16_t    channels;
@@ -72,7 +72,7 @@ struct KeAudioFormat
     uint32_t    bits_per_second;
     int         frequency;
     uint32_t    data_size;
-};
+};*/
 
 /* 
  * 3D sound effect structure 
@@ -90,6 +90,8 @@ struct IKeSoundBuffer : public IKeUnknown
     virtual void SetVelocity( float* velocity ) PURE;
     virtual void SetVolume( float volume ) PURE;
     virtual void SetPitch( float pitch ) PURE;
+
+	WAVEFORMATEX wfx;
 };
 
 
@@ -123,22 +125,12 @@ public:
     
 public:
     virtual bool ConfirmDevice() PURE;
-    virtual bool CreateSoundBuffer( KeAudioFormat* audio_format, IKeSoundBuffer** sound_buffer ) PURE;
-    virtual void ReleaseSoundBuffer( IKeSoundBuffer* sound_buffer ) PURE;
-    virtual bool SetBufferData( IKeSoundBuffer* sound_buffer, void* buffer_data, uint32_t buffer_size ) PURE;
-    virtual bool PlaySoundBuffer( IKeSoundBuffer* sound_buffer, bool looping ) PURE;
-    virtual void StopSoundBuffer( IKeSoundBuffer* sound_buffer ) PURE;
-    virtual void PauseSoundBuffer( IKeSoundBuffer* sound_buffer ) PURE;
+    virtual bool CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer** sound_buffer ) PURE;
     
     virtual void SetListenerPosition( float* position ) PURE;
     virtual void SetListenerVelocity( float* velocity ) PURE;
     virtual void SetListenerOrientation( float* at, float* up ) PURE;
-    
-    virtual void SetBufferPosition( IKeSoundBuffer* sound_buffer, float* position ) PURE;
-    virtual void SetBufferVelocity( IKeSoundBuffer* sound_buffer, float* velocity ) PURE;
-    virtual void SetBufferVolume( IKeSoundBuffer* sound_buffer, float volume ) PURE;
-    virtual void SetBufferPitch( IKeSoundBuffer* sound_buffer, float pitch ) PURE;
-    
+
 protected:
     bool initialized;
     float listener_position[3];
