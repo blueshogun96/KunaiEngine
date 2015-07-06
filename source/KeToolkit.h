@@ -66,7 +66,7 @@ bool KeImageRead( char* image_path, KeImageData* image_out );
  * Name: KeImageReadFromMemory
  * Desc: Opens an image from a file in memory.
  */
-bool KeImageReadFromMemory( void* image_file_ptr, KeImageData* image_out );
+bool KeImageReadFromMemory( void* image_file_ptr, uint32_t size, KeImageData* image_out );
 
 /*
  * Name: KeImageClose

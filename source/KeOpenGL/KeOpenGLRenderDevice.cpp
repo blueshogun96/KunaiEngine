@@ -24,9 +24,9 @@
  */
 #define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
 #define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
-#define OGL_DISPDBG( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
-#define OGL_DISPDBG_R( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
-#define OGL_DISPDBG_RB( a, b, c ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
+#define OGL_DISPDBG( a, b ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
+#define OGL_DISPDBG_R( a, b ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
+#define OGL_DISPDBG_RB( a, b ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
 
 
 /* GPU fencing routines */
@@ -201,7 +201,7 @@ uint32_t texture_filter_modes[] =
     GL_LINEAR,
     GL_NEAREST_MIPMAP_NEAREST,
     GL_LINEAR_MIPMAP_NEAREST,
-    GL_LINEAR_MIPMAP_NEAREST,
+    GL_NEAREST_MIPMAP_LINEAR,
     GL_LINEAR_MIPMAP_LINEAR
 };
 
@@ -622,19 +622,19 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
 
     /* Create a vertex array object */
     glGenVertexArrays( 1, &gb->vao );
-    OGL_DISPDBG_RB( KE_ERROR, "Error creating vertex array object!", glGetError() ); //error = glGetError();
+    OGL_DISPDBG_RB( KE_ERROR, "Error creating vertex array object!" ); //error = glGetError();
     
     /* Bind this vertex array object */
     glBindVertexArray( gb->vao );
     
     /* Create the vertex buffer object */
     glGenBuffers( 1, &gb->vbo[0] );
-    OGL_DISPDBG_RB( KE_ERROR, "Error generating vertex buffer object!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error generating vertex buffer object!" );
     
     /* Set the vertex buffer data */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
     glBufferData( GL_ARRAY_BUFFER, vertex_data_size, vertex_data, buffer_usage_types[flags] );
-    OGL_DISPDBG_RB( KE_ERROR, "Error setting vertex buffer data!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error setting vertex buffer data!" );
      
 	/* Set the vertex attributes for this geometry buffer */
 	for( int i = 0; va[i].index != -1; i++ )
@@ -653,12 +653,12 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
     {
         glGenBuffers( 1, &gb->vbo[1] );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
-        OGL_DISPDBG_RB( KE_ERROR, "Error creating index buffer object!", glGetError() );
+        OGL_DISPDBG_RB( KE_ERROR, "Error creating index buffer object!" );
         
         /* Set the index buffer data */
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, index_data_size, index_data, buffer_usage_types[flags] );
         gb->index_type = index_data_type;
-		OGL_DISPDBG_RB( KE_ERROR, "Error setting index buffer data!", glGetError() );
+		OGL_DISPDBG_RB( KE_ERROR, "Error setting index buffer data!" );
     }
     else
         gb->vbo[1] = 0;
@@ -806,11 +806,11 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     GLuint uniform_tex7 = glGetUniformLocation( p, "tex7" );
     
     gp->matrices[0] = glGetUniformLocation( p, "world" );
-	OGL_DISPDBG( KE_WARNING, "Could not find the world matrix uniform location...", glGetError() );
+	OGL_DISPDBG( KE_WARNING, "Could not find the world matrix uniform location..." );
     gp->matrices[1] = glGetUniformLocation( p, "view" );
-	OGL_DISPDBG( KE_WARNING, "Could not find the view matrix uniform location...", glGetError() );
+	OGL_DISPDBG( KE_WARNING, "Could not find the view matrix uniform location..." );
     gp->matrices[2] = glGetUniformLocation( p, "proj" );
-	OGL_DISPDBG( KE_WARNING, "Could not find the projection matrix uniform location...", glGetError() );
+	OGL_DISPDBG( KE_WARNING, "Could not find the projection matrix uniform location..." );
     
     glUniform1i( uniform_tex0, 0 );
     glUniform1i( uniform_tex1, 1 );
@@ -871,7 +871,7 @@ void IKeOpenGLRenderDevice::SetProgram( IKeGpuProgram* gpu_program )
         current_gpu_program = gpu_program;
     
         glUseProgram( gp->program );
-		OGL_DISPDBG_R( KE_ERROR, "Invalid GPU program!", glGetError() );
+		OGL_DISPDBG_R( KE_ERROR, "Invalid GPU program!" );
     }
     else
         glUseProgram(0);
@@ -1082,13 +1082,13 @@ bool IKeOpenGLRenderDevice::CreateTexture1D( uint32_t target, int width, int mip
     
     /* Use OpenGL to create a new 1D texture */
     glGenTextures( 1, &t->handle );
-	OGL_DISPDBG_RB( KE_ERROR, "Error generating texture!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error generating texture!" );
     glBindTexture( t->target, t->handle );
-    OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!" );
     
     /* Set the initial texture attributes */
     glTexImage1D( t->target, 0, internal_texture_formats[format], width, 0, texture_formats[format], data_types[data_type], pixels );
-    OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
     glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -1119,17 +1119,17 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     
     /* Use OpenGL to create a new 2D texture */
     glGenTextures( 1, &t->handle );
-	OGL_DISPDBG_RB( KE_ERROR, "Error generating texture!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error generating texture!" );
     glBindTexture( t->target, t->handle );
-    OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!" );
     
     /* Set the initial texture attributes */
     glTexImage2D( t->target, 0, internal_texture_formats[format], width, height, 0, texture_formats[format], data_types[data_type], pixels );
-    OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
-    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     
     return true;
 }
@@ -1157,13 +1157,13 @@ bool IKeOpenGLRenderDevice::CreateTexture3D( uint32_t target, int width, int hei
     
     /* Use OpenGL to create a new 3D texture */
     glGenTextures( 1, &t->handle );
-	OGL_DISPDBG_RB( KE_ERROR, "Error generating texture!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error generating texture!" );
     glBindTexture( t->target, t->handle );
-    OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!" );
     
     /* Set the initial texture attributes */
     glTexImage3D( t->target, 0, internal_texture_formats[format], width, height, depth, 0, texture_formats[format], data_types[data_type], pixels );
-    OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
     glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -1211,7 +1211,7 @@ void IKeOpenGLRenderDevice::SetTextureData2D( int offsetx, int offsety, int widt
 	//glEnable( t->target );
 	glBindTexture( t->target, t->handle );
     glTexSubImage2D( t->target, miplevel, offsetx, offsety, width, height, t->depth_format, t->data_type, pixels );
-	OGL_DISPDBG( KE_ERROR, "Error setting texture data!", glGetError() );
+	OGL_DISPDBG( KE_ERROR, "Error setting texture data!" );
 	glBindTexture( t->target, 0 );
 }
 
@@ -1238,7 +1238,7 @@ bool IKeOpenGLRenderDevice::CreateRenderTarget( int width, int height, int depth
     
     /* Generate frame buffer object */
     glGenFramebuffers( 1, &rt->frame_buffer_object );
-    OGL_DISPDBG_RB( 1, "Error creating FBO!", glGetError() );
+    OGL_DISPDBG_RB( 1, "Error creating FBO!" );
     
     /* Bind the FBO */
     glBindFramebuffer( GL_FRAMEBUFFER, rt->frame_buffer_object );
@@ -1252,7 +1252,7 @@ bool IKeOpenGLRenderDevice::CreateRenderTarget( int width, int height, int depth
     
     /* Create the depth buffer */
     glGenRenderbuffers( 1, &rt->depth_render_buffer );
-    OGL_DISPDBG_RB( 1, "Error creating depth buffer!", glGetError() );
+    OGL_DISPDBG_RB( 1, "Error creating depth buffer!" );
     
     /* Set the depth buffer attributes */
     IKeOpenGLTexture* tex = static_cast<IKeOpenGLTexture*>( rt->texture );
@@ -1588,7 +1588,7 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     
     /* Draw the vertices */
     glDrawArrays( primitive_types[primtype], first, count );
-    OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!" );
 }
 
 
@@ -1612,12 +1612,12 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
     
     /* Bind the vertex buffer object, but not the index buffer object */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
-	OGL_DISPDBG_R( KE_ERROR, "Error binding vertex buffer!", glGetError() );
+	OGL_DISPDBG_R( KE_ERROR, "Error binding vertex buffer!" );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     
     /* Draw the vertices */
     glDrawArrays( primitive_types[primtype], first, count );
-    OGL_DISPDBG_R( KE_ERROR, "Vertex buffer rendering error (glDrawArrays)!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Vertex buffer rendering error (glDrawArrays)!" );
 }
 
 /*
@@ -1637,13 +1637,13 @@ void IKeOpenGLRenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t str
     
     /* Bind the vertex and index buffer objects */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
-	OGL_DISPDBG_R( KE_ERROR, "Error binding vertex buffer!", glGetError() );
+	OGL_DISPDBG_R( KE_ERROR, "Error binding vertex buffer!" );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
-    OGL_DISPDBG_R( KE_ERROR, "Error binding index buffer!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding index buffer!" );
    
     /* Draw the vertices */
     glDrawElements( primitive_types[primtype], count, data_types[gb->index_type], NULL );
-    OGL_DISPDBG_R( KE_ERROR, "Indexed geometry rendering error (glDrawElements)!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Indexed geometry rendering error (glDrawElements)!" );
 }
 
 /*
@@ -1664,13 +1664,13 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesRange( uint32_t primtype, uint32_
     
     /* Bind the vertex buffer object, but not the index buffer object */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
-	OGL_DISPDBG_R( KE_ERROR, "Error binding vertex buffer!", glGetError() );
+	OGL_DISPDBG_R( KE_ERROR, "Error binding vertex buffer!" );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
-    OGL_DISPDBG_R( KE_ERROR, "Error binding index buffer!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding index buffer!" );
     
     /* Draw the vertices */
     glDrawRangeElements( primitive_types[primtype], start, end, count, data_types[gb->index_type], NULL );
-    OGL_DISPDBG_R( KE_ERROR, "Indexed geometry rendering error (glDrawRangeElements)!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Indexed geometry rendering error (glDrawRangeElements)!" );
 }
 
 /*

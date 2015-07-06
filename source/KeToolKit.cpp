@@ -17,32 +17,6 @@
 /* JoJpeg library for saving JPEGs */
 #include "jo_jpeg.h"
 
-/* Ripped this from PC headers */
-/* Used to deal with .wav files */
-#ifndef _WIN32
-typedef struct {
-    uint16_t  wFormatTag;
-    uint16_t  nChannels;
-    uint32_t nSamplesPerSec;
-    uint32_t nAvgBytesPerSec;
-    uint16_t  nBlockAlign;
-} WAVEFORMAT;
-
-typedef struct {
-    uint16_t  wFormatTag;
-    uint16_t  nChannels;
-    uint32_t nSamplesPerSec;
-    uint32_t nAvgBytesPerSec;
-    uint16_t  nBlockAlign;
-    uint16_t  wBitsPerSample;
-    uint16_t  cbSize;
-} WAVEFORMATEX;
-
-#define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) |   \
-((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24 ))
-#define mmioFOURCC MAKEFOURCC
-#endif
 
 
 /*
@@ -176,13 +150,22 @@ bool KeImageRead( char* image_path, KeImageData* image_out )
     image_out->bpp = surface->format->BitsPerPixel;
     //image_out->palette = surface->format->palette; TODO
     
+    memmove( image_out->pixels, surface->pixels, surface->w*surface->h*(surface->format->BytesPerPixel) );
+    
+    SDL_FreeSurface( surface );
+    
     return true;
 }
 
-bool KeImageReadFromMemory( void* image_file_ptr, KeImageData* image_out )
+bool KeImageReadFromMemory( void* image_file_ptr, uint32_t size, KeImageData* image_out )
 {
     SDL_RWops* rwop = NULL;
     SDL_Surface* surf = NULL;
+    
+    rwop = SDL_RWFromConstMem( image_file_ptr, size );
+    
+    //SDL_RWread(<#ctx#>, <#ptr#>, <#size#>, <#n#>)
+    SDL_FreeRW( rwop );
     
     return false;   /* TODO */
 }

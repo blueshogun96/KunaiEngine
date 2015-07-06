@@ -106,4 +106,31 @@ typedef struct _RECT
 }RECT;
 
 #define ZeroMemory(a,b) memset( a, 0, b )
+
+/* Ripped this from PC headers */
+#ifndef _WIN32
+typedef struct {
+    uint16_t  wFormatTag;
+    uint16_t  nChannels;
+    uint32_t nSamplesPerSec;
+    uint32_t nAvgBytesPerSec;
+    uint16_t  nBlockAlign;
+} WAVEFORMAT;
+
+typedef struct {
+    uint16_t  wFormatTag;
+    uint16_t  nChannels;
+    uint32_t nSamplesPerSec;
+    uint32_t nAvgBytesPerSec;
+    uint16_t  nBlockAlign;
+    uint16_t  wBitsPerSample;
+    uint16_t  cbSize;
+} WAVEFORMATEX;
+
+#define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
+((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) |   \
+((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24 ))
+#define mmioFOURCC MAKEFOURCC
+#endif
+
 #endif
