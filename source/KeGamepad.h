@@ -1,0 +1,71 @@
+#pragma once
+
+#include "Ke.h"
+#include "KeSystem.h"
+
+
+
+/*
+ * Gamepad button macros
+ */
+#define KE_GAMEPAD_BUTTON_A					0
+#define KE_GAMEPAD_BUTTON_B					1
+#define KE_GAMEPAD_BUTTON_X					2
+#define KE_GAMEPAD_BUTTON_Y					3
+#define KE_GAMEPAD_BUTTON_BACK				4
+#define KE_GAMEPAD_BUTTON_GUIDE				5
+#define KE_GAMEPAD_BUTTON_START				6
+#define KE_GAMEPAD_BUTTON_LEFTSTICK			7
+#define KE_GAMEPAD_BUTTON_RIGHTSTICK		8
+#define KE_GAMEPAD_BUTTON_LEFTSHOULDER		9
+#define KE_GAMEPAD_BUTTON_RIGHTSHOULDER		10
+#define KE_GAMEPAD_BUTTON_DPAD_UP			11
+#define KE_GAMEPAD_BUTTON_DPAD_DOWN			12
+#define KE_GAMEPAD_BUTTON_DPAD_LEFT			13
+#define KE_GAMEPAD_BUTTON_DPAD_RIGHT		14
+
+
+/*
+ * Gamepad buttons
+ */
+struct KeGamepadButtons
+{
+	uint32_t	timestamp;
+	bool		pressed;
+};
+
+/*
+ * Gamepad state structure
+ */
+struct KeGamepadState
+{
+	KeGamepadButtons buttons[24];
+	bool			 connected;
+};
+
+
+/*
+ * Gamepad management APIs
+ */
+
+/*
+ * Name: KeInitializeGamepads
+ * Desc: Initializes the gamepad API for the target platform.
+ */
+bool KeInitializeGamepads();
+
+
+/*
+ * Name: KeUnintializeGamepads
+ * Desc: Uninitializes the above.
+ */
+void KeUninitializeGamepads();
+
+
+/*
+ * Name: KeGetGamepadState
+ * Desc: Returns the input state of the specified gamepad
+ */
+bool KeGetGamepadState( int device_id, KeGamepadState* gamepad );
+
+
