@@ -7,6 +7,7 @@
 
 #include "Ke.h"
 #include "KeSystem.h"
+#include "KeGamepadCallbacks.h"
 #include "nvdebug.h"
 #include <thread>
 #include <vector>
@@ -48,30 +49,7 @@ void (*pfnKeAppDidEnterForeground)( void* ) = NULL;
 void* pKeContext = NULL;
 
 
-/* Thread structure */
-struct ke_thread_t
-{
-    SDL_Thread*     thread;
-    SDL_threadID    thread_id;
-};
 
-/* Mutex structure */
-struct ke_mutex_t
-{
-    SDL_mutex*      mutex;
-};
-
-/* Semaphore structure */
-struct ke_semaphore_t
-{
-    SDL_semaphore*  semaphore;
-};
-
-/* Critical section structure*/
-struct ke_critical_section_t
-{
-    pthread_mutex_t mutex;
-};
 
 
 /* Input functions */
@@ -118,7 +96,20 @@ void KeProcessEvents()
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERBUTTONUP:
                 KeOnGamepad( KeGetContextPointer(), &event );
+				KeOnGamepadButtonPress( event.cbutton.which, &event.cbutton );
                 break;
+
+			case SDL_CONTROLLERAXISMOTION:
+				__asm nop;
+				break;
+
+			case SDL_CONTROLLERDEVICEADDED:
+				KeOnGamepadAdded( event.cdevice.which );
+				break;
+
+			case SDL_CONTROLLERDEVICEREMOVED:
+				KeOnGamepadRemoved( event.cdevice.which );
+				break;
         }
     }
     

@@ -28,11 +28,11 @@ bool KeOpenGLInsertFenceNV( IKeOpenGLFence** fence )
 
 	/* Generate a new fence */
 	glGenFencesNV( 1, &(*fence)->fence );
-	OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!" );
 
 	/* Set the fence */
 	glSetFenceNV( (*fence)->fence, GL_ALL_COMPLETED_NV );
-	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!" );
 
 	return true;
 #else
@@ -97,7 +97,7 @@ bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 
 	/* Set the fence */
 	glSetFenceAPPLE( (*fence)->fence );
-	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!" );
 
 	return true;
 #else

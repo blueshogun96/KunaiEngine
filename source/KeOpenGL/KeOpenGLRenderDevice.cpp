@@ -1128,8 +1128,8 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
-    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
     return true;
 }
@@ -1308,7 +1308,7 @@ void IKeOpenGLRenderDevice::BindRenderTarget( IKeRenderTarget* rendertarget )
     glBindFramebuffer( GL_FRAMEBUFFER, rt->frame_buffer_object );
     error = glGetError();
     if( error != GL_NO_ERROR )
-        DISPDBG( 1, "IKeOpenGLRenderDevice::bind_render_target(): Error binding rendertarget! (error=0x" << error << ")\n" );
+        DISPDBG( 1, "Error binding rendertarget! (error=0x" << error << ")\n" );
 }
 
 /*
@@ -1439,6 +1439,33 @@ bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
                 break;
         }
         
+        i++;
+    }
+
+	/* Apply each render state in the list */
+	i = 0;
+    while( i != sb->state_count )
+    {
+        switch( sb->states[i].state )
+        {
+			case KE_TS_MAGFILTER:
+                glTexParameteri( texture_targets[sb->states[i].param1], GL_TEXTURE_MAG_FILTER, texture_filter_modes[sb->states[i].param2] );
+                break;
+                
+            case KE_TS_MINFILTER:
+                glTexParameteri( texture_targets[sb->states[i].param1], GL_TEXTURE_MIN_FILTER, texture_filter_modes[sb->states[i].param2] );
+                break;
+                
+            default:
+                DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << sb->states[i].state << "\n"
+                        "param1: " << sb->states[i].param1 << "\n"
+                        "param2: " << sb->states[i].param2 << "\n"
+                        "param3: " << sb->states[i].param3 << "\n"
+                        "fparam: " << sb->states[i].fparam << "\n"
+                        "dparam: " << sb->states[i].dparam << "\n" );
+                break;   
+		}
+
         i++;
     }
     
