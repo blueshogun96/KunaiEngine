@@ -100,7 +100,6 @@ void KeProcessEvents()
                 break;
 
 			case SDL_CONTROLLERAXISMOTION:
-				__asm nop;
 				break;
 
 			case SDL_CONTROLLERDEVICEADDED:
@@ -109,6 +108,16 @@ void KeProcessEvents()
 
 			case SDL_CONTROLLERDEVICEREMOVED:
 				KeOnGamepadRemoved( event.cdevice.which );
+				break;
+
+			case SDL_JOYAXISMOTION:
+			case SDL_JOYBALLMOTION:
+			case SDL_JOYHATMOTION:
+			case SDL_JOYBUTTONDOWN:
+			case SDL_JOYBUTTONUP:
+			case SDL_JOYDEVICEADDED:
+			case SDL_JOYDEVICEREMOVED:
+				_asm nop;
 				break;
         }
     }

@@ -36,9 +36,12 @@ bool KeInitializeGamepads()
 	int ret = 0;
 
 	/* Initialize SDL2 gamepad API */
-	ret = SDL_InitSubSystem( SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC );
+	ret = SDL_InitSubSystem( SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC );
 	if( ret != 0 )
-		DISPDBG( KE_ERROR, "An error has occured initializing game controller and haptics!" );
+		DISPDBG( KE_ERROR, "An error has occured initializing SDL controller API!" );
+	
+	/* Enable joystick events */
+	SDL_JoystickEventState( SDL_ENABLE );
 
 	return ret;
 }
@@ -54,7 +57,7 @@ void KeUninitializeGamepads()
 	GamepadHandles.empty();
 
 	/* Uninitialize the gamepad API */
-	SDL_QuitSubSystem( SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC );
+	SDL_QuitSubSystem( SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC );
 }
 
 
