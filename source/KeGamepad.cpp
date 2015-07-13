@@ -95,10 +95,10 @@ void KeOnGamepadAdded( int device_id )
 				SDL_HapticClose( handle.haptic );
 				handle.haptic = 0;
 
-				DISPDBG( KE_WARNING, "Error initializing rumble feature for gamepad! "
-					"Device ID:" << device_id <<
-					"Joystick ID: " << handle.joystick_id << 
-					"Error code:" << SDL_GetError() );
+				DISPDBG( KE_WARNING, "Error initializing rumble feature for gamepad!\n"
+                    "Device ID: " << device_id << std::endl <<
+					"Joystick ID: " << handle.joystick_id <<  std::endl <<
+					"Error: " << SDL_GetError() );
 			}
 		}
 		else

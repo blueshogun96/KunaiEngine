@@ -1386,6 +1386,11 @@ void IKeOpenGLESRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride
     IKeOpenGLESGpuProgram* gp = static_cast<IKeOpenGLESGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
     
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindVertexArrayOES(0);
+
     /* Set the vertex attributes for this geometry buffer */
     for( int i = 0; vertex_attributes[i].index != -1; i++ )
     {
@@ -1408,13 +1413,9 @@ void IKeOpenGLESRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride
     glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
     error = glGetError();
     
-    /* Unbind any VBO or IBO bound */
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-    
     /* Draw the vertices */
     glDrawArrays( primitive_types[primtype], first, count );
-    OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!", glGetError() );
+    OGL_DISPDBG_R( KE_ERROR, "Non-VBO rendering error (glDrawArrays)!", glGetError() );
 }
 
 

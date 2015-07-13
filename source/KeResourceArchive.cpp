@@ -8,7 +8,7 @@
 //#define MINIZ_HEADER_INCLUDED
 
 #include "KeResourceArchive.h"
-#include "miniz.c"
+#include <miniz.c>
 
 
 KeZipResourceArchive::KeZipResourceArchive() : archive(nullptr)

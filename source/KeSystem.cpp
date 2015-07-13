@@ -67,6 +67,9 @@ void KeProcessEvents()
     //ke_rdtsc();
 	SDL_Event   event;
     
+    /* Pump events for input devices */
+    SDL_PumpEvents();
+    
     /* Check for any SDL supported events */
     while( SDL_PollEvent( &event ) )
     {
@@ -117,7 +120,7 @@ void KeProcessEvents()
 			case SDL_JOYBUTTONUP:
 			case SDL_JOYDEVICEADDED:
 			case SDL_JOYDEVICEREMOVED:
-				_asm nop;
+				//_asm nop;
 				break;
         }
     }
