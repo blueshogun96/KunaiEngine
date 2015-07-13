@@ -160,12 +160,31 @@ bool KeImageRead( char* image_path, KeImageData* image_out )
 bool KeImageReadFromMemory( void* image_file_ptr, uint32_t size, KeImageData* image_out )
 {
     SDL_RWops* rwop = NULL;
-    SDL_Surface* surf = NULL;
+    SDL_Surface* surface = NULL;
     
+    /* Create a RW op from our memory pointer */
     rwop = SDL_RWFromConstMem( image_file_ptr, size );
-    
-    //SDL_RWread(<#ctx#>, <#ptr#>, <#size#>, <#n#>)
-    SDL_FreeRW( rwop );
+    if( rwop )
+    {
+        /* Get the surface from our RW op */
+        surface = IMG_Load_RW( rwop, No );
+        SDL_FreeRW( rwop );
+        
+        if( !surface )
+            return false;
+        
+        image_out->pixels = new uint8_t[surface->w*surface->h*(surface->format->BytesPerPixel)];
+        image_out->width = surface->w;
+        image_out->height = surface->h;
+        image_out->bpp = surface->format->BitsPerPixel;
+        //image_out->palette = surface->format->palette; TODO
+        
+        memmove( image_out->pixels, surface->pixels, surface->w*surface->h*(surface->format->BytesPerPixel) );
+        
+        SDL_FreeSurface( surface );
+        
+        return true;
+    }
     
     return false;   /* TODO */
 }
@@ -188,13 +207,67 @@ bool KeImageSavePNG( int width, int height, void* pixels, char* image_path )
 
 bool KeImageSaveJPG( int width, int height, void* pixels, char* image_path )
 {
-    return false;   /* TODO */
+    if( !jo_write_jpg( image_path, pixels, width, height, 4, 4 ) )
+        DISPDBG( KE_WARNING, "Failed to save JPG image!" );
+    
+    return true;
 }
 
 bool KeImageSaveBMP( int width, int height, void* pixels, char* image_path )
 {
-    /* TODO */
-    return false;
+    FILE* bmpfile;
+    unsigned char header[0x36];
+    long size;
+    unsigned char line[1024*2*3];
+    int w = width, h = height;
+    short i,j;
+    unsigned char empty[2] = {0,0};
+    unsigned int color;
+    
+    size = w * h * 3 + 0x38;
+    
+    memset( header, 0, 0x36 );
+    header[0] = 'B';
+    header[1] = 'M';
+    header[2] = size & 0xff;
+    header[3] = ( size >> 8 ) & 0xff;
+    header[4] = ( size >> 16 ) & 0xff;
+    header[5] = ( size >> 24 ) & 0xff;
+    header[0x0a] = 0x36;
+    header[0x0e] = 0x28;
+    header[0x12] = w % 256;
+    header[0x13] = w / 256;
+    header[0x16] = h % 256;
+    header[0x17] = h / 256;
+    header[0x1a] = 0x01;
+    header[0x1c] = 0x18;
+    header[0x26] = 0x12;
+    header[0x27] = 0x0b;
+    header[0x2a] = 0x12;
+    
+    if( ( bmpfile = fopen( image_path, "wb" ) ) == NULL )
+    {
+        DISPDBG( KE_WARNING, "Could not open directory to save BMP image!" );
+        return false;
+    }
+    
+    fwrite( header, 0x36, 1, bmpfile );
+    for( i = 0; i < h; i++ )
+    {
+        for( j = 0; j < w; j++ )
+        {
+            color = ((uint8_t*)pixels)[j+(i*w)];
+            line[j*3+2] = ( color ) & 0xff;
+            line[j*3+1] = ( color >> 8 ) & 0xff;
+            line[j*3+0] = ( color >> 16 ) & 0xff;
+        }
+        fwrite( line, w * 3, 1, bmpfile );
+    }
+    
+    fwrite( empty, 0x2, 1, bmpfile );
+    fclose( bmpfile );
+    
+    return true;
 }
 
 /*
@@ -204,6 +277,32 @@ bool KeImageSaveBMP( int width, int height, void* pixels, char* image_path )
  */
 bool KeSoundReadWAV( char* wav_path, KeSoundData* sound_data )
 {
+    FILE* fp = fopen( wav_path, "rb" );
+
+    if( !fp )
+    {
+        return false;
+    }
+    
+    fseek( fp, 0, SEEK_END );
+    size_t fsize = ftell(fp);
+    
+    std::unique_ptr<uint8_t> riff( new uint8_t[fsize] );
+    
+    fseek( fp, 0, SEEK_SET );
+    fread( sound_data->ptr, 1, fsize, fp );
+    
+    WAVEFORMATEX* wfx;
+    uint8_t* chunk_data = NULL;
+    if( UnpackWAVData( riff.get(), &wfx, (uint8_t**) &chunk_data, &sound_data->bytes ) )
+    {
+        sound_data->ptr = malloc( sound_data->bytes );
+        sound_data->frequency = wfx->nAvgBytesPerSec;
+        sound_data->bit_rate = wfx->wBitsPerSample;
+        
+        return true;
+    }
+    
     return false;
 }
 
@@ -213,6 +312,17 @@ bool KeSoundReadWAV( char* wav_path, KeSoundData* sound_data )
  */
 bool KeSoundReadWAVFromMemory( void* wav_file_ptr, KeSoundData* sound_data )
 {
+    WAVEFORMATEX* wfx;
+    uint8_t* chunk_data = NULL;
+    if( UnpackWAVData( wav_file_ptr, &wfx, (uint8_t**) &chunk_data, &sound_data->bytes ) )
+    {
+        sound_data->ptr = malloc( sound_data->bytes );
+        sound_data->frequency = wfx->nAvgBytesPerSec;
+        sound_data->bit_rate = wfx->wBitsPerSample;
+        
+        return true;
+    }
+    
     return false;
 }
 
@@ -222,5 +332,7 @@ bool KeSoundReadWAVFromMemory( void* wav_file_ptr, KeSoundData* sound_data )
  */
 void KeSoundClose( KeSoundData* sound_data )
 {
-    
+    if( sound_data )
+        if( sound_data->ptr )
+            free( sound_data->ptr );
 }
