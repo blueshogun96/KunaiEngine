@@ -45,6 +45,16 @@ struct KeGamepadState
 
 
 /*
+ * Joystick state structure
+ */
+struct KeJoystickState
+{
+	KeGamepadButtons buttons[24];
+	uint32_t		 dpad;
+};
+
+
+/*
  * Gamepad management APIs
  */
 
@@ -69,3 +79,8 @@ void KeUninitializeGamepads();
 bool KeGetGamepadState( int device_id, KeGamepadState* gamepad );
 
 
+/*
+ * Name: KeGetJoystickState
+ * Desc: Returns the input state of the specified Joystick
+ */
+bool KeGetJoystickState( int device_id, KeJoystickState* Joystick );

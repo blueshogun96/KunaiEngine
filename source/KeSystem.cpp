@@ -114,13 +114,28 @@ void KeProcessEvents()
 				break;
 
 			case SDL_JOYAXISMOTION:
+				_asm nop;
+				break;
+
 			case SDL_JOYBALLMOTION:
+				_asm nop;
+				break;
+
 			case SDL_JOYHATMOTION:
+				KeOnJoystickPOVPress( event.jdevice.which, &event.jhat );
+				break;
+
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
+				KeOnJoystickButtonPress( event.jdevice.which, &event.jbutton );
+				break;
+
 			case SDL_JOYDEVICEADDED:
+				KeOnJoystickAdded( event.jdevice.which );
+				break;
+
 			case SDL_JOYDEVICEREMOVED:
-				//_asm nop;
+				KeOnJoystickRemoved( event.jdevice.which );
 				break;
         }
     }
