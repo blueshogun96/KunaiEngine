@@ -2,17 +2,26 @@
 #include <vector>
 
 
-/* Gamepad handle */
+/* 
+ * Gamepad handle 
+ */
 class CKeGamepadHandle
 {
 public:
-	CKeGamepadHandle() : game_controller(NULL), haptic(NULL), joystick_id(0), id(0), connected(No) {}
+	CKeGamepadHandle() : game_controller(NULL), haptic(NULL), joystick_id(-1), id(0), connected(No) {}
 	~CKeGamepadHandle()
 	{
-		if( haptic )
-			SDL_HapticClose( haptic );
+        if( haptic )
+        {
+            SDL_HapticClose( haptic );
+            haptic = NULL;
+        }
 
-		SDL_GameControllerClose( game_controller );
+        if( game_controller )
+        {
+            SDL_GameControllerClose( game_controller );
+            game_controller = NULL;
+        }
 	}
 
 	SDL_GameController* game_controller;
@@ -23,18 +32,27 @@ public:
 	bool				connected;
 };
 
-/* Joystick handle */
+
+/* 
+ * Joystick handle 
+ */
 class CKeJoystickHandle
 {
 public:
-	CKeJoystickHandle() : joystick( NULL ), joystick_id(-1), haptic(NULL), connected(No) {}
+	CKeJoystickHandle() : joystick( NULL ), joystick_id(-1), id(0), haptic(NULL), connected(No) {}
 	~CKeJoystickHandle()
 	{
 		if( haptic )
+        {
 			SDL_HapticClose( haptic );
+            haptic = NULL;
+        }
 
 		if( joystick )
+        {
 			SDL_JoystickClose( joystick );
+            joystick = NULL;
+        }
 	}
 	SDL_Joystick*	joystick;
 	SDL_JoystickID	joystick_id;
@@ -45,10 +63,8 @@ public:
 };
 
 /* Gamepad handles */
-std::vector<CKeGamepadHandle> GamepadHandles;
-std::vector<CKeJoystickHandle> JoystickHandles;
-
-SDL_Joystick* test_joy;
+std::vector<std::shared_ptr<CKeGamepadHandle>> GamepadHandles;
+std::vector<std::shared_ptr<CKeJoystickHandle>> JoystickHandles;
 
 
 /*
@@ -66,7 +82,9 @@ bool KeInitializeGamepads()
 	
 	/* Enable joystick events */
 	SDL_JoystickEventState( SDL_ENABLE );
-
+    
+    //test_controller = SDL_GameControllerOpen(0);
+    
 	return ret;
 }
 
@@ -77,6 +95,8 @@ bool KeInitializeGamepads()
  */
 void KeUninitializeGamepads()
 {
+    //SDL_GameControllerClose( test_controller );
+    
 	/* Kill all open gamepad devices */
 	GamepadHandles.empty();
 
@@ -91,50 +111,53 @@ void KeUninitializeGamepads()
  */
 void KeOnGamepadAdded( int device_id )
 {
-	CKeGamepadHandle handle;
+    std::shared_ptr<CKeGamepadHandle> handle( new CKeGamepadHandle );
 
 	/* Attempt to open this device */
-	handle.game_controller = SDL_GameControllerOpen( device_id );
+	handle->game_controller = SDL_GameControllerOpen( device_id );
 
 	/* Get the joystick instance ID */
-	SDL_Joystick* j = SDL_GameControllerGetJoystick( handle.game_controller );
-	handle.joystick_id = SDL_JoystickInstanceID(j);
-	handle.connected = Yes;
-	handle.id = device_id;
+	SDL_Joystick* j = SDL_GameControllerGetJoystick( handle->game_controller );
+	handle->joystick_id = SDL_JoystickInstanceID(j);
+	handle->connected = Yes;
+	handle->id = device_id; /* Game controller ID */
 
-	ZeroMemory( &handle.state, sizeof( KeGamepadState ) );
+	ZeroMemory( &handle->state, sizeof( KeGamepadState ) );
 
 	/* Is this a haptic device? */
 	if( SDL_JoystickIsHaptic(j) )
 	{
-		handle.haptic = SDL_HapticOpenFromJoystick(j);
+		handle->haptic = SDL_HapticOpenFromJoystick(j);
 
 		/* Is this a rumble supported haptic feature? */
-		if( SDL_HapticRumbleSupported( handle.haptic ) )
+		if( SDL_HapticRumbleSupported( handle->haptic ) )
 		{
 			/* Can we initialize the rumble feature? */
-			if( SDL_HapticRumbleInit( handle.haptic ) )
+			if( SDL_HapticRumbleInit( handle->haptic ) )
 			{
 				/* An error occurred */
-				SDL_HapticClose( handle.haptic );
-				handle.haptic = 0;
+				SDL_HapticClose( handle->haptic );
+				handle->haptic = 0;
 
 				DISPDBG( KE_WARNING, "Error initializing rumble feature for gamepad!\n"
-                    "Device ID: " << device_id << std::endl <<
-					"Joystick ID: " << handle.joystick_id <<  std::endl <<
-					"Error: " << SDL_GetError() );
+                    "\tDevice ID: " << device_id << std::endl <<
+					"\tJoystick ID: " << handle->joystick_id <<  std::endl <<
+                    "\tError: " << SDL_GetError() << std::endl );
 			}
 		}
 		else
 		{
 			/* This is not a rumble haptic */
-			SDL_HapticClose( handle.haptic );
-			handle.haptic = 0;
+			SDL_HapticClose( handle->haptic );
+			handle->haptic = 0;
 		}
 	}
 
 	/* Add this to the list of handles */
 	GamepadHandles.push_back(handle);
+    
+    DISPDBG( KE_DBGLVL(0), "Gamepad #" << handle->id << " (" << handle->joystick_id << ") added\n"
+            "\tDevice name: " << SDL_GameControllerName( handle->game_controller ) << "\n" );
 }
 
 
@@ -148,14 +171,14 @@ void KeOnGamepadButtonPress( int device_id, void* context )
 
 	/* Search for the specified device and update the button info */
 
-	std::vector<CKeGamepadHandle>::iterator i = GamepadHandles.begin();
+    std::vector<std::shared_ptr<CKeGamepadHandle>>::iterator i = GamepadHandles.begin();
 
 	while( i != GamepadHandles.end() )
 	{
-		if( i->id == device_id )
+		if( (*i)->joystick_id == device_id )
 		{
-			i->state.buttons[event->button].pressed = event->state;
-			i->state.buttons[event->button].timestamp = event->timestamp;
+			(*i)->state.buttons[event->button].pressed = event->state;
+			(*i)->state.buttons[event->button].timestamp = event->timestamp;
 
 			return;
 		}
@@ -173,12 +196,14 @@ void KeOnGamepadRemoved( int device_id )
 {
 	/* Search for this ID, if we find it, go ahead and remove it after unintializing it. */
 
-	std::vector<CKeGamepadHandle>::iterator i = GamepadHandles.begin();
+    std::vector<std::shared_ptr<CKeGamepadHandle>>::iterator i = GamepadHandles.begin();
 
 	while( i != GamepadHandles.end() )
 	{
-		if( i->id == device_id )
+		if( (*i)->joystick_id == device_id )
 		{
+            DISPDBG( KE_DBGLVL(0), "Gamepad #" << (*i)->id << " (" << (*i)->joystick_id << ") removed\n" );
+            
 			GamepadHandles.erase(i);
 
 			return;
@@ -196,13 +221,13 @@ void KeOnGamepadRemoved( int device_id )
  */
 bool KeGetGamepadState( int device_id, KeGamepadState* gamepad )
 {
-	std::vector<CKeGamepadHandle>::iterator i = GamepadHandles.begin();
+    std::vector<std::shared_ptr<CKeGamepadHandle>>::iterator i = GamepadHandles.begin();
 
 	while( i != GamepadHandles.end() )
 	{
-		if( i->id == device_id )
+		if( (*i)->id == device_id )
 		{
-			memmove( gamepad, &i->state, sizeof( KeGamepadState ) );
+			memmove( gamepad, &(*i)->state, sizeof( KeGamepadState ) );
 
 			return true;
 		}
@@ -211,6 +236,16 @@ bool KeGetGamepadState( int device_id, KeGamepadState* gamepad )
 	}
 
 	return false;
+}
+
+
+/*
+ * Name: KeGetGamepadCount
+ * Desc: Returns the number of gamepads connected
+ */
+int KeGetGamepadCount()
+{
+    return int(GamepadHandles.size());
 }
 
 
@@ -224,47 +259,50 @@ bool KeGetGamepadState( int device_id, KeGamepadState* gamepad )
  */
 void KeOnJoystickAdded( int device_id )
 {
-	CKeJoystickHandle handle;
+    std::shared_ptr<CKeJoystickHandle> handle( new CKeJoystickHandle );
 
 	/* Attempt to open this device */
-	handle.joystick = SDL_JoystickOpen( device_id );
-	handle.joystick_id = SDL_JoystickInstanceID( handle.joystick );
-	handle.id = device_id;
-	handle.connected = Yes;
+	handle->joystick = SDL_JoystickOpen( device_id );
+	handle->joystick_id = SDL_JoystickInstanceID( handle->joystick );
+	handle->id = device_id;
+	handle->connected = Yes;
 
-	ZeroMemory( &handle.state, sizeof( KeJoystickState ) );
+	ZeroMemory( &handle->state, sizeof( KeJoystickState ) );
 
 	/* Is this a haptic device? */
-	if (SDL_JoystickIsHaptic( handle.joystick ))
+	if (SDL_JoystickIsHaptic( handle->joystick ))
 	{
-		handle.haptic = SDL_HapticOpenFromJoystick( handle.joystick );
+		handle->haptic = SDL_HapticOpenFromJoystick( handle->joystick );
 
 		/* Is this a rumble supported haptic feature? */
-		if (SDL_HapticRumbleSupported( handle.haptic ))
+		if (SDL_HapticRumbleSupported( handle->haptic ))
 		{
 			/* Can we initialize the rumble feature? */
-			if (SDL_HapticRumbleInit( handle.haptic ))
+			if (SDL_HapticRumbleInit( handle->haptic ))
 			{
 				/* An error occurred */
-				SDL_HapticClose( handle.haptic );
-				handle.haptic = 0;
+				SDL_HapticClose( handle->haptic );
+				handle->haptic = 0;
 
 				DISPDBG( KE_WARNING, "Error initializing rumble feature for Joystick!\n"
 					"Device ID: " << device_id << std::endl <<
-					"Joystick ID: " << handle.joystick_id << std::endl <<
-					"Error: " << SDL_GetError() );
+					"Joystick ID: " << handle->joystick_id << std::endl <<
+                    "Error: " << SDL_GetError() << std::endl );
 			}
 		}
 		else
 		{
 			/* This is not a rumble haptic */
-			SDL_HapticClose( handle.haptic );
-			handle.haptic = 0;
+			SDL_HapticClose( handle->haptic );
+			handle->haptic = 0;
 		}
 	}
 
 	/* Add this to the list of handles */
 	JoystickHandles.push_back( handle );
+    
+    DISPDBG( KE_DBGLVL(0), "Joystick #" << handle->id << " (" << handle->joystick_id << ") added\n"
+            "\tDevice name: " << SDL_JoystickName( handle->joystick ) << "\n" );
 }
 
 
@@ -278,14 +316,14 @@ void KeOnJoystickButtonPress( int device_id, void* context )
 
 	/* Search for the specified device and update the button info */
 
-	std::vector<CKeJoystickHandle>::iterator i = JoystickHandles.begin();
+    std::vector<std::shared_ptr<CKeJoystickHandle>>::iterator i = JoystickHandles.begin();
 
-	while (i != JoystickHandles.end())
+	while( i != JoystickHandles.end())
 	{
-		if (i->id == device_id)
+		if( (*i)->joystick_id == device_id )
 		{
-			i->state.buttons[event->button].pressed = event->state;
-			i->state.buttons[event->button].timestamp = event->timestamp;
+			(*i)->state.buttons[event->button].pressed = event->state;
+			(*i)->state.buttons[event->button].timestamp = event->timestamp;
 
 			return;
 		}
@@ -295,22 +333,22 @@ void KeOnJoystickButtonPress( int device_id, void* context )
 }
 
 /*
-* Name: KeOnJoystickButtonPress
-* Desc: Called when a Joystick POV hat has been pressed
-*/
+ * Name: KeOnJoystickButtonPress
+ * Desc: Called when a Joystick POV hat has been pressed
+ */
 void KeOnJoystickPOVPress( int device_id, void* context )
 {
 	SDL_JoyHatEvent* event = static_cast<SDL_JoyHatEvent*>(context);
 
 	/* Search for the specified device and update the button info */
 
-	std::vector<CKeJoystickHandle>::iterator i = JoystickHandles.begin();
+    std::vector<std::shared_ptr<CKeJoystickHandle>>::iterator i = JoystickHandles.begin();
 
-	while (i != JoystickHandles.end())
+	while( i != JoystickHandles.end() )
 	{
-		if (i->id == device_id)
+		if( (*i)->joystick_id == device_id )
 		{
-			i->state.dpad = event->value;
+			(*i)->state.dpad = event->value;
 
 			return;
 		}
@@ -320,19 +358,21 @@ void KeOnJoystickPOVPress( int device_id, void* context )
 }
 
 /*
-* Name: KeOnJoystickRemoved
-* Desc: Called when a Joystick has been removed/dettached.
-*/
+ * Name: KeOnJoystickRemoved
+ * Desc: Called when a Joystick has been removed/dettached.
+ */
 void KeOnJoystickRemoved( int device_id )
 {
 	/* Search for this ID, if we find it, go ahead and remove it after unintializing it. */
 
-	std::vector<CKeJoystickHandle>::iterator i = JoystickHandles.begin();
+    std::vector<std::shared_ptr<CKeJoystickHandle>>::iterator i = JoystickHandles.begin();
 
-	while (i != JoystickHandles.end())
+	while( i != JoystickHandles.end() )
 	{
-		if (i->id == device_id)
+		if( (*i)->joystick_id == device_id )
 		{
+            DISPDBG( KE_DBGLVL(0), "Joystick #" << (*i)->id << " (" << (*i)->joystick_id << ") removed\n" );
+            
 			JoystickHandles.erase( i );
 
 			return;
@@ -350,13 +390,13 @@ void KeOnJoystickRemoved( int device_id )
  */
 bool KeGetJoystickState( int device_id, KeJoystickState* Joystick )
 {
-	std::vector<CKeJoystickHandle>::iterator i = JoystickHandles.begin();
+    std::vector<std::shared_ptr<CKeJoystickHandle>>::iterator i = JoystickHandles.begin();
 
-	while (i != JoystickHandles.end())
+	while( i != JoystickHandles.end() )
 	{
-		if (i->id == device_id)
+		if( (*i)->id == device_id )
 		{
-			memmove( Joystick, &i->state, sizeof( KeJoystickState ) );
+			memmove( Joystick, &(*i)->state, sizeof( KeJoystickState ) );
 
 			return true;
 		}
@@ -365,4 +405,14 @@ bool KeGetJoystickState( int device_id, KeJoystickState* Joystick )
 	}
 
 	return false;
+}
+
+
+/*
+ * Name: KeGetJoystickCount
+ * Desc: Returns the number of joysticks connected
+ */
+int KeGetJoystickCount()
+{
+    return int(JoystickHandles.size());
 }

@@ -57,6 +57,8 @@ void KeUpdateKeys();
 void KeProcessKeyEvent( SDL_Event* event );
 void KeProcessMouseEvent( SDL_Event* event );
 
+void null() {}
+
 /*
  * Name: KeProcessEvents
  * Desc: Handles system events during the application's lifetime.
@@ -114,11 +116,9 @@ void KeProcessEvents()
 				break;
 
 			case SDL_JOYAXISMOTION:
-				_asm nop;
 				break;
 
 			case SDL_JOYBALLMOTION:
-				_asm nop;
 				break;
 
 			case SDL_JOYHATMOTION:
