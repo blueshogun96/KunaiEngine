@@ -30,7 +30,7 @@ struct KeThread
 	virtual ~KeThread();
 
 	bool Wait( uint32_t timeout );
-	uint32_t GetLastStatus();
+	uint32_t GetLastError();
 
 #ifndef _WIN32
 	pthread_attr_t thread_attr;
@@ -39,5 +39,5 @@ struct KeThread
 	HANDLE thread;
 	uint32_t thread_id;
 #endif
-	uint32_t last_status;
+	uint32_t last_error;
 };
