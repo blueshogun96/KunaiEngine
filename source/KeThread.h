@@ -14,7 +14,11 @@
 /*
  * Thread function pointer
  */
+#ifndef _WIN32
 typedef void (*KeThreadPfn)( void* );
+#else
+typedef uint32_t (__stdcall *KeThreadPfn)( void* );
+#endif
 
 
 /*
@@ -25,6 +29,15 @@ struct KeThread
 	KeThread( KeThreadPfn pfn, void* context = NULL, bool suspended = No );
 	virtual ~KeThread();
 
+	bool Wait( uint32_t timeout );
+	uint32_t GetLastStatus();
+
+#ifndef _WIN32
 	pthread_attr_t thread_attr;
 	pthread_t thread;
+#else
+	HANDLE thread;
+	uint32_t thread_id;
+#endif
+	uint32_t last_status;
 };
