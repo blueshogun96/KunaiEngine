@@ -80,7 +80,21 @@ bool KeGetGamepadState( int device_id, KeGamepadState* gamepad );
 
 
 /*
+ * Name: KeGetGamepadCount
+ * Desc: Returns the number of gamepads connected
+ */
+int KeGetGamepadCount();
+
+
+/*
  * Name: KeGetJoystickState
  * Desc: Returns the input state of the specified Joystick
  */
 bool KeGetJoystickState( int device_id, KeJoystickState* Joystick );
+
+
+/*
+ * Name: KeGetJoystickCount
+ * Desc: Returns the number of joysticks connected
+ */
+int KeGetJoystickCount();
