@@ -107,7 +107,6 @@
 #define KE_RS_DEPTHTEST     1
 #define KE_RS_DEPTHFUNC     2
 #define KE_RS_DEPTHMASK     3
-//#define KE_RS_CLEARDEPTH    4
 #define KE_RS_BLENDEQUATION 4
 #define KE_RS_ALPHABLEND    5
 #define KE_RS_FRONTFACE     6
@@ -394,9 +393,14 @@ struct IKeFence : public IKeUnknown
 /*
  * Render and texture state structure
  */
-struct IKeStateBuffer : public IKeUnknown
+struct IKeRenderStateBuffer : public IKeUnknown
 {
     virtual void Destroy() PURE;
+};
+
+struct IKeTextureSamplerBuffer : public IKeUnknown
+{
+	virtual void Destroy() PURE;
 };
 
 /*
@@ -467,10 +471,12 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget ) PURE;
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget ) PURE;
     virtual void SetTexture( int stage, IKeTexture* texture ) PURE;
-    virtual bool CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer ) PURE;
-    virtual bool SetStateBuffer( IKeStateBuffer* state_buffer ) PURE;
+    virtual bool CreateRenderStateBuffer( KeState* state_params, int state_count, IKeRenderStateBuffer** state_buffer ) PURE;
+	virtual bool CreateTextureSamplerBuffer( KeState* state_params, int state_count, IKeTextureSamplerBuffer** state_buffer ) PURE;
+    virtual bool SetRenderStateBuffer( IKeRenderStateBuffer* state_buffer ) PURE;
+	virtual bool SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer ) PURE;
     virtual void SetRenderStates( KeState* states ) PURE;
-    virtual void SetSamplerStates( KeState* states ) PURE;
+    virtual void SetSamplerStates( int stage, KeState* states ) PURE;
     virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data ) PURE;
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count ) PURE;
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count ) PURE;
@@ -535,7 +541,7 @@ public:
     
 public:
     virtual bool Initialized() PURE;
-    virtual void SetStates( IKeStateBuffer* state ) PURE;
+    //virtual void SetStates( IKeStateBuffer* state ) PURE;
     virtual void SetProgram( IKeGpuProgram* program ) PURE;
     virtual void SetTexture( IKeTexture* texture ) PURE;
     virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size ) PURE;

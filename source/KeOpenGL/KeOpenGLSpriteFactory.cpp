@@ -63,10 +63,10 @@ bool IKeOpenGLSpriteFactory::Initialized()
  * Name:
  * Desc:
  */
-void IKeOpenGLSpriteFactory::SetStates( IKeStateBuffer* state )
-{
-    
-}
+//void IKeOpenGLSpriteFactory::SetStates( IKeStateBuffer* state )
+//{
+//    
+//}
 
 void IKeOpenGLSpriteFactory::SetProgram( IKeGpuProgram* program )
 {

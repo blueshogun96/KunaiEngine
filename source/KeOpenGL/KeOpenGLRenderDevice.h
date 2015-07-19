@@ -144,12 +144,20 @@ struct IKeOpenGLFence : public IKeFence
 /*
  * Render/Texture state structure
  */
-struct IKeOpenGLStateBuffer : public IKeStateBuffer
+struct IKeOpenGLRenderStateBuffer : public IKeRenderStateBuffer
 {
     virtual void Destroy();
     
     KeState*    states;         /* OpenGL state values */
     int         state_count;    /* The number of states in this buffer */
+};
+
+struct IKeOpenGLTextureSamplerBuffer : public IKeTextureSamplerBuffer
+{
+	virtual void Destroy();
+
+	KeState*    states;         /* OpenGL state values */
+	int         state_count;    /* The number of states in this buffer */
 };
 
 
@@ -212,10 +220,12 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget );
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget );
     virtual void SetTexture( int stage, IKeTexture* texture );
-    virtual bool CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer );
-    virtual bool SetStateBuffer( IKeStateBuffer* state_buffer );
-    virtual void SetRenderStates( KeState* states );
-    virtual void SetSamplerStates( KeState* states );
+	virtual bool CreateRenderStateBuffer( KeState* state_params, int state_count, IKeRenderStateBuffer** state_buffer );
+	virtual bool CreateTextureSamplerBuffer( KeState* state_params, int state_count, IKeTextureSamplerBuffer** state_buffer );
+	virtual bool SetRenderStateBuffer( IKeRenderStateBuffer* state_buffer );
+	virtual bool SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer );
+	virtual void SetRenderStates( KeState* states );
+	virtual void SetSamplerStates( int stage, KeState* states );
     virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data );
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count );
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count );
@@ -257,6 +267,8 @@ protected:
 	int			minor_version;
 	int			fence_vendor;
 	void*		dd;
+	KeState		samplers[8][16];
+	int			dirty_samplers[8][16];
 };
 
 
@@ -272,7 +284,7 @@ public:
     
 public:
     virtual bool Initialized();
-    virtual void SetStates( IKeStateBuffer* state );
+    //virtual void SetStates( IKeStateBuffer* state );
     virtual void SetProgram( IKeGpuProgram* program );
     virtual void SetTexture( IKeTexture* texture );
     virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size );

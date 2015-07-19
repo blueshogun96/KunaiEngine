@@ -163,13 +163,19 @@ struct IKeDirect3D11Fence : public IKeFence
 /*
  * Render/Texture state structure
  */
-struct IKeDirect3D11StateBuffer : public IKeStateBuffer
+struct IKeDirect3D11RenderStateBuffer : public IKeRenderStateBuffer
 {
     virtual void Destroy();
 
 	CD3D11BlendState			bs;
 	CD3D11RasterizerState		rs;
 	CD3D11DepthStencilState		dss;
+};
+
+struct IKeDirect3D11TextureSamplerBuffer : public IKeTextureSamplerBuffer
+{
+	virtual void Destroy();
+
 	CD3D11SamplerState			ss;
 };
 
@@ -233,10 +239,12 @@ public:
     virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget );
     virtual void BindRenderTarget( IKeRenderTarget* rendertarget );
     virtual void SetTexture( int stage, IKeTexture* texture );
-	virtual bool CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer );
-    virtual bool SetStateBuffer( IKeStateBuffer* state_buffer );
-    virtual void SetRenderStates( KeState* states );
-    virtual void SetSamplerStates( KeState* states );
+	virtual bool CreateRenderStateBuffer( KeState* state_params, int state_count, IKeRenderStateBuffer** state_buffer );
+	virtual bool CreateTextureSamplerBuffer( KeState* state_params, int state_count, IKeTextureSamplerBuffer** state_buffer );
+	virtual bool SetRenderStateBuffer( IKeRenderStateBuffer* state_buffer );
+	virtual bool SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer );
+	virtual void SetRenderStates( KeState* states );
+	virtual void SetSamplerStates( int stage, KeState* states );
 	virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data );
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count );
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count );

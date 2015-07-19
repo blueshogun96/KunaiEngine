@@ -93,7 +93,7 @@ bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 
 	/* Generate a new fence */
 	glGenFencesAPPLE( 1, &(*fence)->fence );
-	OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!", glGetError() );
+	OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!" );
 
 	/* Set the fence */
 	glSetFenceAPPLE( (*fence)->fence );

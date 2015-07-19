@@ -11,11 +11,21 @@
 
 
 /*
- * Name: IKeDirect3D11State::Destroy
+ * Name: IKeDirect3D11RenderState::Destroy
  * Desc: Handles destruction of this interface instance.
  */
-void IKeDirect3D11StateBuffer::Destroy()
+void IKeDirect3D11RenderStateBuffer::Destroy()
 {
     /* Delete this instance */
     delete this;
+}
+
+/*
+ * Name: IKeDirect3D11TextureSamler::Destroy
+ * Desc: Handles destruction of this interface instance.
+ */
+void IKeDirect3D11TextureSamplerBuffer::Destroy()
+{
+	/* Delete this instance */
+	delete this;
 }

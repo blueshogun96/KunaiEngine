@@ -13,7 +13,7 @@
  * Name: KeThread::KeThread
  * Desc: Constructor creating a new POSIX thread
  */
-KeThread::KeThread( KeThreadPfn pfn, void* context = NULL, bool suspended = No )
+KeThread::KeThread( KeThreadPfn pfn, void* context, bool suspended )
 {
 #ifndef _WIN32
 	/* Create a thread attribute and mutex */

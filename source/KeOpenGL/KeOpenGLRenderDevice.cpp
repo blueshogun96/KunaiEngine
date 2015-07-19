@@ -429,14 +429,21 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     current_geometrybuffer = NULL;
     
 	/* Nullify texture stages */
-	current_texture[0] = nullptr;
-	current_texture[1] = nullptr;
-	current_texture[2] = nullptr;
-	current_texture[3] = nullptr;
-	current_texture[4] = nullptr;
-	current_texture[5] = nullptr;
-	current_texture[6] = nullptr;
-	current_texture[7] = nullptr;
+	current_texture[0] = NULL;
+	current_texture[1] = NULL;
+	current_texture[2] = NULL;
+	current_texture[3] = NULL;
+	current_texture[4] = NULL;
+	current_texture[5] = NULL;
+	current_texture[6] = NULL;
+	current_texture[7] = NULL;
+
+	/* Clear dirty sampler state flags */
+	KeState empty = { -1, 0, 0, 0, 0, 0 };
+
+	for( int i = 0; i < 8; i++ )
+		memmove( &samplers[i], &empty, sizeof( KeState ) );
+	ZeroMemory( dirty_samplers, sizeof( int ) * 8 * 16 );
 
     /* Mark as initialized */
     initialized = Yes;
@@ -1343,17 +1350,18 @@ void IKeOpenGLRenderDevice::SetTexture( int stage, IKeTexture* texture )
     }
 }
 
+
 /*
- * Name: IKeOpenGLRenderDevice::CreateState
+ * Name: IKeOpenGLRenderDevice::CreateRenderStateBuffer
  * Desc: Creates a compiled buffer of render and texture states.  At the time of writing, OpenGL
  *       does not have an equivalent to Direct3D's state buffer, we have to create a faux state buffer
  *       and save/set each state individually.
  */
-bool IKeOpenGLRenderDevice::CreateStateBuffer( KeState* state_params, int state_count, IKeStateBuffer** state_buffer )
+bool IKeOpenGLRenderDevice::CreateRenderStateBuffer( KeState* state_params, int state_count, IKeRenderStateBuffer** state_buffer )
 {
     /* Create a new state buffer interface */
-    (*state_buffer) = new IKeOpenGLStateBuffer;
-    IKeOpenGLStateBuffer* sb = static_cast<IKeOpenGLStateBuffer*>( *state_buffer );
+    (*state_buffer) = new IKeOpenGLRenderStateBuffer;
+    IKeOpenGLRenderStateBuffer* sb = static_cast<IKeOpenGLRenderStateBuffer*>( *state_buffer );
     
     /* Allocate faux state buffer */
     sb->states = new KeState[state_count];
@@ -1365,7 +1373,29 @@ bool IKeOpenGLRenderDevice::CreateStateBuffer( KeState* state_params, int state_
     return true;
 }
 
-bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
+/*
+ * Name: IKeOpenGLRenderDevice::CreateTextureSamplerBuffer
+ * Desc: Creates a compiled buffer of texture states.  At the time of writing, OpenGL
+ *       does not have an equivalent to Direct3D's state buffer, we have to create a faux state buffer
+ *       and save/set each state individually.
+ */
+bool IKeOpenGLRenderDevice::CreateTextureSamplerBuffer( KeState* state_params, int state_count, IKeTextureSamplerBuffer** state_buffer )
+{
+	/* Create a new state buffer interface */
+	(*state_buffer) = new IKeOpenGLTextureSamplerBuffer;
+	IKeOpenGLTextureSamplerBuffer* sb = static_cast<IKeOpenGLTextureSamplerBuffer*>(*state_buffer);
+
+	/* Allocate faux state buffer */
+	sb->states = new KeState[state_count];
+
+	/* Copy the supplied state parameters over */
+	memmove( sb->states, state_params, sizeof( KeState ) * state_count );
+	sb->state_count = state_count;
+
+	return true;
+}
+
+bool IKeOpenGLRenderDevice::SetRenderStateBuffer( IKeRenderStateBuffer* state_buffer )
 {
     int i = 0;
     
@@ -1373,7 +1403,7 @@ bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
     if( !state_buffer )
         return false;
     
-    IKeOpenGLStateBuffer* sb = static_cast<IKeOpenGLStateBuffer*>(state_buffer);
+    IKeOpenGLRenderStateBuffer* sb = static_cast<IKeOpenGLRenderStateBuffer*>(state_buffer);
     
     /* Apply each render state in the list */
     while( i != sb->state_count )
@@ -1430,7 +1460,7 @@ bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
                 break;
                 
             default:
-                DISPDBG( KE_WARNING, "Bad render or texture state!\nstate: " << sb->states[i].state << "\n"
+                DISPDBG( KE_WARNING, "Bad render state!\nstate: " << sb->states[i].state << "\n"
                         "param1: " << sb->states[i].param1 << "\n"
                         "param2: " << sb->states[i].param2 << "\n"
                         "param3: " << sb->states[i].param3 << "\n"
@@ -1441,35 +1471,56 @@ bool IKeOpenGLRenderDevice::SetStateBuffer( IKeStateBuffer* state_buffer )
         
         i++;
     }
-
-	/* Apply each render state in the list */
-	i = 0;
-    while( i != sb->state_count )
-    {
-        switch( sb->states[i].state )
-        {
-			case KE_TS_MAGFILTER:
-                glTexParameteri( texture_targets[sb->states[i].param1], GL_TEXTURE_MAG_FILTER, texture_filter_modes[sb->states[i].param2] );
-                break;
-                
-            case KE_TS_MINFILTER:
-                glTexParameteri( texture_targets[sb->states[i].param1], GL_TEXTURE_MIN_FILTER, texture_filter_modes[sb->states[i].param2] );
-                break;
-                
-            default:
-                DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << sb->states[i].state << "\n"
-                        "param1: " << sb->states[i].param1 << "\n"
-                        "param2: " << sb->states[i].param2 << "\n"
-                        "param3: " << sb->states[i].param3 << "\n"
-                        "fparam: " << sb->states[i].fparam << "\n"
-                        "dparam: " << sb->states[i].dparam << "\n" );
-                break;   
-		}
-
-        i++;
-    }
     
     return true;
+}
+
+
+bool IKeOpenGLRenderDevice::SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer )
+{
+	int i = 0;
+
+	/* Sanity check */
+	if (!state_buffer)
+		return false;
+
+	IKeOpenGLTextureSamplerBuffer* sb = static_cast<IKeOpenGLTextureSamplerBuffer*>(state_buffer);
+
+#if 0
+	/* Apply each render state in the list */
+	while (i != sb->state_count)
+	{
+		switch (sb->states[i].state)
+		{
+		case KE_TS_MAGFILTER:
+			glTexParameteri( texture_targets[sb->states[i].param1], GL_TEXTURE_MAG_FILTER, texture_filter_modes[sb->states[i].param2] );
+			break;
+
+		case KE_TS_MINFILTER:
+			glTexParameteri( texture_targets[sb->states[i].param1], GL_TEXTURE_MIN_FILTER, texture_filter_modes[sb->states[i].param2] );
+			break;
+
+		default:
+			DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << sb->states[i].state << "\n"
+				"param1: " << sb->states[i].param1 << "\n"
+				"param2: " << sb->states[i].param2 << "\n"
+				"param3: " << sb->states[i].param3 << "\n"
+				"fparam: " << sb->states[i].fparam << "\n"
+				"dparam: " << sb->states[i].dparam << "\n" );
+			break;
+		}
+
+		i++;
+	}
+#else
+	KeState empty = { -1, 0, 0, 0, 0, 0 };
+
+	/* Copy this sampler state to the texture unit slot */
+	memcpy( &samplers[stage], sb->states, sizeof( KeState ) * sb->state_count );
+	memcpy( &samplers[stage][sb->state_count], &empty, sizeof( KeState ) );
+#endif
+
+	return true;
 }
 
 /*
@@ -1554,9 +1605,16 @@ void IKeOpenGLRenderDevice::SetRenderStates( KeState* states )
  * Desc: Applies a list of user defined sampler states.
  * TODO: Allow explicit deferring of sampler states?
  */
-void IKeOpenGLRenderDevice::SetSamplerStates( KeState* states )
+void IKeOpenGLRenderDevice::SetSamplerStates( int stage, KeState* states )
 {
     int i = 0;
+	int previous_texture_unit;
+
+#if 0
+	/* Save the previous active texture unit before changing it */
+	/* TODO: Is this necessary? */
+	glGetIntegerv( GL_ACTIVE_TEXTURE, &previous_texture_unit );
+	glActiveTexture( GL_TEXTURE0 + state );
     
     while( states[i].state != -1 )
     {
@@ -1579,7 +1637,20 @@ void IKeOpenGLRenderDevice::SetSamplerStates( KeState* states )
                         "dparam: " << states[i].dparam << "\n" );
                 break;
         }
+
+		i++;
     }
+
+	/* Restore the previous texture unit */
+	glGetIntegerv( GL_ACTIVE_TEXTURE, &previous_texture_unit );
+#else
+	while( states[i].state != -1 )
+	{
+		memmove( &samplers[stage][i], &states[i], sizeof( KeState ) );
+		i++;
+	}
+	memmove( &samplers[stage][i], &states[i], sizeof( KeState ) );
+#endif
 }
 
 void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data )
@@ -1629,6 +1700,47 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
    
+
+	for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
+	{
+		/* Don't bother setting samplers to texture stages not being used */
+		if( current_texture[texture_stage] == NULL )
+			continue;
+
+		/* Change the active texture unit before making changes */
+		glActiveTexture( GL_TEXTURE0 + texture_stage );
+		//glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
+		//	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
+
+		IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
+
+		int i = 0;
+		while( samplers[texture_stage][i].state != -1 )
+		{
+			switch( samplers[texture_stage][i].state )
+			{
+			case KE_TS_MAGFILTER:
+				glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			case KE_TS_MINFILTER:
+				glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			default:
+				DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
+					"param1: " << samplers[texture_stage][i].param1 << "\n"
+					"param2: " << samplers[texture_stage][i].param2 << "\n"
+					"param3: " << samplers[texture_stage][i].param3 << "\n"
+					"fparam: " << samplers[texture_stage][i].fparam << "\n"
+					"dparam: " << samplers[texture_stage][i].dparam << "\n" );
+				break;
+			}
+
+			i++;
+		}
+	}
+
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
     error = glGetError();
