@@ -439,7 +439,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 	current_texture[7] = NULL;
 
 	/* Clear dirty sampler state flags */
-	KeState empty = { -1, 0, 0, 0, 0, 0 };
+	KeState empty = { static_cast<uint32_t>(-1), 0, 0, 0, 0, 0 };
 
 	for( int i = 0; i < 8; i++ )
 		memmove( &samplers[i], &empty, sizeof( KeState ) );
@@ -1513,7 +1513,7 @@ bool IKeOpenGLRenderDevice::SetTextureSamplerBuffer( int stage, IKeTextureSample
 		i++;
 	}
 #else
-	KeState empty = { -1, 0, 0, 0, 0, 0 };
+	KeState empty = { static_cast<uint32_t>(-1), 0, 0, 0, 0, 0 };
 
 	/* Copy this sampler state to the texture unit slot */
 	memcpy( &samplers[stage], sb->states, sizeof( KeState ) * sb->state_count );

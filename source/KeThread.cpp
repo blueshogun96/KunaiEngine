@@ -7,6 +7,9 @@
 
 #include "KeThread.h"
 
+#ifdef __APPLE__
+#include <mach/thread_act.h>
+#endif
 
 
 /*
@@ -18,13 +21,15 @@ KeThread::KeThread( KeThreadPfn pfn, void* context, bool suspended )
 #ifndef _WIN32
 	/* Create a thread attribute and mutex */
 	pthread_attr_init( &thread_attr );
-	pthread_mutex_init( &mutex );
+	pthread_mutex_init( &mutex, NULL );
 
-	/* Create suspended thread if desired */
-	if( suspended ) 
+    /* Create suspended thread if desired */
+    /* TODO: Support suspended threads for Linux, not just Win32 and OSX. */
 #ifdef __APPLE__
-		pthread_create_suspended_np( &thread_attr );
+	if( suspended )
+		pthread_create_suspended_np( &thread, NULL, (void *(*)(void *)) pfn, context );
 #endif
+    pthread_create( &thread, NULL, (void *(*)(void *)) pfn, context );
 #else
 	/* Create mutex */
 	mutex = CreateMutex( NULL, TRUE, NULL );
@@ -96,6 +101,7 @@ void KeThread::Suspend()
 #elif defined(__APPLE__)
 	thread_suspend( pthread_mach_thread_np( thread ) );
 #else
+    /* TODO: Linux */
 #endif
 } 
 
@@ -109,9 +115,10 @@ void KeThread::Resume()
 #ifdef _WIN32
 	last_error = ResumeThread( thread );
 #elif defined(__APPLE__)
-	pthread_mutex_lock( mutex );
+	pthread_mutex_lock( &mutex );
 	thread_resume( pthread_mach_thread_np( thread ) );
-	pthread_mutex_unlock( mutex );
+	pthread_mutex_unlock( &mutex );
 #else
+    /* TODO: Linux */
 #endif
 }
