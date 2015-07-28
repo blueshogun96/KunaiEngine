@@ -1,6 +1,8 @@
 #include <stdio.h>
 
-#if defined(_WIN32) || defined(_WIN64)
+//#define ENABLE_3DV
+
+#if (defined(_WIN32) || defined(_WIN64)) && defined(ENABLE_3DV)
 
 //extern "C" {
 #include "opengl_3dv.h"
@@ -927,7 +929,9 @@ void GLD3DBuffers_destroy(GLD3DBuffers *gl_d3d_buffers) {
 
 #else
 
-void GLD3DBuffers_create(GLD3DBuffers *gl_d3d_buffers, void *window_handle, bool vsync, bool stereo) {
+#include "opengl_3dv.h"
+
+void GLD3DBuffers_create(GLD3DBuffers *gl_d3d_buffers, void *window_handle, int vsync, int stereo) {
 	printf("Direct3D not available on this platform\n");
 }
 
