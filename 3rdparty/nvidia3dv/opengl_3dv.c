@@ -932,7 +932,7 @@ void GLD3DBuffers_destroy(GLD3DBuffers *gl_d3d_buffers) {
 #include "opengl_3dv.h"
 
 void GLD3DBuffers_create(GLD3DBuffers *gl_d3d_buffers, void *window_handle, int vsync, int stereo) {
-	printf("Direct3D not available on this platform\n");
+	fprintf(stderr, "Direct3D not available on this platform\n");
 }
 
 void GLD3DBuffers_activate_left(GLD3DBuffers *gl_d3d_buffers) {
