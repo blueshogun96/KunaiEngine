@@ -372,6 +372,9 @@ struct IKeRenderTarget : public IKeResourceBuffer
     
     virtual void* MapData( uint32_t flags ) PURE;
     virtual void UnmapData( void* ) PURE;
+
+	virtual bool GetTexture( IKeTexture** texture ) PURE;
+	virtual IKeTexture* GetTexture2() PURE;
 };
 
 /*

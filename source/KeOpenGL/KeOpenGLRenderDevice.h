@@ -115,9 +115,15 @@ struct IKeOpenGLRenderTarget : public IKeRenderTarget
 {
     virtual void Destroy();
     
-    uint32_t    frame_buffer_object;    /* Frame buffer object handle */
-    uint32_t    depth_render_buffer;    /* Depth render buffer */
-    /* TODO: Stencil? */
+	virtual void* MapData( uint32_t flags );
+	virtual void UnmapData( void* );
+
+	virtual bool GetTexture( IKeTexture** texture );
+	virtual IKeTexture* GetTexture2();
+
+    uint32_t    fbo;				/* Frame buffer object handle */
+    uint32_t    depth_buffer;		/* Depth render buffer */
+    uint32_t	stencil_buffer;		/* Stencil buffer */
     
     IKeTexture* texture;
 };

@@ -8,6 +8,8 @@
 #ifndef __ke_d3d11_renderdevice__
 #define __ke_d3d11_renderdevice__
 
+#pragma warning(disable:4838)
+
 #include "KeRenderDevice.h"
 #ifdef __APPLE__
 #error "Direct3D is not supported on non-Microsoft platforms!"
@@ -134,6 +136,9 @@ struct IKeDirect3D11RenderTarget : public IKeRenderTarget
     
     virtual void* MapData( uint32_t flags );
     virtual void UnmapData( void* );
+
+	virtual bool GetTexture( IKeTexture** texture );
+	virtual IKeTexture* GetTexture2();
 
 	uint32_t    frame_buffer_object;    /* Frame buffer object handle */
 	uint32_t    depth_render_buffer;    /* Depth render buffer */

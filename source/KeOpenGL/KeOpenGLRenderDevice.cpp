@@ -205,6 +205,16 @@ uint32_t texture_filter_modes[] =
     GL_LINEAR_MIPMAP_LINEAR
 };
 
+/* OpenGL texture wrap modes */
+uint32_t texture_wrap_modes[] = 
+{
+	GL_REPEAT,
+	GL_CLAMP,
+	GL_CLAMP_TO_EDGE,
+	GL_CLAMP_TO_BORDER,
+	GL_MIRRORED_REPEAT
+};
+
 /*
  * Name: ke_initialize_default_shaders
  * Desc: Initializes the default shaders to be used when there is
@@ -1138,6 +1148,9 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
+	/* Unbind texture */
+	glBindTexture( t->target, 0 );
+
     return true;
 }
 
@@ -1241,8 +1254,42 @@ void IKeOpenGLRenderDevice::SetTextureData3D( int offsetx, int offsety, int offs
 bool IKeOpenGLRenderDevice::CreateRenderTarget( int width, int height, int depth, uint32_t flags, IKeRenderTarget** rendertarget )
 {
     GLenum error = glGetError();
+	(*rendertarget) = new IKeOpenGLRenderTarget;
     IKeOpenGLRenderTarget* rt = static_cast<IKeOpenGLRenderTarget*>( *rendertarget );
     
+#if 1
+	/* Generate a texture as our colour buffer */
+	if( !this->CreateTexture2D( KE_TEXTURE_2D, width, height, 0, KE_TEXTUREFORMAT_RGBA, KE_UNSIGNED_BYTE, &rt->texture ) )
+	{
+		DISPDBG_RB( KE_ERROR, "Error creating render target texture!" );
+	}
+
+	/* Get OpenGL texture handle */
+	uint32_t texture_handle = static_cast<IKeOpenGLTexture*>( rt->texture )->handle;
+
+	/* Depth buffer */
+	glGenRenderbuffers( 1, &rt->depth_buffer );
+	glBindRenderbuffer( GL_RENDERBUFFER, rt->depth_buffer );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
+	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+
+	/* Framebuffer to link everything together */
+	glGenFramebuffers( 1, &rt->fbo);
+	glBindFramebuffer( GL_FRAMEBUFFER, rt->fbo );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_handle, 0 );
+	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rt->depth_buffer );
+	
+	/* Did it work? */
+	GLenum status;
+	if( ( status = glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) != GL_FRAMEBUFFER_COMPLETE )
+	{
+		OGL_DISPDBG( KE_ERROR, "Error linking framebuffer (status: " << status << ")" );
+		return 0;
+	}
+
+	/* Unbind the fbo */
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+#else
     /* Generate frame buffer object */
     glGenFramebuffers( 1, &rt->frame_buffer_object );
     OGL_DISPDBG_RB( 1, "Error creating FBO!" );
@@ -1279,6 +1326,7 @@ bool IKeOpenGLRenderDevice::CreateRenderTarget( int width, int height, int depth
         error = glGetError();
         DISPDBG_RB( 1, "Error during rendertarget creation!" );
     }
+#endif
     
     return true;
 }
@@ -1295,8 +1343,8 @@ void IKeOpenGLRenderDevice::DeleteRenderTarget( IKeRenderTarget* rendertarget )
     this->DeleteTexture( static_cast<IKeOpenGLTexture*>( rt->texture ) );
     
     /* Delete the render target */
-    glDeleteRenderbuffers( 1, &rt->depth_render_buffer );
-    glDeleteFramebuffers( 1, &rt->frame_buffer_object );
+    glDeleteRenderbuffers( 1, &rt->depth_buffer );
+    glDeleteFramebuffers( 1, &rt->fbo );
 
 	delete rendertarget;
 }
@@ -1312,10 +1360,15 @@ void IKeOpenGLRenderDevice::BindRenderTarget( IKeRenderTarget* rendertarget )
     IKeOpenGLRenderTarget* rt = static_cast<IKeOpenGLRenderTarget*>( rendertarget );
     
     /* Bind the FBO */
-    glBindFramebuffer( GL_FRAMEBUFFER, rt->frame_buffer_object );
-    error = glGetError();
-    if( error != GL_NO_ERROR )
-        DISPDBG( 1, "Error binding rendertarget! (error=0x" << error << ")\n" );
+	if( rt )
+	{
+		glBindFramebuffer( GL_FRAMEBUFFER, rt->fbo );
+		error = glGetError();
+		if( error != GL_NO_ERROR )
+			DISPDBG( 1, "Error binding rendertarget! (error=0x" << error << ")\n" );
+	}
+	else
+		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 /*
@@ -1725,6 +1778,18 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
 
 			case KE_TS_MINFILTER:
 				glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			case KE_TS_WRAPU:
+				glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			case KE_TS_WRAPV:
+				glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			case KE_TS_WRAPW:
+				glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
 				break;
 
 			default:
