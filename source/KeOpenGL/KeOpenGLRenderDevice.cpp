@@ -209,7 +209,11 @@ uint32_t texture_filter_modes[] =
 uint32_t texture_wrap_modes[] = 
 {
 	GL_REPEAT,
+#ifndef __APPLE__
 	GL_CLAMP,
+#else
+    0,
+#endif
 	GL_CLAMP_TO_EDGE,
 	GL_CLAMP_TO_BORDER,
 	GL_MIRRORED_REPEAT

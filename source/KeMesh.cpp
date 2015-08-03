@@ -20,7 +20,7 @@ Assimp::Importer    importer;
 bool KeOpenScene( char* meshfile )
 {
     /* Import this mesh from disk */
-    scene = importer.ReadFile( meshfile, aiProcessPreset_TargetRealtime_Quality );
+    scene = importer.ReadFile( meshfile, aiProcessPreset_TargetRealtime_MaxQuality );
     if( !scene )
         return false;
     

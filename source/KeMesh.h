@@ -12,6 +12,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include "openctm.h"
 
 
 /*
@@ -42,6 +43,7 @@ struct KeMesh
     int face_count;
     int vertex_count;
     int index_count;
+    int material_index;
     
     KeMeshVertex* vertices;
     uint32_t* indices;
