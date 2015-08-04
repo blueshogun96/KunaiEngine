@@ -11,8 +11,8 @@
 
 
 #include <iostream>
-#include "Leap.h"
-#include "LeapMath.h"
+#include <Leap.h>
+#include <LeapMath.h>
 
 
 /*

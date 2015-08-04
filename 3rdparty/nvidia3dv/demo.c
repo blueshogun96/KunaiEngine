@@ -1,9 +1,9 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
-extern "C" {
+//extern "C" {
 #include "opengl_3dv.h"
-}
+//}
 
 SDL_Window *window;
 GLD3DBuffers gl_d3d_buffers = {0};
