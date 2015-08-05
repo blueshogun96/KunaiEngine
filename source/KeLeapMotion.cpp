@@ -28,7 +28,12 @@
 void KeLeapMotionCallbackNull( const Leap::Controller& controller ) {}
 
 /* Callback functions; set them all to NULL initially. */
-KeLeapMotionCallback pfnKeLeapCallbacks[10] = { KeLeapMotionCallbackNull };
+KeLeapMotionCallback pfnKeLeapCallbacks[10] =
+{
+    KeLeapMotionCallbackNull, KeLeapMotionCallbackNull, KeLeapMotionCallbackNull, KeLeapMotionCallbackNull,
+    KeLeapMotionCallbackNull, KeLeapMotionCallbackNull, KeLeapMotionCallbackNull, KeLeapMotionCallbackNull,
+    KeLeapMotionCallbackNull, KeLeapMotionCallbackNull
+};
 
 /* Leap motion controller */
 Leap::Controller LeapMotionController;
@@ -44,61 +49,61 @@ class KeLeapMotionListener : public Leap::Listener
 {
     void onInit( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_INIT]( controller );
     }
 
     void onConnect( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_CONNECT]( controller );
     }
 
     void onDisconnect( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_DISCONNECT]( controller );
     }
 
     void onExit( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_EXIT]( controller );
     }
 
     void onFrame( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        //DISPDBG( KE_DBGLVL(0), "..." );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_FRAME]( controller );
     }
 
     void onFocusGained( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_FOCUSGAINED]( controller );
     }
 
     void onFocusLost( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_FOCUSLOST]( controller );
     }
     
     void onDeviceChange( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_DEVICECHANGE]( controller );
     }
     
     void onServiceConnect( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_SERVICECONNECT]( controller );
     }
     
     void onServiceDisconnect( const Leap::Controller& controller )
     {
-        DISPDBG( KE_DBGLVL(0), "..." );
+        DISPDBG( KE_DBGLVL(0), "...\n" );
         pfnKeLeapCallbacks[KE_LEAP_CALLBACK_SERVICEDISCONNECT]( controller );
     }
 } LeapMotionListener;
@@ -201,4 +206,21 @@ void KeLeapMotionUninitializeListener()
     ListenerInitialized = No;
 }
 
+/*
+ * Name: KeLeapMotionDeviceConnected
+ * Desc: Returns true if a leap motion device is attached and detected.
+ */
+bool KeLeapMotionDeviceConnected()
+{
+    return LeapMotionController.isConnected();
+}
+
+/*
+ * Name: KeLeapMotionGetController
+ * Desc: Returns a reference to the leap motion controller handled by the engine.
+ */
+Leap::Controller& KeLeapMotionGetController()
+{
+    return LeapMotionController;
+}
 
