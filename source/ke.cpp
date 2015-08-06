@@ -120,7 +120,7 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 	/* Read settings file */
 	yaml_parser_set_input_file( &yaml_parser, fp );
 
-	bool init_renderer = No, init_audio = No, init_leap_motion = No;
+	bool init_renderer = No, init_audio = No, init_leap_motion = No, init_kinect = No;
 	KeRenderDeviceDesc rddesc;
 	KeAudioDeviceDesc  addesc;
 
@@ -132,8 +132,8 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 
 	do
 	{
-		std::string scalar;
-		int key = No, value = No;
+		static std::string keyval = " ", valueval = " ";
+		static int key = No, value = No;
 
 		yaml_parser_scan( &yaml_parser, &token );
 
@@ -144,17 +144,36 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 		case YAML_STREAM_END_TOKEN:		break;
 
 		/* Token types (read before actual token) */
-		case YAML_KEY_TOKEN:   fprintf(stderr, "(Key token)   "); break;
-		case YAML_VALUE_TOKEN: fprintf(stderr, "(Value token) "); break;
+        case YAML_KEY_TOKEN:   key = Yes; break;
+        case YAML_VALUE_TOKEN: value = Yes; break;
 
 		/* Block delimeters */
-		case YAML_BLOCK_SEQUENCE_START_TOKEN: puts("<b>Start Block (Sequence)</b>"); break;
-		case YAML_BLOCK_ENTRY_TOKEN:          puts("<b>Start Block (Entry)</b>");    break;
-		case YAML_BLOCK_END_TOKEN:            puts("<b>End block</b>");              break;
+		case YAML_BLOCK_SEQUENCE_START_TOKEN: break;
+		case YAML_BLOCK_ENTRY_TOKEN:          break;
+		case YAML_BLOCK_END_TOKEN:            break;
 
 		/* Data */
-		case YAML_BLOCK_MAPPING_START_TOKEN:  puts("[Block mapping]");            break;
-		case YAML_SCALAR_TOKEN:  fprintf(stderr, "scalar %s \n", token.data.scalar.value); break;
+		case YAML_BLOCK_MAPPING_START_TOKEN:  break;
+		case YAML_SCALAR_TOKEN:
+                fprintf(stderr, "scalar %s \n", token.data.scalar.value);
+                
+                /* Key token value */
+                if( key )
+                {
+                    keyval = *token.data.scalar.value;
+                }
+                
+                /* Value token value */
+                if( value )
+                {
+                    valueval = *token.data.scalar.value;
+                    
+                    /* Reset key and values */
+                    keyval = " ", valueval = " ";
+                }
+                
+                key = No, value = No;
+                break;
 
 		/* Others */
 		default:
