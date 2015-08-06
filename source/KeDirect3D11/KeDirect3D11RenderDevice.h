@@ -19,7 +19,7 @@
 //#include <d3d11_1.h>
 #include <d3d11_2.h>
 #include <D3Dcompiler.h>
-#include <xnamath.h>
+//#include <xnamath.h>
 #include <comip.h>
 #include <comdef.h>
 #include <ddraw.h>

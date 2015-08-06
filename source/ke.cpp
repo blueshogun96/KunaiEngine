@@ -8,6 +8,7 @@
 #include "Ke.h"
 #include "KeSystem.h"
 #include "KeDebug.h"
+#include "yaml.h"
 
 
 NVDebug*			dbg = nullptr;				/* Debug log */
@@ -58,6 +59,120 @@ bool KeInitialize()
     KeResetKeys();
     
     return true;
+}
+
+/*
+ * Name: KeInitializeEx
+ * Desc: Same as above, but initializes more engine components as specified in the settings
+ *		 script.  The first param is the path to the YAML based file where the engine settings
+ *       are stored.  Any components listed will be initialized in this function.
+ */
+bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDevice** ad )
+{
+	/* Set the current directory to our resource directory */
+    KeSetCurrentPathToResourceDirectory();
+    
+    /* Initial debug logging */
+    dbg = new NVDebug( KE_DBG_LEVEL, "debug.txt" );
+    DISPDBG( KE_DBGLVL(0), "Initialization started\n" );
+    
+    /* Initialize SDL and the necessary sub-systems. For now, we only want to initialize 
+       timing and events. */
+    if( SDL_Init( SDL_INIT_EVENTS | SDL_INIT_TIMER ) != 0 )
+	{
+		DISPDBG( KE_ERROR, "Error initializing SDL timer and events!" );
+	}
+	else
+	{
+		DISPDBG( KE_DBGLVL(3), "SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) = OK\n" );
+	}
+    
+    /* Gather display modes */
+    extern int KeGatherAllDisplayInformation();
+    KeGatherAllDisplayInformation();
+    
+    /* Insert event handler for mobile/embedded platforms */
+#ifdef __MOBILE_OS__
+    extern int KeProcessAppEvents( void *userdata, SDL_Event *event );
+    SDL_SetEventFilter( KeProcessAppEvents, KeGetContextPointer() );
+#endif
+   
+    /* Reset keys */
+    KeResetKeys();
+
+	/* Open settings file */
+	FILE* fp = fopen( settings_file.c_str(), "r" );
+	if( !fp )
+	{
+		DISPDBG( KE_ERROR, "Error opening settings file!\nFile: " << settings_file << std::endl );
+		return false;
+	}
+
+	/* Initialize YAML parser */
+	yaml_parser_t yaml_parser;
+	if( !yaml_parser_initialize( &yaml_parser ) )
+	{
+		fclose(fp);
+		DISPDBG( KE_ERROR, "Error intiializing YAML parser!" );
+		return false;
+	}
+
+	/* Read settings file */
+	yaml_parser_set_input_file( &yaml_parser, fp );
+
+	bool init_renderer = No, init_audio = No, init_leap_motion = No;
+	KeRenderDeviceDesc rddesc;
+	KeAudioDeviceDesc  addesc;
+
+	ZeroMemory( &rddesc, sizeof( KeRenderDeviceDesc ) );
+	ZeroMemory( &addesc, sizeof( KeAudioDeviceDesc ) );
+
+	/* Parse the data */
+	yaml_token_t token;
+
+	do
+	{
+		std::string scalar;
+		int key = No, value = No;
+
+		yaml_parser_scan( &yaml_parser, &token );
+
+		switch (token.type)
+		{
+		/* Stream start/end */
+		case YAML_STREAM_START_TOKEN:	break;
+		case YAML_STREAM_END_TOKEN:		break;
+
+		/* Token types (read before actual token) */
+		case YAML_KEY_TOKEN:   fprintf(stderr, "(Key token)   "); break;
+		case YAML_VALUE_TOKEN: fprintf(stderr, "(Value token) "); break;
+
+		/* Block delimeters */
+		case YAML_BLOCK_SEQUENCE_START_TOKEN: puts("<b>Start Block (Sequence)</b>"); break;
+		case YAML_BLOCK_ENTRY_TOKEN:          puts("<b>Start Block (Entry)</b>");    break;
+		case YAML_BLOCK_END_TOKEN:            puts("<b>End block</b>");              break;
+
+		/* Data */
+		case YAML_BLOCK_MAPPING_START_TOKEN:  puts("[Block mapping]");            break;
+		case YAML_SCALAR_TOKEN:  fprintf(stderr, "scalar %s \n", token.data.scalar.value); break;
+
+		/* Others */
+		default:
+			fprintf( stderr, "Got token of type %d\n", token.type );
+		}
+		if( token.type != YAML_STREAM_END_TOKEN )
+			yaml_token_delete( &token );
+	} while( token.type != YAML_STREAM_END_TOKEN );
+	yaml_token_delete( &token );
+
+	/* Close YAML parser */
+	yaml_parser_delete( &yaml_parser );
+	fclose(fp);
+ 
+    /* Call user specified initialization routine */
+    KeOnInitialize( KeGetContextPointer() );
+    
+	return true;
 }
 
 /*
