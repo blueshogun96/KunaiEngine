@@ -153,21 +153,65 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 		case YAML_BLOCK_END_TOKEN:            break;
 
 		/* Data */
-		case YAML_BLOCK_MAPPING_START_TOKEN:  break;
+		case YAML_BLOCK_MAPPING_START_TOKEN:  
+			if( value )
+			{
+				if( keyval == "RenderDevice" )
+					init_renderer = Yes;
+				if( keyval == "AudioDevice" )
+					init_audio = Yes;
+				if( keyval == "LeapMotionDevice" )
+					init_leap_motion = Yes;
+				if( keyval == "KinectDevice" )
+					init_kinect = Yes;
+
+				value = No;
+			}
+			break;
 		case YAML_SCALAR_TOKEN:
                 fprintf(stderr, "scalar %s \n", token.data.scalar.value);
                 
                 /* Key token value */
                 if( key )
                 {
-                    keyval = *token.data.scalar.value;
+                    keyval = (const char*) token.data.scalar.value;
                 }
                 
                 /* Value token value */
                 if( value )
                 {
-                    valueval = *token.data.scalar.value;
+                    valueval = (const char*) token.data.scalar.value;
                     
+					/* RenderDevice settings */
+					if( keyval == "WindowWidth" )
+						rddesc.width = atoi( valueval.c_str() );
+					else if( keyval == "WindowHeight" )
+						rddesc.height = atoi( valueval.c_str() );
+					else if( keyval == "ColourBpp" )
+						rddesc.colour_bpp = atoi( valueval.c_str() );
+					else if( keyval == "DepthBpp" )
+						rddesc.depth_bpp = atoi( valueval.c_str() );
+					else if( keyval == "StencilBpp" )
+						rddesc.stencil_bpp = atoi( valueval.c_str() );
+					else if( keyval == "BufferCount" )
+						rddesc.buffer_count = atoi( valueval.c_str() );
+					else if( keyval == "RefreshRate" )
+						rddesc.device_type = atoi( valueval.c_str() );
+					else if( keyval == "DeviceType" )
+					{
+						if( valueval == "OpenGL3" )		rddesc.device_type = KE_RENDERDEVICE_OGL3;
+						if( valueval == "OpenGL4" )		rddesc.device_type = KE_RENDERDEVICE_OGL4;
+						if( valueval == "Direct3D11" )	rddesc.device_type = KE_RENDERDEVICE_D3D11;
+						if( valueval == "OpenGLES2" )	rddesc.device_type = KE_RENDERDEVICE_OGLES2;
+						if( valueval == "OpenGLES3" )	rddesc.device_type = KE_RENDERDEVICE_OGLES3;
+						if( valueval == "Metal" )		rddesc.device_type = KE_RENDERDEVICE_METAL;
+					}
+					else if( keyval == "Fullscreen" )
+						rddesc.fullscreen = valueval == "Yes" ? Yes : No;
+
+					/* AudioDevice settings */
+
+						
                     /* Reset key and values */
                     keyval = " ", valueval = " ";
                 }
@@ -188,6 +232,13 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 	yaml_parser_delete( &yaml_parser );
 	fclose(fp);
  
+	/* Create window and rendering device */
+	if( init_renderer && rd != NULL )
+	{
+		if( !KeCreateWindowAndDevice( &rddesc, rd ) )
+			return false;
+	}
+
     /* Call user specified initialization routine */
     KeOnInitialize( KeGetContextPointer() );
     
