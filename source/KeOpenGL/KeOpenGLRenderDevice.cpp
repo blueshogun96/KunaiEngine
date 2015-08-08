@@ -314,6 +314,10 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     if( !renderdevice_desc )
 		DISPDBG_R( KE_ERROR, "Invalid render device description!" );
     
+    /* Do we have a valid window width/height? */
+    if( renderdevice_desc->width < 1 || renderdevice_desc->height < 1 )
+        DISPDBG_R( KE_ERROR, "Invalid render target resolution!" );
+    
     /* Save a copy of the render device description */
     device_desc = new KeRenderDeviceDesc;
     memmove( device_desc, renderdevice_desc, sizeof( KeRenderDeviceDesc ) );

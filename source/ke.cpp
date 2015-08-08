@@ -196,7 +196,7 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 					else if( keyval == "BufferCount" )
 						rddesc.buffer_count = atoi( valueval.c_str() );
 					else if( keyval == "RefreshRate" )
-						rddesc.device_type = atoi( valueval.c_str() );
+						rddesc.refresh_rate = atoi( valueval.c_str() );
 					else if( keyval == "DeviceType" )
 					{
 						if( valueval == "OpenGL3" )		rddesc.device_type = KE_RENDERDEVICE_OGL3;

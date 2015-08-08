@@ -36,6 +36,9 @@ void KeLeapMotionSetServiceConnectCallback( KeLeapMotionCallback pfn );
 void KeLeapMotionSetServiceDisconnectCallback( KeLeapMotionCallback pfn );
 
 
+/*
+ * Leap Motion functionality
+ */
 bool KeLeapMotionInitializeListener( bool ProcessBackgroundFrames );
 void KeLeapMotionUninitializeListener();
 bool KeLeapMotionDeviceConnected();
