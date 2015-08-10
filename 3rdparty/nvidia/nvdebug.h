@@ -127,8 +127,8 @@ do																\
 	if (NVDebug::GetSingletonPtr() != NULL)						\
 	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
 		NVDebug::GetSingleton().FlushLastMessage();	\
-		NVDebug::GetSingleton().GetLastMessage() << __FUNCTION__ << "(): " << b;	\
-		NVDebug::GetSingleton().GetStream() << __FUNCTION__ << "(): " << b;			\
+		NVDebug::GetSingleton().GetLastMessage() << __PRETTY_FUNCTION__ << ": " << b;	\
+		NVDebug::GetSingleton().GetStream() << __PRETTY_FUNCTION__ << ": " << b;			\
 		NVDebug::GetSingleton().EndOutput(); }				\
 } while(0)
 

@@ -151,9 +151,9 @@ uint32_t internal_texture_formats[] =
 /* OpenGL cull modes */
 uint32_t cull_modes[] =
 {
-    GL_NONE,
-    GL_CW,
-    GL_CCW
+    0,
+    GL_FRONT,
+    GL_BACK
 };
 
 /* OpenGL blend modes */
@@ -1222,9 +1222,13 @@ void IKeOpenGLRenderDevice::DeleteTexture( IKeTexture* texture )
  */
 void IKeOpenGLRenderDevice::SetTextureData1D( int offsetx, int width, int miplevel, void* pixels, IKeTexture* texture )
 {
+    GLenum error = glGetError();
     IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>( texture );
-    
+
+    glBindTexture( t->target, t->handle );
     glTexSubImage1D( t->target, miplevel, offsetx, width, t->internal_format, t->data_type, pixels );
+    OGL_DISPDBG( KE_ERROR, "Error setting texture data!" );
+    glBindTexture( t->target, 0 );
 }
 
 /*
@@ -1233,7 +1237,7 @@ void IKeOpenGLRenderDevice::SetTextureData1D( int offsetx, int width, int miplev
  */
 void IKeOpenGLRenderDevice::SetTextureData2D( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, IKeTexture* texture )
 {
-	GLenum error = glGetError( );
+	GLenum error = glGetError();
     IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>( texture );
     
 	//glEnable( t->target );
@@ -1514,10 +1518,12 @@ bool IKeOpenGLRenderDevice::SetRenderStateBuffer( IKeRenderStateBuffer* state_bu
                 
             case KE_RS_CULLMODE:
                 if( sb->states[i].param1 )
+                {
                     glEnable( GL_CULL_FACE );
+                    glCullFace( cull_modes[sb->states[i].param2] );
+                }
                 else
                     glDisable( GL_CULL_FACE );
-                glCullFace( cull_modes[sb->states[i].param2] );
                 break;
                 
             default:
