@@ -26,7 +26,7 @@ namespace washu {
     void * allocator::allocate (size_t bytes, std::type_info const & info, char const * from, size_t line) {
         size_t padding = 16 - sizeof( header );
 
-#ifdef __APPLE__    /* MacOSX guarantees that all memory allocates is 16-byte aligned */
+#ifdef __APPLE__    /* MacOSX guarantees that all memory allocated is 16-byte aligned */
         void * ptr = malloc (bytes + sizeof(header) +padding);
 #else
         void * ptr = _aligned_malloc (bytes + sizeof(header) +padding, 16);

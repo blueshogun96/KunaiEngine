@@ -61,6 +61,12 @@
 #define __trap  __asm__("int $3")
 #endif
 
+#ifdef __APPLE__
+#define __KE_FUNCTION__ __PRETTY_FUNCTION__
+#else
+#define __KE_FUNCTION__ __FUNCTION__
+#endif
+
 
 static const DWORD MaxDebugFileSize = 100000;
 
@@ -127,8 +133,8 @@ do																\
 	if (NVDebug::GetSingletonPtr() != NULL)						\
 	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
 		NVDebug::GetSingleton().FlushLastMessage();	\
-		NVDebug::GetSingleton().GetLastMessage() << __PRETTY_FUNCTION__ << ": " << b;	\
-		NVDebug::GetSingleton().GetStream() << __PRETTY_FUNCTION__ << ": " << b;			\
+		NVDebug::GetSingleton().GetLastMessage() << __KE_FUNCTION__ << ": " << b;	\
+		NVDebug::GetSingleton().GetStream() << __KE_FUNCTION__ << ": " << b;			\
 		NVDebug::GetSingleton().EndOutput(); }				\
 } while(0)
 
@@ -161,7 +167,7 @@ do																\
 	if (NVDebug::GetSingletonPtr() != NULL)						\
 	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
 		NVDebug::GetSingleton().FlushLastMessage();	\
-		NVDebug::GetSingleton().GetLastMessage() << __FUNCTION__ << "(): " << b;	\
+		NVDebug::GetSingleton().GetLastMessage() << __KE_FUNCTION__ << "(): " << b;	\
 	}				\
 } while(0)
 #define NVASSERT(a, b)

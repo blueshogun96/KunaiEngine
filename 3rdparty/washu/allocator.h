@@ -42,9 +42,13 @@ namespace washu {
 #define NEW_ARRAY(Type, Count) washu::allocator::allocate_array<Type>(Count, __FILE__, __LINE__)
 #define DEL(Ptr) washu::allocator::release(Ptr, __FILE__, __LINE__)
 #define DEL_ARRAY(Ptr) washu::allocator::release_array(Ptr, __FILE__, __LINE__)
+#define MALLOC(Size) (washu::allocator::allocate(Size, typeid(void), __FILE__, __LINE__))
+#define FREE(Ptr) washu::allocator::release(Ptr, __FILE__, __LINE__)
 #else
 #define NEW(Type) new Type
 #define DEL(Ptr) delete Ptr;
 #define NEW_ARRAY(Type, Count) new Type[Count]
 #define DEL_ARRAY(Ptr) delete [] Ptr
+#define MALLOC(Size) malloc(Size)
+#define FREE(Ptr) free(Ptr)
 #endif

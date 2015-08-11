@@ -38,6 +38,7 @@ public:
 
 protected:
 	virtual void OnInit() { m_state = RUNNING; }
+	virtual void OnRender( uint32_t delta_miliseconds ) PURE;
 	virtual void OnUpdate( uint32_t delta_miliseconds ) PURE;
 	virtual void OnSuccess() {}
 	virtual void OnFail() {}
