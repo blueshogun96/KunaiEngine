@@ -43,6 +43,7 @@ public:
 	virtual bool	IsOpen();
 	virtual void	Close();
 	virtual bool	Read( std::string filename, void** ptr, size_t* size );
+	virtual bool	ReadString( std::string filename, void** ptr, size_t* size );
     
 protected:
 	void*	archive;
