@@ -119,7 +119,11 @@ int UnpackWAVData( void* pRIFFBytes, WAVEFORMATEX** ppwfmx, uint8_t** ppChunkDat
  */
 bool KeImageInitialize()
 {
-    return IMG_Init( IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP );
+    int ret = IMG_Init( IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP );
+	if( !ret )
+		DISPDBG( KE_ERROR, "Error initializing SDL_Image library.\nReason: " << IMG_GetError() << std::endl );
+
+	return ret;
 }
 
 /*
@@ -171,7 +175,10 @@ bool KeImageReadFromMemory( void* image_file_ptr, uint32_t size, KeImageData* im
         SDL_FreeRW( rwop );
         
         if( !surface )
+		{
+			DISPDBG( KE_ERROR, "Error processing this image buffer.\nReason: " << IMG_GetError() );
             return false;
+		}
         
         image_out->pixels = new uint8_t[surface->w*surface->h*(surface->format->BytesPerPixel)];
         image_out->width = surface->w;

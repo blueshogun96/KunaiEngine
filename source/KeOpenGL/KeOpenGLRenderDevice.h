@@ -59,12 +59,15 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
     
     virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
+	virtual void GetDesc( KeGeometryBufferDesc* desc );
     
-    uint32_t vbo[2];    /* Vertex and index buffer */
-    uint32_t vao;       /* Vertex array object */
-    uint32_t length;    /* Length of vertex data (in bytes) */
-    uint32_t index_type;/* Data type for index data */
-    uint32_t lock_flags;/* Buffer lock flags */
+    uint32_t vbo[2];		/* Vertex and index buffer */
+    uint32_t vao;			/* Vertex array object */
+    uint32_t vd_length;		/* Length of vertex data (in bytes) */
+	uint32_t id_length;		/* Length of index data (in bytes) */
+	uint32_t vertex_size;	/* Size of each vertex (in bytes) */
+    uint32_t index_type;	/* Data type for index data */
+    uint32_t lock_flags;	/* Buffer lock flags */
 };
 
 /*

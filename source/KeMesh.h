@@ -51,6 +51,7 @@ struct KeMesh
 
 
 bool KeOpenScene( char* meshfile );
+bool KeOpenSceneFromMemory( void* ptr, uint32_t size );
 void KeCloseScene();
 int KeGetMeshCount();
 bool KeReadMeshVertexData( int index, KeMesh* mesh_out );

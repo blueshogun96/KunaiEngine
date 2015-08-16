@@ -197,6 +197,7 @@
 #define KE_TEXTUREFORMAT_RGBA   0
 #define KE_TEXTUREFORMAT_BGRA   1
 #define KE_TEXTUREFORMAT_R8		2
+#define KE_TEXTUREFORMAT_RGB	3
 
 /*
  * Texture filtering modes
@@ -285,6 +286,18 @@ struct KeState
     double   dparam;
 };
 
+
+/* 
+ * Geometry buffer description 
+ */
+struct KeGeometryBufferDesc
+{
+	uint32_t vertex_data_size;
+	uint32_t index_data_size;
+	uint32_t vertex_size;
+	uint32_t index_type;
+};
+
 /*
  * Texture data description
  */
@@ -331,6 +344,7 @@ struct IKeGeometryBuffer : public IKeResourceBuffer
     
     virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
+	virtual void GetDesc( KeGeometryBufferDesc* desc ) PURE;
 };
 
 /*

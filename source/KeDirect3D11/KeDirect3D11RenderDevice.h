@@ -76,6 +76,7 @@ struct IKeDirect3D11GeometryBuffer : public IKeGeometryBuffer
 
 	virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
+	virtual void GetDesc( KeGeometryBufferDesc* desc );
 
 	CD3D11Buffer	vb;		/* Vertex buffer */
 	CD3D11Buffer	ib;		/* Index buffer */

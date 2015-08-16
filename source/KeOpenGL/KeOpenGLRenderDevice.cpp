@@ -139,13 +139,15 @@ uint32_t texture_formats[] =
 {
     GL_RGBA,
     GL_BGRA,
-	GL_RED
+	GL_RED,
+	GL_RGB
 };
 uint32_t internal_texture_formats[] = 
 {
 	GL_RGBA,
 	GL_BGRA,
 	GL_R8,
+	GL_RGB
 };
 
 /* OpenGL cull modes */
@@ -673,6 +675,10 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
 		glEnableVertexAttribArray(va[i].index);
 	}
 
+	/* Save vertex data size and vertex stride */
+	gb->vd_length = vertex_data_size;
+	gb->vertex_size = va[0].stride;
+
     /* Create an index buffer if desired */
     if( index_data_size )
     {
@@ -684,6 +690,9 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, index_data_size, index_data, buffer_usage_types[flags] );
         gb->index_type = index_data_type;
 		OGL_DISPDBG_RB( KE_ERROR, "Error setting index buffer data!" );
+
+		/* Save index data size */
+		gb->id_length = index_data_size;
     }
     else
         gb->vbo[1] = 0;
@@ -741,6 +750,7 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     *gpu_program = new IKeOpenGLGpuProgram;
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( *gpu_program );
     GLenum error = glGetError();
+	int Fail = No;
     
 	v = glCreateShader( GL_VERTEX_SHADER );
 	f = glCreateShader( GL_FRAGMENT_SHADER );
@@ -759,7 +769,9 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
         int len = 0;
         
         glGetShaderInfoLog( v, 2048, &len, str );
-		printf("Vertex shader not compiled.\n%s\n", str);
+		DISPDBG( KE_ERROR, "Vertex shader not compiled.\n" << str );
+		//fprintf( stderr, "Vertex shader not compiled.\n%s\n", str);
+		Fail = Yes;
 	}
     
 	glCompileShader(f);
@@ -770,9 +782,22 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
         int len = 0;
         
         glGetShaderInfoLog( f, 2048, &len, str );
-		printf("Fragment shader not compiled.\n%s\n", str);
+		DISPDBG( KE_ERROR, "Fragment shader not compiled.\n" << str );
+		//fprintf( stderr, "Fragment shader not compiled.\n%s\n", str);
+		Fail = Yes;
 	}
     
+	if( Fail )
+	{
+		glDeleteShader(v);
+		glDeleteShader(f);
+		glDeleteShader(g);
+		gp->Destroy();
+		gp = NULL;
+
+		DISPDBG_RB( KE_ERROR, "An error occured building this GPU program!" );
+	}
+
 	p = glCreateProgram();
     
 	glBindAttribLocation( p, 0, "in_pos" );
@@ -944,9 +969,11 @@ void IKeOpenGLRenderDevice::SetProgramConstant3FV( const char* location, int cou
  */
 void IKeOpenGLRenderDevice::SetProgramConstant4FV( const char* location, int count, float* value )
 {
+	GLenum error = glGetError();
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     
     int loc = glGetUniformLocation( p->program, location );
+	OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform4fv( loc, count, value );
 }
 

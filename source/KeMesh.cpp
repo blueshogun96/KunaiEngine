@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 Shogun3D. All rights reserved.
 //
 
-#include "KePlatform.h"
+#include "Ke.h"
 #include "KeMesh.h"
 #include "nvdebug.h"
 
@@ -23,6 +23,19 @@ bool KeOpenScene( char* meshfile )
     scene = importer.ReadFile( meshfile, aiProcessPreset_TargetRealtime_MaxQuality );
     if( !scene )
         return false;
+    
+    return true;
+}
+
+bool KeOpenSceneFromMemory( void* ptr, uint32_t size )
+{
+    /* Import this mesh from disk */
+    scene = importer.ReadFileFromMemory( ptr, size, aiProcessPreset_TargetRealtime_MaxQuality );
+    if( !scene )
+	{
+		DISPDBG( KE_ERROR, "Error reading mesh file!\nReason: " << importer.GetErrorString() );
+        return false;
+	}
     
     return true;
 }
