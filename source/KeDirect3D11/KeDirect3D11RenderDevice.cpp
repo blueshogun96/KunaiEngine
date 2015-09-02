@@ -448,9 +448,18 @@ void IKeDirect3D11RenderDevice::SetClearColourUBV( uint8_t* colour )
 */
 void IKeDirect3D11RenderDevice::SetClearDepth( float depth )
 {
-	//glClearDepth(depth);
+	clear_depth = depth;
 }
 
+
+/*
+ * Name: IKeDirect3D11RenderDevice::SetClearStencil
+ * Desc: 
+ */
+void IKeDirect3D11RenderDevice::SetClearStencil( uint32_t stencil )
+{
+	clear_stencil = stencil;
+}
 
 /*
 * Name: IKeDirect3D11RenderDevice::clear_render_buffer
@@ -483,9 +492,28 @@ void IKeDirect3D11RenderDevice::ClearStencilBuffer()
 
 
 /*
-* Name: IKeDirect3D11RenderDevice::swap
-* Desc: Swaps the double buffer.
-*/
+ * Name: IKeDirect3D11RenderDevice::Clear
+ * Desc: 
+ */
+void IKeDirect3D11RenderDevice::Clear( uint32_t buffers )
+{
+	if( buffers & KE_COLOUR_BUFFER )
+		d3ddevice_context->ClearRenderTargetView( d3d_render_target_view, clear_colour );
+
+	uint32_t flags = 0;
+
+	if( buffers & KE_DEPTH_BUFFER )		flags |= 0x1;
+	if( buffers & KE_STENCIL_BUFFER )	flags |= 0x2;
+
+	if( flags )
+		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, (D3D11_CLEAR_FLAG) flags, clear_depth, clear_stencil );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::swap
+ * Desc: Swaps the double buffer.
+ */
 void IKeDirect3D11RenderDevice::Swap()
 {
 	HRESULT hr = dxgi_swap_chain->Present( swap_interval, 0 );

@@ -102,6 +102,14 @@
 
 
 /*
+ * Render buffer types
+ */
+#define KE_COLOUR_BUFFER	0x1
+#define KE_DEPTH_BUFFER		0x2
+#define KE_STENCIL_BUFFER	0x4
+
+
+/*
  * Renderstate types 
  */
 #define KE_RS_DEPTHTEST     1
@@ -449,9 +457,11 @@ public:
     virtual void SetClearColourFV( float* colour ) PURE;
     virtual void SetClearColourUBV( uint8_t* colour ) PURE;
     virtual void SetClearDepth( float depth ) PURE;
+	virtual void SetClearStencil( uint32_t stencil ) PURE;
     virtual void ClearColourBuffer() PURE;
     virtual void ClearDepthBuffer() PURE;
     virtual void ClearStencilBuffer() PURE;
+	virtual void Clear( uint32_t buffers ) PURE;
     virtual void Swap() PURE;
     
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer ) PURE;

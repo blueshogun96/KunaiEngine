@@ -43,7 +43,7 @@ void KeZipResourceArchive::Close()
         mz_zip_reader_end( (mz_zip_archive*) archive );
         
         /* Delete the archive pointer */
-        free( archive );
+        delete archive;
         archive = nullptr;
     }
 }

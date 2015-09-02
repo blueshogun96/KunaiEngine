@@ -585,6 +585,16 @@ void IKeOpenGLRenderDevice::SetClearDepth( float depth )
 
 
 /*
+ * Name: IKeOpenGLRenderDevice::SetClearStencil
+ * Desc: 
+ */
+void IKeOpenGLRenderDevice::SetClearStencil( uint32_t stencil )
+{
+    glStencilMask( stencil );
+}
+
+
+/*
  * Name: IKeOpenGLRenderDevice::clear_render_buffer
  * Desc: Clears only the current render buffer
  */
@@ -613,6 +623,24 @@ void IKeOpenGLRenderDevice::ClearStencilBuffer()
     glClear( GL_STENCIL_BUFFER_BIT );
 }
 
+
+/*
+ * Name: IKeOpenGLRenderDevice::Clear
+ * Desc: Clears all of the specified buffers
+ */
+void IKeOpenGLRenderDevice::Clear( uint32_t buffers )
+{
+	uint32_t flags = 0;
+
+	if( buffers & KE_COLOUR_BUFFER )
+		flags |= GL_COLOR_BUFFER_BIT;
+	if( buffers & KE_DEPTH_BUFFER )
+		flags |= GL_DEPTH_BUFFER_BIT;
+	if( buffers & KE_STENCIL_BUFFER )
+		flags |= GL_STENCIL_BUFFER_BIT;
+
+	glClear( flags );
+}
 
 /*
  * Name: IKeOpenGLRenderDevice::swap

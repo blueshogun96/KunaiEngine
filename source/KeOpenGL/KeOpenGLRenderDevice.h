@@ -190,9 +190,11 @@ public:
     virtual void SetClearColourFV( float* colour );
     virtual void SetClearColourUBV( uint8_t* colour );
     virtual void SetClearDepth( float depth );
+	virtual void SetClearStencil( uint32_t stencil );
     virtual void ClearColourBuffer();
     virtual void ClearDepthBuffer();
     virtual void ClearStencilBuffer();
+	virtual void Clear( uint32_t buffers );
     virtual void Swap();
     
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer );
