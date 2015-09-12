@@ -129,23 +129,20 @@ D3D11_BLEND blend_modes[] =
     D3D11_BLEND_INV_SRC1_ALPHA
 };
 
-
-
-#if 0
-/* OpenGL data types */
-uint32_t data_types[] =
+DXGI_FORMAT data_types[] = 
 {
-	GL_BYTE,
-	GL_UNSIGNED_BYTE,
-	GL_SHORT,
-	GL_UNSIGNED_SHORT,
-	GL_INT,
-	GL_UNSIGNED_INT,
-	GL_FLOAT,
-	GL_DOUBLE
+	DXGI_FORMAT_R8_SINT,
+	DXGI_FORMAT_R8_UINT,
+	DXGI_FORMAT_R16_SINT,
+	DXGI_FORMAT_R16_UINT,
+	DXGI_FORMAT_R32_SINT,
+	DXGI_FORMAT_R32_UINT,
+	DXGI_FORMAT_R32_FLOAT,
+	DXGI_FORMAT_R32_TYPELESS,	/* TODO: Will this work for double? */
 };
 
 
+#if 0
 
 /* OpenGL texture targets */
 uint32_t texture_targets[] =
@@ -565,8 +562,22 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
 	gb->ib = NULL;
 	if( index_data_size )
 	{
-		/* TODO */
-		D3D_DISPDBG_RB( KE_ERROR, "Index buffers not yet supported for D3D11!", hr );
+		ZeroMemory( &bd, sizeof(bd) );
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.ByteWidth = index_data_size;
+		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		ZeroMemory( &id, sizeof(id) );
+		id.pSysMem = index_data;
+
+		hr = d3ddevice->CreateBuffer( &bd, &id, &gb->ib );
+		if( FAILED( hr ) )
+		{
+			delete (*geometry_buffer);
+			D3D_DISPDBG_RB( KE_ERROR, "Error creating index buffer!", hr );
+		}
+
+		gb->index_type = index_data_type;
 	}
 
 	return true;
@@ -1332,19 +1343,19 @@ bool IKeDirect3D11RenderDevice::CreateRenderStateBuffer( KeState* state_params, 
 	}
 
 	/* Create our state buffers */
-	if (use_blend)
+	if( use_blend )
 	{
 		hr = d3ddevice->CreateBlendState( &blend_desc, &sb->bs );
 		D3D_DISPDBG( KE_ERROR, "Error creating blend state!", hr );
 	}
 
-	if (use_depth_stencil)
+	if( use_depth_stencil )
 	{
 		hr = d3ddevice->CreateDepthStencilState( &depth_stencil_desc, &sb->dss );
 		D3D_DISPDBG( KE_ERROR, "Error creating depth stencil state!", hr );
 	}
 
-	if (use_raster)
+	if( use_raster )
 	{
 		hr = d3ddevice->CreateRasterizerState( &raster_desc, &sb->rs );
 		D3D_DISPDBG( KE_ERROR, "Error creating rasterizer state!", hr );
@@ -1371,9 +1382,9 @@ bool IKeDirect3D11RenderDevice::CreateTextureSamplerBuffer( KeState* state_param
 
 	/* Apply each render state in the list */
 	int i = 0;
-	while (i != state_count)
+	while( i != state_count )
 	{
-		switch (state_params[i].state)
+		switch( state_params[i].state )
 		{
 		default:
 			DISPDBG( KE_WARNING, "Bad texture sampler state!\nstate: " << state_params[i].state << "\n"
@@ -1501,6 +1512,12 @@ void IKeDirect3D11RenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t
 {
 	IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>(current_geometrybuffer);
 	IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>(current_gpu_program);
+
+	uint32_t offset = 0;		/* TODO: Allow user to specify this */
+	d3ddevice_context->IASetVertexBuffers( 0, 1, &gb->vb, &stride, &offset );
+	d3ddevice_context->IASetIndexBuffer( gb->ib, data_types[gb->index_type], 0 );
+	d3ddevice_context->IASetPrimitiveTopology( primitive_types[primtype] );
+	d3ddevice_context->DrawIndexed( count, 0, 0 );
 }
 
 /*
@@ -1511,6 +1528,12 @@ void IKeDirect3D11RenderDevice::DrawIndexedVerticesRange( uint32_t primtype, uin
 {
 	IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>(current_geometrybuffer);
 	IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>(current_gpu_program);
+
+	uint32_t offset = 0;		/* TODO: Allow user to specify this */
+	d3ddevice_context->IASetVertexBuffers( 0, 1, &gb->vb, &stride, &offset );
+	d3ddevice_context->IASetIndexBuffer( gb->ib, data_types[gb->index_type], 0 );
+	d3ddevice_context->IASetPrimitiveTopology( primitive_types[primtype] );
+	d3ddevice_context->DrawIndexed( count, start, 0 );
 }
 
 /*

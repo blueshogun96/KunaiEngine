@@ -35,7 +35,7 @@ IKeXAudio2AudioDevice::IKeXAudio2AudioDevice( KeAudioDeviceDesc* audiodevice_des
 {
     uint32_t flags = 0;
 
-#ifdef _DEBUG
+#if (_WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8*/) && defined(_DEBUG)
 	flags = XAUDIO2_DEBUG_ENGINE;
 #endif
 
