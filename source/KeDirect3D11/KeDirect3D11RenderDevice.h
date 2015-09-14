@@ -138,6 +138,13 @@ struct IKeDirect3D11Texture : public IKeTexture
 	CD3D11Texture2D		tex2d;
 	CD3D11Texture3D		tex3d;
 	uint32_t			flags;
+
+    uint32_t width, height;     /* Texture width/height */
+    uint32_t depth;             /* Texture depth (for 3D and array textures) */
+    uint32_t depth_format;      /* See glTexImageXD */
+    uint32_t internal_format;   /* See glTexImageXD */
+    uint32_t data_type;         /* Internal data type */
+    uint32_t target;            /* Direct3D11 texture type */
 };
 
 /*
