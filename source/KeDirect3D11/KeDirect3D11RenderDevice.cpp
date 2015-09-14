@@ -141,6 +141,12 @@ DXGI_FORMAT data_types[] =
 	DXGI_FORMAT_R32_TYPELESS,	/* TODO: Will this work for double? */
 };
 
+/* Direct3D texture formats */
+DXGI_FORMAT texture_formats[] =
+{
+	DXGI_FORMAT_R8G8B8A8_UNORM,
+	DXGI_FORMAT_B8G8R8A8_UNORM
+};
 
 #if 0
 
@@ -163,14 +169,6 @@ uint32_t polygon_modes[] =
 	GL_FRONT_AND_BACK
 };
 
-
-
-/* OpenGL texture formats */
-uint32_t texture_formats[] =
-{
-	GL_RGBA,
-	GL_BGRA
-};
 
 /* OpenGL cull modes */
 uint32_t cull_modes[] =
@@ -1018,14 +1016,41 @@ bool IKeDirect3D11RenderDevice::CreateTexture2D( uint32_t target, int width, int
 	(*texture) = new IKeDirect3D11Texture;
 	IKeDirect3D11Texture* t = static_cast<IKeDirect3D11Texture*>(*texture);
 
+	D3D11_TEXTURE2D_DESC desc;
+	ZeroMemory( &desc, sizeof( desc ) );
+	desc.Width = width;
+	desc.Height = height;
+	desc.MipLevels = mipmaps;
+	desc.ArraySize = 1;  /* TODO */
+	desc.Format = texture_formats[format];
+	desc.SampleDesc.Count = 1;
+	desc.Usage = D3D11_USAGE_DYNAMIC;	// TODO 
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+
+	HRESULT hr = d3ddevice->CreateTexture2D( &desc, NULL, &t->tex2d );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating 2D texture!", hr );
+
+	if( pixels )
+	{
+		D3D11_MAPPED_SUBRESOURCE res;
+		hr = d3ddevice_context->Map( t->tex2d, 0, D3D11_MAP_WRITE_DISCARD, 0, &res );
+		if( SUCCEEDED( hr ) )
+		{
+			memcpy( res.pData, pixels, width*height*4 );	// TODO
+			d3ddevice_context->Unmap( t->tex2d, 0 );
+		}
+	}
+
 	/* Set texture attributes */
-	/*t->width = width;
+	t->width = width;
 	t->height = height;
 	t->target = target;
 	t->data_type = data_types[data_type];
 	t->depth_format = texture_formats[format];
 	t->internal_format = texture_formats[format];
-	t->target = target;*/
+	t->target = target;
 
 	return true;
 }
