@@ -29,6 +29,8 @@
 /*
  * Non-ATL based smart COM pointer types
  */
+#define _ComPtr(_interface)	_com_ptr_t<_com_IIID<_interface, __uuidof(_interface)>>
+
 typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>							CDirectDraw7;
 typedef _com_ptr_t<_com_IIID<ID3D11Device, &IID_ID3D11Device>>							CD3D11Device;
 typedef _com_ptr_t<_com_IIID<ID3D11Device1, &IID_ID3D11Device1>>						CD3D11Device1;
