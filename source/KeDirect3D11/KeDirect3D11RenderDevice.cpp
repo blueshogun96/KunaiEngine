@@ -1719,6 +1719,50 @@ void IKeDirect3D11RenderDevice::SetProjectionMatrix( const nv::matrix4f* project
 
 
 /*
+ * Name: IKeDirect3D11RenderDevice::set_view_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetViewMatrix( nv::matrix4f* view )
+{
+    /* Copy over the incoming view matrix */
+    memmove( view->_array, view_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_world_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetWorldMatrix( nv::matrix4f* world )
+{
+    /* Copy over the incoming world matrix */
+    memmove( world->_array, world_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_modelview_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetModelviewMatrix( nv::matrix4f* modelview )
+{
+    /* Copy over the incoming modelview matrix */
+    memmove( modelview->_array, modelview_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_projection_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
+{
+    /* Copy over the incoming projection matrix */
+    memmove( projection->_array, projection_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
 * Name: IKeDirect3D11RenderDevice::block_until_vertical_blank
 * Desc: Stalls the current thread for an interval equivalent to one
 *       vertical blank. This function does not sync to the actual vertical blank

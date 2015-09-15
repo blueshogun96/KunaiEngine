@@ -521,6 +521,10 @@ public:
     virtual void SetWorldMatrix( const nv::matrix4f* world ) PURE;
     virtual void SetModelviewMatrix( const nv::matrix4f* modelview ) PURE;
     virtual void SetProjectionMatrix( const nv::matrix4f* projection ) PURE;
+    virtual void GetViewMatrix( nv::matrix4f* view ) PURE;
+    virtual void GetWorldMatrix( nv::matrix4f* world ) PURE;
+    virtual void GetModelviewMatrix( nv::matrix4f* modelview ) PURE;
+    virtual void GetProjectionMatrix( nv::matrix4f* projection ) PURE;
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank() PURE;

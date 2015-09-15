@@ -250,11 +250,14 @@ public:
     virtual void GetViewport( int* x, int* y, int* width, int* height );
     virtual void GetViewportV( int* viewport );
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
-    //virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
     virtual void SetViewMatrix( const nv::matrix4f* view );
     virtual void SetWorldMatrix( const nv::matrix4f* world );
     virtual void SetModelviewMatrix( const nv::matrix4f* modelview );
     virtual void SetProjectionMatrix( const nv::matrix4f* projection );
+	virtual void GetViewMatrix( nv::matrix4f* view );
+    virtual void GetWorldMatrix( nv::matrix4f* world );
+    virtual void GetModelviewMatrix( nv::matrix4f* modelview );
+    virtual void GetProjectionMatrix( nv::matrix4f* projection );
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank();

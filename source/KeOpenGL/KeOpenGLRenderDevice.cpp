@@ -2078,6 +2078,49 @@ void IKeOpenGLRenderDevice::SetProjectionMatrix( const nv::matrix4f* projection 
     memmove( projection_matrix._array, projection->_array, sizeof( float ) * 16 );
 }
 
+/*
+ * Name: IKeOpenGLRenderDevice::set_view_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetViewMatrix( nv::matrix4f* view )
+{
+    /* Copy over the incoming view matrix */
+    memmove( view->_array, view_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_world_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetWorldMatrix( nv::matrix4f* world )
+{
+    /* Copy over the incoming world matrix */
+    memmove( world->_array, world_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_modelview_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetModelviewMatrix( nv::matrix4f* modelview )
+{
+    /* Copy over the incoming modelview matrix */
+    memmove( modelview->_array, modelview_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_projection_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
+{
+    /* Copy over the incoming projection matrix */
+    memmove( projection->_array, projection_matrix._array, sizeof( float ) * 16 );
+}
+
 
 /*
  * Name: IKeOpenGLRenderDevice::block_until_vertical_blank
