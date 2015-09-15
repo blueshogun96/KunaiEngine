@@ -2,7 +2,6 @@
 
 
 
-
 /*
  * Font object
  */
@@ -117,6 +116,11 @@ void KeCloseFont( KeFont* font )
 	}
 }
 
+
+/*
+ * Name: KeCreateCompiledFontString
+ * Desc: Creates a texture with the desired string using the supplied font and program
+ */
 bool KeCreateCompiledFontString( const char* string, uint32_t colour, IKeGpuProgram* program, KeFont* font, KeCompiledFontString** compiled_string )
 {
 	/* Sanity chechs */
@@ -179,6 +183,11 @@ bool KeCreateCompiledFontString( const char* string, uint32_t colour, IKeGpuProg
 	return true;
 }
 
+
+/*
+ * Name: KeCloseCompiledFontString
+ * Desc: Deletes the resources associated with this compiled string.
+ */
 void KeCloseCompiledFontString( KeCompiledFontString* compiled_string )
 {
 	if( compiled_string )
@@ -191,6 +200,11 @@ void KeCloseCompiledFontString( KeCompiledFontString* compiled_string )
 	}
 }
 
+
+/*
+ * Name: KeDrawCompiledFontString
+ * Desc: Draws the string to the screen using it's own 2D coordinates.
+ */
 void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int y )
 {
 	nv::matrix4f ortho, translation, rotation, identity;
@@ -225,7 +239,7 @@ void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int
 	renderdevice->SetWorldMatrix( &world );
 	renderdevice->SetViewMatrix( &view );
 	renderdevice->SetProjectionMatrix( &projection );
-}f
+}
 
 #if 0
 void RenderText(std::string message, SDL_Color color, int x, int y, int size) {
