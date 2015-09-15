@@ -904,7 +904,7 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     /* Save the handle to this newly created program */
     gp->program = p;
 
-#if 0
+#if 1
 	/* Copy vertex attributes */
 	int va_size = 0;
 	while( vertex_attributes[va_size].index != -1 )

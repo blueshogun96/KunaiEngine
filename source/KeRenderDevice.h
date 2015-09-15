@@ -369,6 +369,7 @@ struct IKeCommandList : public IKeUnknown
 struct IKeGpuProgram : public IKeUnknown
 {
     virtual void Destroy() PURE;
+	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes ) PURE;
 };
 
 /*

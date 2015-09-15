@@ -736,6 +736,16 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		gp->ds = NULL;
 	}
 
+#if 1
+	/* Copy vertex attributes */
+	int va_size = 0;
+	while( vertex_attributes[va_size].index != -1 )
+		va_size++;
+
+	gp->va = new KeVertexAttribute[va_size+1];
+	memmove( gp->va, vertex_attributes, sizeof( KeVertexAttribute ) * (va_size+1) );
+#endif
+
 	return true;
 }
 

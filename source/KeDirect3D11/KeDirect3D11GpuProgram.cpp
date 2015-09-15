@@ -16,6 +16,18 @@
  */
 void IKeDirect3D11GpuProgram::Destroy()
 {
+	/* Delete vertex attributes */
+	delete this->va;
+
     /* Delete this instance */
     delete this;
+}
+
+/*
+ * Name: IKeDirect3D11GpuProgram::GetVertexAttributes
+ * Desc: 
+ */
+void IKeDirect3D11GpuProgram::GetVertexAttributes( KeVertexAttribute* vertex_attributes )
+{
+	vertex_attributes = va;
 }

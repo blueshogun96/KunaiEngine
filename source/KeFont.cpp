@@ -210,10 +210,12 @@ void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int
 	nv::matrix4f ortho, translation, rotation, identity;
 	nv::matrix4f world, view, modelview, projection;
 	IKeRenderDevice* renderdevice = KeGetRenderDevice();
-	float viewport[4];
+	int viewport[4];
+	float colour[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float z = 0.0f;
 
 	/* Get our current viewport */
-	renderdevice->GetViewportV( (int*) viewport );
+	renderdevice->GetViewportV( viewport );
 
 	/* Save the four engine managed matrices before setting new ones */
 	renderdevice->GetWorldMatrix( &world );
@@ -222,7 +224,7 @@ void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int
 	renderdevice->GetProjectionMatrix( &projection );
 	
 	/* Now setup some 2D matrices */
-	nv::ortho2D( ortho, viewport[0], viewport[2], viewport[3], viewport[1] );
+	nv::ortho2D( ortho, (float) viewport[0], (float) viewport[2], (float) viewport[3], (float) viewport[1] );
 	nv::translation( translation, (float) x, (float) y, 0.0f );
 	identity.make_identity();
 	renderdevice->SetWorldMatrix( &translation );
@@ -232,6 +234,8 @@ void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int
 	/* Render this font string */
 	renderdevice->SetGeometryBuffer( compiled_string->gb );
 	renderdevice->SetProgram( compiled_string->gp );
+	renderdevice->GetProgramConstantFV( "z_value", &z );
+	renderdevice->SetProgramConstant4FV( "diffuse", 1, colour );
 	renderdevice->SetTexture( 0, compiled_string->tex );
 	renderdevice->DrawVertices( KE_TRIANGLESTRIP, sizeof(float)*4, 0, 4 );
 

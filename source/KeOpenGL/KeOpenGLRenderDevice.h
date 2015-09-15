@@ -84,6 +84,7 @@ struct IKeOpenGLCommandList : public IKeCommandList
 struct IKeOpenGLGpuProgram : public IKeGpuProgram
 {
     virtual void Destroy();
+	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes );
     
     uint32_t program;       /* GPU program handle */
     uint32_t matrices[3];   /* Handles to the world, view, and projection matrices (respectively) */

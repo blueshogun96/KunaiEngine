@@ -112,6 +112,7 @@ struct IKeDirect3D11CommandList : public IKeCommandList
 struct IKeDirect3D11GpuProgram : public IKeGpuProgram
 {
 	virtual void Destroy();
+	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes );
     
 	CD3D11VertexShader		vs;		/* Vertex shader */
 	CD3D11PixelShader		ps;		/* Pixel shader */
@@ -120,6 +121,7 @@ struct IKeDirect3D11GpuProgram : public IKeGpuProgram
 	CD3D11DomainShader		ds;		/* Domain shader */
 	CD3D11ComputeShader		cs;		/* Compute shader */
 	CD3D11InputLayout		il;		/* Vertex input layout */
+	KeVertexAttribute*		va;
 };
 
 /*
