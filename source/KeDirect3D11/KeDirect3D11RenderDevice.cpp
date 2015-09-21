@@ -679,7 +679,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 				DISPDBG( KE_ERROR, "Error compiling vertex shader source!\n" << (char*)blob_error->GetBufferPointer() << "\n" );
 				delete[] layout;
 				blob_error = 0;
-				DeleteProgram(gp);
+				gp->Destroy();
 			}
 
 			return false;
@@ -690,7 +690,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		{
 			delete[] layout;
 			blob_shader = 0;
-			DeleteProgram(gp);
+			gp->Destroy();
 			DISPDBG( KE_ERROR, "Error creating vertex shader!\n" );
 		}
 
@@ -700,7 +700,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		delete[] layout;
 		if( FAILED( hr ) )
 		{
-			DeleteProgram( gp );
+			gp->Destroy();
 			DISPDBG( KE_ERROR, "Error creating input layout!\n" );
 		}
 
@@ -713,7 +713,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 			{
 				DISPDBG( KE_ERROR, "Error compiling pixel shader source!\n" << (char*)blob_error->GetBufferPointer() << "\n" );
 				blob_error = 0;
-				DeleteProgram(gp);
+				gp->Destroy();
 			}
 
 			return false;
@@ -723,7 +723,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		if( FAILED( hr ) )
 		{
 			blob_shader = 0;
-			DeleteProgram(gp);
+			gp->Destroy();
 			DISPDBG( KE_ERROR, "Error creating pixel shader!\n" );
 		}
 

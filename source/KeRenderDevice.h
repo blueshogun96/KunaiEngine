@@ -206,6 +206,7 @@
 #define KE_TEXTUREFORMAT_BGRA   1
 #define KE_TEXTUREFORMAT_R8		2
 #define KE_TEXTUREFORMAT_RGB	3
+#define KE_TEXTUREFORMAT_BGR	4
 
 /*
  * Texture filtering modes

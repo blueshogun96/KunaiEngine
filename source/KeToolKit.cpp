@@ -170,6 +170,8 @@ bool KeImageReadFromMemory( void* image_file_ptr, uint32_t size, KeImageData* im
     rwop = SDL_RWFromConstMem( image_file_ptr, size );
     if( rwop )
     {
+		SDL_Surface* (*func)( SDL_RWops*, int ) = IMG_Load_RW;
+
         /* Get the surface from our RW op */
         surface = IMG_Load_RW( rwop, No );
         SDL_FreeRW( rwop );

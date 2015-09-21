@@ -140,13 +140,15 @@ uint32_t texture_formats[] =
     GL_RGBA,
     GL_BGRA,
 	GL_RED,
-	GL_RGB
+	GL_RGB,
+	GL_BGR
 };
 uint32_t internal_texture_formats[] = 
 {
 	GL_RGBA,
 	GL_BGRA,
 	GL_R8,
+	GL_RGB,
 	GL_RGB
 };
 
