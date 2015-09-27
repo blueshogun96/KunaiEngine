@@ -231,7 +231,6 @@ void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int
 	
 	/* Now setup some 2D matrices */
 	nv::ortho2D( ortho, (float) viewport[0], (float) viewport[2], (float) viewport[3], (float) viewport[1] );
-	//nv::ortho2D( ortho, 0.0f, 640.0f, 480.0f, 0.0f );
 	nv::translation( translation, (float) x, (float) y, 0.0f );
 	identity.make_identity();
 	renderdevice->SetWorldMatrix( &identity );
@@ -347,12 +346,6 @@ KeDynamicFontString::KeDynamicFontString( const char* ttffont, float font_size, 
     /* Create a 8-bit alpha only texture */
 	KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, tex_width, tex_height, 1, KE_TEXTUREFORMAT_R8, KE_UNSIGNED_BYTE, &tex, temp_bitmap );
 
-    /*glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex_width, tex_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, temp_bitmap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
-
     free(temp_bitmap);
 
     width = tex_width, height = tex_height;
@@ -379,12 +372,6 @@ KeDynamicFontString::KeDynamicFontString( void* ttffont_buffer, uint32_t buffer_
 
     /* Create a 8-bit alpha only texture */
 	KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, tex_width, tex_height, 1, KE_TEXTUREFORMAT_R8, KE_UNSIGNED_BYTE, &tex, temp_bitmap );
-
-    /*glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex_width, tex_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, temp_bitmap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
 
     free(temp_bitmap);
 
