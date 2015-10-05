@@ -32,6 +32,29 @@
 /* GPU fencing routines */
 #include "KeOpenGLFence.h"
 
+/*
+ * Program attribute locations
+ */
+struct KeProgramAttribute
+{
+    int location;
+    char name[32];
+} program_attributes[] =
+{
+    { 0, "in_pos" },
+    { 1, "in_normal" },
+    { 2, "in_tangent" },
+    { 3, "in_bitangent" },
+    { 4, "in_colour" },
+    { 5, "in_tex0" },
+    { 6, "in_tex1" },
+    { 7, "in_tex2" },
+    { 8, "in_tex3" },
+    { 9, "in_tex4" },
+    { 10, "in_tex5" },
+    { 11, "in_tex6" },
+    { 12, "in_tex7" },
+};
 
 /*
  * Globals
@@ -830,7 +853,7 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
 
 	p = glCreateProgram();
     
-	glBindAttribLocation( p, 0, "in_pos" );
+    /*glBindAttribLocation( p, 0, "in_pos" );
     glBindAttribLocation( p, 1, "in_normal" );
     glBindAttribLocation( p, 2, "in_tangent" );
     glBindAttribLocation( p, 3, "in_bitangent" );
@@ -842,7 +865,14 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
 	glBindAttribLocation( p, 9, "in_tex4" );
     glBindAttribLocation( p, 10, "in_tex5" );
     glBindAttribLocation( p, 11, "in_tex6" );
-    glBindAttribLocation( p, 12, "in_tex7" );
+    glBindAttribLocation( p, 12, "in_tex7" );*/
+    
+    int index = 0;
+    while( vertex_attributes[index].index != -1 )
+    {
+        glBindAttribLocation( p, program_attributes[index].location, program_attributes[index].name );
+        index++;
+    }
     
 	glAttachShader( p, v );
 	glAttachShader( p, f );
