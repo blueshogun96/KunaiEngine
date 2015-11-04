@@ -9,7 +9,7 @@ class CKeGamepadHandle
 {
 public:
 	CKeGamepadHandle() : game_controller(NULL), haptic(NULL), joystick_id(-1), id(0), connected(No) {}
-	~CKeGamepadHandle()
+	virtual ~CKeGamepadHandle()
 	{
         if( haptic )
         {
@@ -40,7 +40,7 @@ class CKeJoystickHandle
 {
 public:
 	CKeJoystickHandle() : joystick( NULL ), joystick_id(-1), id(0), haptic(NULL), connected(No) {}
-	~CKeJoystickHandle()
+	virtual ~CKeJoystickHandle()
 	{
 		if( haptic )
         {
@@ -54,6 +54,7 @@ public:
             joystick = NULL;
         }
 	}
+
 	SDL_Joystick*	joystick;
 	SDL_JoystickID	joystick_id;
 	SDL_Haptic*		haptic;
@@ -98,7 +99,8 @@ void KeUninitializeGamepads()
     //SDL_GameControllerClose( test_controller );
     
 	/* Kill all open gamepad devices */
-	GamepadHandles.empty();
+	GamepadHandles.clear();
+	JoystickHandles.clear();
 
 	/* Uninitialize the gamepad API */
 	SDL_QuitSubSystem( SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC );
