@@ -384,6 +384,7 @@ struct IKeTexture : public IKeResourceBuffer
     virtual void UnmapData( void* ) PURE;
     
     virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels ) PURE;
+	virtual bool GetTextureDesc( KeTextureDesc* texture_desc ) PURE;
 };
 
 

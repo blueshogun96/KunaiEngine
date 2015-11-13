@@ -36,3 +36,17 @@ bool IKeDirect3D11Texture::SetTextureData( KeTextureDesc* texture_data, void* pi
 {
 	return false;
 }
+
+bool IKeDirect3D11Texture::GetTextureDesc( KeTextureDesc* texture_desc )
+{
+	if( !texture_desc )
+		return false;
+
+	/* TODO: Fix this */
+
+	texture_desc->width = width;
+	texture_desc->height = height;
+	//texture_desc->mipmap = mipmap;
+
+	return true;
+}

@@ -62,3 +62,18 @@ bool IKeOpenGLTexture::SetTextureData( KeTextureDesc* texture_data, void* pixels
     
     return false;
 }
+
+
+bool IKeOpenGLTexture::GetTextureDesc( KeTextureDesc* texture_desc )
+{
+	if( !texture_desc )
+		return false;
+
+	/* TODO: Fix this */
+
+	texture_desc->width = width;
+	texture_desc->height = height;
+	texture_desc->mipmap = mipmap;
+
+	return true;
+}

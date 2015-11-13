@@ -135,6 +135,7 @@ struct IKeDirect3D11Texture : public IKeTexture
     virtual void UnmapData( void* );
 
 	virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels );
+	virtual bool GetTextureDesc( KeTextureDesc* texture_desc );
 
 	CD3D11Texture1D		tex1d;
 	CD3D11Texture2D		tex2d;
