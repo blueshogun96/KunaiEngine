@@ -66,3 +66,14 @@ bool IKeDirect3D11GeometryBuffer::SetIndexData( uint32_t offset, uint32_t size, 
 {
     return true;
 }
+
+void IKeDirect3D11GeometryBuffer::GetDesc( KeGeometryBufferDesc* desc )
+{
+	if( desc )
+	{
+		/* TODO */
+		return;
+	}
+
+	DISPDBG( KE_WARNING, "Invalid pointer..." );
+}

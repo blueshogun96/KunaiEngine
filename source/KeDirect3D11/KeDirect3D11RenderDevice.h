@@ -8,8 +8,10 @@
 #ifndef __ke_d3d11_renderdevice__
 #define __ke_d3d11_renderdevice__
 
+#pragma warning(disable:4838)
+
 #include "KeRenderDevice.h"
-#ifdef __APPLE__
+#ifndef _WIN32
 #error "Direct3D is not supported on non-Microsoft platforms!"
 #else
 #include <SDL.h>
@@ -17,7 +19,7 @@
 //#include <d3d11_1.h>
 #include <d3d11_2.h>
 #include <D3Dcompiler.h>
-#include <xnamath.h>
+#include <DirectXMath.h>
 #include <comip.h>
 #include <comdef.h>
 #include <ddraw.h>
@@ -27,12 +29,21 @@
 /*
  * Non-ATL based smart COM pointer types
  */
+#define _ComPtr(_interface)	_com_ptr_t<_com_IIID<_interface, __uuidof(_interface)>>
+
 typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>							CDirectDraw7;
 typedef _com_ptr_t<_com_IIID<ID3D11Device, &IID_ID3D11Device>>							CD3D11Device;
+typedef _com_ptr_t<_com_IIID<ID3D11Device1, &IID_ID3D11Device1>>						CD3D11Device1;
+typedef _com_ptr_t<_com_IIID<ID3D11Device2, &IID_ID3D11Device2>>						CD3D11Device2;
 typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext, &IID_ID3D11DeviceContext>>			CD3D11DeviceContext;
+typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext1, &IID_ID3D11DeviceContext1>>			CD3D11DeviceContext1;
+typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext2, &IID_ID3D11DeviceContext2>>			CD3D11DeviceContext2;
 typedef _com_ptr_t<_com_IIID<IDXGISwapChain, &IID_IDXGISwapChain>>						CDXGISwapChain;
+typedef _com_ptr_t<_com_IIID<IDXGISwapChain1, &IID_IDXGISwapChain1>>					CDXGISwapChain1;
 typedef _com_ptr_t<_com_IIID<IDXGIOutput, &IID_IDXGIOutput>>							CDXGIOutput;
+typedef _com_ptr_t<_com_IIID<IDXGIOutput1, &IID_IDXGIOutput1>>							CDXGIOutput1;
 typedef _com_ptr_t<_com_IIID<ID3D11RenderTargetView, &IID_ID3D11RenderTargetView>>		CD3D11RenderTargetView;
+typedef _com_ptr_t<_com_IIID<ID3D11DepthStencilView, &IID_ID3D11DepthStencilView>>		CD3D11DepthStencilView;
 typedef _com_ptr_t<_com_IIID<ID3D11Buffer, &IID_ID3D11Buffer>>							CD3D11Buffer;
 typedef _com_ptr_t<_com_IIID<ID3D11VertexShader, &IID_ID3D11VertexShader>>				CD3D11VertexShader;
 typedef _com_ptr_t<_com_IIID<ID3D11PixelShader, &IID_ID3D11PixelShader>>				CD3D11PixelShader;
@@ -45,11 +56,14 @@ typedef _com_ptr_t<_com_IIID<ID3D11Texture1D, &IID_ID3D11Texture1D>>					CD3D11T
 typedef _com_ptr_t<_com_IIID<ID3D11Texture2D, &IID_ID3D11Texture2D>>					CD3D11Texture2D;
 typedef _com_ptr_t<_com_IIID<ID3D11Texture3D, &IID_ID3D11Texture3D>>					CD3D11Texture3D;
 typedef _com_ptr_t<_com_IIID<ID3D11BlendState, &IID_ID3D11BlendState>>					CD3D11BlendState;
+typedef _com_ptr_t<_com_IIID<ID3D11BlendState1, &IID_ID3D11BlendState1>>				CD3D11BlendState1;
 typedef _com_ptr_t<_com_IIID<ID3D11RasterizerState, &IID_ID3D11RasterizerState>>		CD3D11RasterizerState;
+typedef _com_ptr_t<_com_IIID<ID3D11RasterizerState1, &IID_ID3D11RasterizerState1>>		CD3D11RasterizerState1;
 typedef _com_ptr_t<_com_IIID<ID3D11DepthStencilState, &IID_ID3D11DepthStencilState>>	CD3D11DepthStencilState;
 typedef _com_ptr_t<_com_IIID<ID3D11SamplerState, &IID_ID3D11SamplerState>>				CD3D11SamplerState;
 typedef _com_ptr_t<_com_IIID<ID3D11Query, &IID_ID3D11Query>>							CD3D11Query;
 typedef _com_ptr_t<_com_IIID<ID3D11CommandList, &IID_ID3D11CommandList>>				CD3D11CommandList;
+typedef _com_ptr_t<_com_IIID<ID3D11ShaderResourceView, &IID_ID3D11ShaderResourceView>>	CD3D11ShaderResourceView;
 
 
 /*
@@ -74,6 +88,7 @@ struct IKeDirect3D11GeometryBuffer : public IKeGeometryBuffer
 
 	virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
+	virtual void GetDesc( KeGeometryBufferDesc* desc );
 
 	CD3D11Buffer	vb;		/* Vertex buffer */
 	CD3D11Buffer	ib;		/* Index buffer */
@@ -97,6 +112,7 @@ struct IKeDirect3D11CommandList : public IKeCommandList
 struct IKeDirect3D11GpuProgram : public IKeGpuProgram
 {
 	virtual void Destroy();
+	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes );
     
 	CD3D11VertexShader		vs;		/* Vertex shader */
 	CD3D11PixelShader		ps;		/* Pixel shader */
@@ -105,6 +121,7 @@ struct IKeDirect3D11GpuProgram : public IKeGpuProgram
 	CD3D11DomainShader		ds;		/* Domain shader */
 	CD3D11ComputeShader		cs;		/* Compute shader */
 	CD3D11InputLayout		il;		/* Vertex input layout */
+	KeVertexAttribute*		va;
 };
 
 /*
@@ -118,11 +135,19 @@ struct IKeDirect3D11Texture : public IKeTexture
     virtual void UnmapData( void* );
 
 	virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels );
+	virtual bool GetTextureDesc( KeTextureDesc* texture_desc );
 
 	CD3D11Texture1D		tex1d;
 	CD3D11Texture2D		tex2d;
 	CD3D11Texture3D		tex3d;
 	uint32_t			flags;
+
+    uint32_t width, height;     /* Texture width/height */
+    uint32_t depth;             /* Texture depth (for 3D and array textures) */
+    uint32_t depth_format;      /* See glTexImageXD */
+    uint32_t internal_format;   /* See glTexImageXD */
+    uint32_t data_type;         /* Internal data type */
+    uint32_t target;            /* Direct3D11 texture type */
 };
 
 /*
@@ -134,6 +159,9 @@ struct IKeDirect3D11RenderTarget : public IKeRenderTarget
     
     virtual void* MapData( uint32_t flags );
     virtual void UnmapData( void* );
+
+	virtual bool GetTexture( IKeTexture** texture );
+	virtual IKeTexture* GetTexture2();
 
 	uint32_t    frame_buffer_object;    /* Frame buffer object handle */
 	uint32_t    depth_render_buffer;    /* Depth render buffer */
@@ -200,9 +228,11 @@ public:
     virtual void SetClearColourFV( float* colour );
     virtual void SetClearColourUBV( uint8_t* colour );
     virtual void SetClearDepth( float depth );
+	virtual void SetClearStencil( uint32_t stencil );
     virtual void ClearColourBuffer();
     virtual void ClearDepthBuffer();
     virtual void ClearStencilBuffer();
+	virtual void Clear( uint32_t buffers );
     virtual void Swap();
     
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer );
@@ -262,6 +292,10 @@ public:
     virtual void SetWorldMatrix( const nv::matrix4f* world );
     virtual void SetModelviewMatrix( const nv::matrix4f* modelview );
     virtual void SetProjectionMatrix( const nv::matrix4f* projection );
+	virtual void GetViewMatrix( nv::matrix4f* view );
+    virtual void GetWorldMatrix( nv::matrix4f* world );
+    virtual void GetModelviewMatrix( nv::matrix4f* modelview );
+    virtual void GetProjectionMatrix( nv::matrix4f* projection );
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank();
@@ -287,6 +321,7 @@ protected:
 	CDXGISwapChain					dxgi_swap_chain; 
 	CDXGIOutput						dxgi_output;
 	CD3D11RenderTargetView			d3d_render_target_view;
+	CD3D11DepthStencilView			d3d_depth_stencil_view;
 	DXGI_SWAP_CHAIN_DESC			swapchain_desc;
 	int								swap_interval;
 	CDirectDraw7					dd;

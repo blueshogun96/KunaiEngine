@@ -102,6 +102,14 @@
 
 
 /*
+ * Render buffer types
+ */
+#define KE_COLOUR_BUFFER	0x1
+#define KE_DEPTH_BUFFER		0x2
+#define KE_STENCIL_BUFFER	0x4
+
+
+/*
  * Renderstate types 
  */
 #define KE_RS_DEPTHTEST     1
@@ -197,6 +205,8 @@
 #define KE_TEXTUREFORMAT_RGBA   0
 #define KE_TEXTUREFORMAT_BGRA   1
 #define KE_TEXTUREFORMAT_R8		2
+#define KE_TEXTUREFORMAT_RGB	3
+#define KE_TEXTUREFORMAT_BGR	4
 
 /*
  * Texture filtering modes
@@ -285,6 +295,18 @@ struct KeState
     double   dparam;
 };
 
+
+/* 
+ * Geometry buffer description 
+ */
+struct KeGeometryBufferDesc
+{
+	uint32_t vertex_data_size;
+	uint32_t index_data_size;
+	uint32_t vertex_size;
+	uint32_t index_type;
+};
+
 /*
  * Texture data description
  */
@@ -331,6 +353,7 @@ struct IKeGeometryBuffer : public IKeResourceBuffer
     
     virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
+	virtual void GetDesc( KeGeometryBufferDesc* desc ) PURE;
 };
 
 /*
@@ -347,6 +370,7 @@ struct IKeCommandList : public IKeUnknown
 struct IKeGpuProgram : public IKeUnknown
 {
     virtual void Destroy() PURE;
+	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes ) PURE;
 };
 
 /*
@@ -360,6 +384,7 @@ struct IKeTexture : public IKeResourceBuffer
     virtual void UnmapData( void* ) PURE;
     
     virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels ) PURE;
+	virtual bool GetTextureDesc( KeTextureDesc* texture_desc ) PURE;
 };
 
 
@@ -372,6 +397,9 @@ struct IKeRenderTarget : public IKeResourceBuffer
     
     virtual void* MapData( uint32_t flags ) PURE;
     virtual void UnmapData( void* ) PURE;
+
+	virtual bool GetTexture( IKeTexture** texture ) PURE;
+	virtual IKeTexture* GetTexture2() PURE;
 };
 
 /*
@@ -432,9 +460,11 @@ public:
     virtual void SetClearColourFV( float* colour ) PURE;
     virtual void SetClearColourUBV( uint8_t* colour ) PURE;
     virtual void SetClearDepth( float depth ) PURE;
+	virtual void SetClearStencil( uint32_t stencil ) PURE;
     virtual void ClearColourBuffer() PURE;
     virtual void ClearDepthBuffer() PURE;
     virtual void ClearStencilBuffer() PURE;
+	virtual void Clear( uint32_t buffers ) PURE;
     virtual void Swap() PURE;
     
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer ) PURE;
@@ -494,6 +524,10 @@ public:
     virtual void SetWorldMatrix( const nv::matrix4f* world ) PURE;
     virtual void SetModelviewMatrix( const nv::matrix4f* modelview ) PURE;
     virtual void SetProjectionMatrix( const nv::matrix4f* projection ) PURE;
+    virtual void GetViewMatrix( nv::matrix4f* view ) PURE;
+    virtual void GetWorldMatrix( nv::matrix4f* world ) PURE;
+    virtual void GetModelviewMatrix( nv::matrix4f* modelview ) PURE;
+    virtual void GetProjectionMatrix( nv::matrix4f* projection ) PURE;
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank() PURE;

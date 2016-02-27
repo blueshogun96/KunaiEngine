@@ -60,7 +60,7 @@ public:
 	KeStrongProcessPtr RemoveChild();
 	KeStrongProcessPtr PeekChild() { return m_child; }
 
-private:
+protected:
 	void SetState( State new_state ) { m_state = new_state; }
 };
 

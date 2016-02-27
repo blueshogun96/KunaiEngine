@@ -129,23 +129,26 @@ D3D11_BLEND blend_modes[] =
     D3D11_BLEND_INV_SRC1_ALPHA
 };
 
-
-
-#if 0
-/* OpenGL data types */
-uint32_t data_types[] =
+DXGI_FORMAT data_types[] = 
 {
-	GL_BYTE,
-	GL_UNSIGNED_BYTE,
-	GL_SHORT,
-	GL_UNSIGNED_SHORT,
-	GL_INT,
-	GL_UNSIGNED_INT,
-	GL_FLOAT,
-	GL_DOUBLE
+	DXGI_FORMAT_R8_SINT,
+	DXGI_FORMAT_R8_UINT,
+	DXGI_FORMAT_R16_SINT,
+	DXGI_FORMAT_R16_UINT,
+	DXGI_FORMAT_R32_SINT,
+	DXGI_FORMAT_R32_UINT,
+	DXGI_FORMAT_R32_FLOAT,
+	DXGI_FORMAT_R32_TYPELESS,	/* TODO: Will this work for double? */
 };
 
+/* Direct3D texture formats */
+DXGI_FORMAT texture_formats[] =
+{
+	DXGI_FORMAT_R8G8B8A8_UNORM,
+	DXGI_FORMAT_B8G8R8A8_UNORM
+};
 
+#if 0
 
 /* OpenGL texture targets */
 uint32_t texture_targets[] =
@@ -166,14 +169,6 @@ uint32_t polygon_modes[] =
 	GL_FRONT_AND_BACK
 };
 
-
-
-/* OpenGL texture formats */
-uint32_t texture_formats[] =
-{
-	GL_RGBA,
-	GL_BGRA
-};
 
 /* OpenGL cull modes */
 uint32_t cull_modes[] =
@@ -448,9 +443,18 @@ void IKeDirect3D11RenderDevice::SetClearColourUBV( uint8_t* colour )
 */
 void IKeDirect3D11RenderDevice::SetClearDepth( float depth )
 {
-	//glClearDepth(depth);
+	clear_depth = depth;
 }
 
+
+/*
+ * Name: IKeDirect3D11RenderDevice::SetClearStencil
+ * Desc: 
+ */
+void IKeDirect3D11RenderDevice::SetClearStencil( uint32_t stencil )
+{
+	clear_stencil = stencil;
+}
 
 /*
 * Name: IKeDirect3D11RenderDevice::clear_render_buffer
@@ -483,9 +487,28 @@ void IKeDirect3D11RenderDevice::ClearStencilBuffer()
 
 
 /*
-* Name: IKeDirect3D11RenderDevice::swap
-* Desc: Swaps the double buffer.
-*/
+ * Name: IKeDirect3D11RenderDevice::Clear
+ * Desc: 
+ */
+void IKeDirect3D11RenderDevice::Clear( uint32_t buffers )
+{
+	if( buffers & KE_COLOUR_BUFFER )
+		d3ddevice_context->ClearRenderTargetView( d3d_render_target_view, clear_colour );
+
+	uint32_t flags = 0;
+
+	if( buffers & KE_DEPTH_BUFFER )		flags |= 0x1;
+	if( buffers & KE_STENCIL_BUFFER )	flags |= 0x2;
+
+	if( flags )
+		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, (D3D11_CLEAR_FLAG) flags, clear_depth, clear_stencil );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::swap
+ * Desc: Swaps the double buffer.
+ */
 void IKeDirect3D11RenderDevice::Swap()
 {
 	HRESULT hr = dxgi_swap_chain->Present( swap_interval, 0 );
@@ -537,8 +560,22 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
 	gb->ib = NULL;
 	if( index_data_size )
 	{
-		/* TODO */
-		D3D_DISPDBG_RB( KE_ERROR, "Index buffers not yet supported for D3D11!", hr );
+		ZeroMemory( &bd, sizeof(bd) );
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.ByteWidth = index_data_size;
+		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		ZeroMemory( &id, sizeof(id) );
+		id.pSysMem = index_data;
+
+		hr = d3ddevice->CreateBuffer( &bd, &id, &gb->ib );
+		if( FAILED( hr ) )
+		{
+			delete (*geometry_buffer);
+			D3D_DISPDBG_RB( KE_ERROR, "Error creating index buffer!", hr );
+		}
+
+		gb->index_type = index_data_type;
 	}
 
 	return true;
@@ -642,7 +679,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 				DISPDBG( KE_ERROR, "Error compiling vertex shader source!\n" << (char*)blob_error->GetBufferPointer() << "\n" );
 				delete[] layout;
 				blob_error = 0;
-				DeleteProgram(gp);
+				gp->Destroy();
 			}
 
 			return false;
@@ -653,7 +690,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		{
 			delete[] layout;
 			blob_shader = 0;
-			DeleteProgram(gp);
+			gp->Destroy();
 			DISPDBG( KE_ERROR, "Error creating vertex shader!\n" );
 		}
 
@@ -663,7 +700,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		delete[] layout;
 		if( FAILED( hr ) )
 		{
-			DeleteProgram( gp );
+			gp->Destroy();
 			DISPDBG( KE_ERROR, "Error creating input layout!\n" );
 		}
 
@@ -676,7 +713,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 			{
 				DISPDBG( KE_ERROR, "Error compiling pixel shader source!\n" << (char*)blob_error->GetBufferPointer() << "\n" );
 				blob_error = 0;
-				DeleteProgram(gp);
+				gp->Destroy();
 			}
 
 			return false;
@@ -686,7 +723,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		if( FAILED( hr ) )
 		{
 			blob_shader = 0;
-			DeleteProgram(gp);
+			gp->Destroy();
 			DISPDBG( KE_ERROR, "Error creating pixel shader!\n" );
 		}
 
@@ -698,6 +735,16 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		gp->cs = NULL;
 		gp->ds = NULL;
 	}
+
+#if 1
+	/* Copy vertex attributes */
+	int va_size = 0;
+	while( vertex_attributes[va_size].index != -1 )
+		va_size++;
+
+	gp->va = new KeVertexAttribute[va_size+1];
+	memmove( gp->va, vertex_attributes, sizeof( KeVertexAttribute ) * (va_size+1) );
+#endif
 
 	return true;
 }
@@ -979,14 +1026,41 @@ bool IKeDirect3D11RenderDevice::CreateTexture2D( uint32_t target, int width, int
 	(*texture) = new IKeDirect3D11Texture;
 	IKeDirect3D11Texture* t = static_cast<IKeDirect3D11Texture*>(*texture);
 
+	D3D11_TEXTURE2D_DESC desc;
+	ZeroMemory( &desc, sizeof( desc ) );
+	desc.Width = width;
+	desc.Height = height;
+	desc.MipLevels = mipmaps;
+	desc.ArraySize = 1;  /* TODO */
+	desc.Format = texture_formats[format];
+	desc.SampleDesc.Count = 1;
+	desc.Usage = D3D11_USAGE_DYNAMIC;	// TODO 
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+
+	HRESULT hr = d3ddevice->CreateTexture2D( &desc, NULL, &t->tex2d );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating 2D texture!", hr );
+
+	if( pixels )
+	{
+		D3D11_MAPPED_SUBRESOURCE res;
+		hr = d3ddevice_context->Map( t->tex2d, 0, D3D11_MAP_WRITE_DISCARD, 0, &res );
+		if( SUCCEEDED( hr ) )
+		{
+			memcpy( res.pData, pixels, width*height*4 );	// TODO
+			d3ddevice_context->Unmap( t->tex2d, 0 );
+		}
+	}
+
 	/* Set texture attributes */
-	/*t->width = width;
+	t->width = width;
 	t->height = height;
 	t->target = target;
 	t->data_type = data_types[data_type];
 	t->depth_format = texture_formats[format];
 	t->internal_format = texture_formats[format];
-	t->target = target;*/
+	t->target = target;
 
 	return true;
 }
@@ -1304,19 +1378,19 @@ bool IKeDirect3D11RenderDevice::CreateRenderStateBuffer( KeState* state_params, 
 	}
 
 	/* Create our state buffers */
-	if (use_blend)
+	if( use_blend )
 	{
 		hr = d3ddevice->CreateBlendState( &blend_desc, &sb->bs );
 		D3D_DISPDBG( KE_ERROR, "Error creating blend state!", hr );
 	}
 
-	if (use_depth_stencil)
+	if( use_depth_stencil )
 	{
 		hr = d3ddevice->CreateDepthStencilState( &depth_stencil_desc, &sb->dss );
 		D3D_DISPDBG( KE_ERROR, "Error creating depth stencil state!", hr );
 	}
 
-	if (use_raster)
+	if( use_raster )
 	{
 		hr = d3ddevice->CreateRasterizerState( &raster_desc, &sb->rs );
 		D3D_DISPDBG( KE_ERROR, "Error creating rasterizer state!", hr );
@@ -1343,9 +1417,9 @@ bool IKeDirect3D11RenderDevice::CreateTextureSamplerBuffer( KeState* state_param
 
 	/* Apply each render state in the list */
 	int i = 0;
-	while (i != state_count)
+	while( i != state_count )
 	{
-		switch (state_params[i].state)
+		switch( state_params[i].state )
 		{
 		default:
 			DISPDBG( KE_WARNING, "Bad texture sampler state!\nstate: " << state_params[i].state << "\n"
@@ -1473,6 +1547,12 @@ void IKeDirect3D11RenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t
 {
 	IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>(current_geometrybuffer);
 	IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>(current_gpu_program);
+
+	uint32_t offset = 0;		/* TODO: Allow user to specify this */
+	d3ddevice_context->IASetVertexBuffers( 0, 1, &gb->vb, &stride, &offset );
+	d3ddevice_context->IASetIndexBuffer( gb->ib, data_types[gb->index_type], 0 );
+	d3ddevice_context->IASetPrimitiveTopology( primitive_types[primtype] );
+	d3ddevice_context->DrawIndexed( count, 0, 0 );
 }
 
 /*
@@ -1483,6 +1563,12 @@ void IKeDirect3D11RenderDevice::DrawIndexedVerticesRange( uint32_t primtype, uin
 {
 	IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>(current_geometrybuffer);
 	IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>(current_gpu_program);
+
+	uint32_t offset = 0;		/* TODO: Allow user to specify this */
+	d3ddevice_context->IASetVertexBuffers( 0, 1, &gb->vb, &stride, &offset );
+	d3ddevice_context->IASetIndexBuffer( gb->ib, data_types[gb->index_type], 0 );
+	d3ddevice_context->IASetPrimitiveTopology( primitive_types[primtype] );
+	d3ddevice_context->DrawIndexed( count, start, 0 );
 }
 
 /*
@@ -1639,6 +1725,50 @@ void IKeDirect3D11RenderDevice::SetProjectionMatrix( const nv::matrix4f* project
 	/* Copy over the incoming projection matrix */
 	//memmove( &projection_matrix, projection, sizeof( nv::matrix4f ) );
 	memmove( projection_matrix._array, projection->_array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_view_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetViewMatrix( nv::matrix4f* view )
+{
+    /* Copy over the incoming view matrix */
+    memmove( view->_array, view_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_world_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetWorldMatrix( nv::matrix4f* world )
+{
+    /* Copy over the incoming world matrix */
+    memmove( world->_array, world_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_modelview_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetModelviewMatrix( nv::matrix4f* modelview )
+{
+    /* Copy over the incoming modelview matrix */
+    memmove( modelview->_array, modelview_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::set_projection_matrix
+ * Desc:
+ */
+void IKeDirect3D11RenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
+{
+    /* Copy over the incoming projection matrix */
+    memmove( projection->_array, projection_matrix._array, sizeof( float ) * 16 );
 }
 
 

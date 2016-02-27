@@ -32,6 +32,29 @@
 /* GPU fencing routines */
 #include "KeOpenGLFence.h"
 
+/*
+ * Program attribute locations
+ */
+struct KeProgramAttribute
+{
+    int location;
+    char name[32];
+} program_attributes[] =
+{
+    { 0, "in_pos" },
+    { 1, "in_normal" },
+    { 2, "in_tangent" },
+    { 3, "in_bitangent" },
+    { 4, "in_colour" },
+    { 5, "in_tex0" },
+    { 6, "in_tex1" },
+    { 7, "in_tex2" },
+    { 8, "in_tex3" },
+    { 9, "in_tex4" },
+    { 10, "in_tex5" },
+    { 11, "in_tex6" },
+    { 12, "in_tex7" },
+};
 
 /*
  * Globals
@@ -139,21 +162,25 @@ uint32_t texture_formats[] =
 {
     GL_RGBA,
     GL_BGRA,
-	GL_RED
+	GL_RED,
+	GL_RGB,
+	GL_BGR
 };
 uint32_t internal_texture_formats[] = 
 {
 	GL_RGBA,
 	GL_BGRA,
 	GL_R8,
+	GL_RGB,
+	GL_RGB
 };
 
 /* OpenGL cull modes */
 uint32_t cull_modes[] =
 {
-    GL_NONE,
-    GL_CW,
-    GL_CCW
+    0,
+    GL_FRONT,
+    GL_BACK
 };
 
 /* OpenGL blend modes */
@@ -203,6 +230,20 @@ uint32_t texture_filter_modes[] =
     GL_LINEAR_MIPMAP_NEAREST,
     GL_NEAREST_MIPMAP_LINEAR,
     GL_LINEAR_MIPMAP_LINEAR
+};
+
+/* OpenGL texture wrap modes */
+uint32_t texture_wrap_modes[] = 
+{
+	GL_REPEAT,
+#ifndef __APPLE__
+	GL_CLAMP,
+#else
+    0,
+#endif
+	GL_CLAMP_TO_EDGE,
+	GL_CLAMP_TO_BORDER,
+	GL_MIRRORED_REPEAT
 };
 
 /*
@@ -299,6 +340,10 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     /* Sanity checks */
     if( !renderdevice_desc )
 		DISPDBG_R( KE_ERROR, "Invalid render device description!" );
+    
+    /* Do we have a valid window width/height? */
+    if( renderdevice_desc->width < 1 || renderdevice_desc->height < 1 )
+        DISPDBG_R( KE_ERROR, "Invalid render target resolution!" );
     
     /* Save a copy of the render device description */
     device_desc = new KeRenderDeviceDesc;
@@ -565,6 +610,16 @@ void IKeOpenGLRenderDevice::SetClearDepth( float depth )
 
 
 /*
+ * Name: IKeOpenGLRenderDevice::SetClearStencil
+ * Desc: 
+ */
+void IKeOpenGLRenderDevice::SetClearStencil( uint32_t stencil )
+{
+    glStencilMask( stencil );
+}
+
+
+/*
  * Name: IKeOpenGLRenderDevice::clear_render_buffer
  * Desc: Clears only the current render buffer
  */
@@ -593,6 +648,24 @@ void IKeOpenGLRenderDevice::ClearStencilBuffer()
     glClear( GL_STENCIL_BUFFER_BIT );
 }
 
+
+/*
+ * Name: IKeOpenGLRenderDevice::Clear
+ * Desc: Clears all of the specified buffers
+ */
+void IKeOpenGLRenderDevice::Clear( uint32_t buffers )
+{
+	uint32_t flags = 0;
+
+	if( buffers & KE_COLOUR_BUFFER )
+		flags |= GL_COLOR_BUFFER_BIT;
+	if( buffers & KE_DEPTH_BUFFER )
+		flags |= GL_DEPTH_BUFFER_BIT;
+	if( buffers & KE_STENCIL_BUFFER )
+		flags |= GL_STENCIL_BUFFER_BIT;
+
+	glClear( flags );
+}
 
 /*
  * Name: IKeOpenGLRenderDevice::swap
@@ -655,6 +728,10 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
 		glEnableVertexAttribArray(va[i].index);
 	}
 
+	/* Save vertex data size and vertex stride */
+	gb->vd_length = vertex_data_size;
+	gb->vertex_size = va[0].stride;
+
     /* Create an index buffer if desired */
     if( index_data_size )
     {
@@ -666,6 +743,9 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
         glBufferData( GL_ELEMENT_ARRAY_BUFFER, index_data_size, index_data, buffer_usage_types[flags] );
         gb->index_type = index_data_type;
 		OGL_DISPDBG_RB( KE_ERROR, "Error setting index buffer data!" );
+
+		/* Save index data size */
+		gb->id_length = index_data_size;
     }
     else
         gb->vbo[1] = 0;
@@ -723,6 +803,7 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     *gpu_program = new IKeOpenGLGpuProgram;
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( *gpu_program );
     GLenum error = glGetError();
+	int Fail = No;
     
 	v = glCreateShader( GL_VERTEX_SHADER );
 	f = glCreateShader( GL_FRAGMENT_SHADER );
@@ -741,7 +822,9 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
         int len = 0;
         
         glGetShaderInfoLog( v, 2048, &len, str );
-		printf("Vertex shader not compiled.\n%s\n", str);
+		DISPDBG( KE_ERROR, "Vertex shader not compiled.\n" << str );
+		//fprintf( stderr, "Vertex shader not compiled.\n%s\n", str);
+		Fail = Yes;
 	}
     
 	glCompileShader(f);
@@ -752,12 +835,25 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
         int len = 0;
         
         glGetShaderInfoLog( f, 2048, &len, str );
-		printf("Fragment shader not compiled.\n%s\n", str);
+		DISPDBG( KE_ERROR, "Fragment shader not compiled.\n" << str );
+		//fprintf( stderr, "Fragment shader not compiled.\n%s\n", str);
+		Fail = Yes;
 	}
     
+	if( Fail )
+	{
+		glDeleteShader(v);
+		glDeleteShader(f);
+		glDeleteShader(g);
+		gp->Destroy();
+		gp = NULL;
+
+		DISPDBG_RB( KE_ERROR, "An error occured building this GPU program!" );
+	}
+
 	p = glCreateProgram();
     
-	glBindAttribLocation( p, 0, "in_pos" );
+    /*glBindAttribLocation( p, 0, "in_pos" );
     glBindAttribLocation( p, 1, "in_normal" );
     glBindAttribLocation( p, 2, "in_tangent" );
     glBindAttribLocation( p, 3, "in_bitangent" );
@@ -769,7 +865,14 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
 	glBindAttribLocation( p, 9, "in_tex4" );
     glBindAttribLocation( p, 10, "in_tex5" );
     glBindAttribLocation( p, 11, "in_tex6" );
-    glBindAttribLocation( p, 12, "in_tex7" );
+    glBindAttribLocation( p, 12, "in_tex7" );*/
+    
+    int index = 0;
+    while( vertex_attributes[index].index != -1 )
+    {
+        glBindAttribLocation( p, program_attributes[index].location, program_attributes[index].name );
+        index++;
+    }
     
 	glAttachShader( p, v );
 	glAttachShader( p, f );
@@ -833,7 +936,7 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     /* Save the handle to this newly created program */
     gp->program = p;
 
-#if 0
+#if 1
 	/* Copy vertex attributes */
 	int va_size = 0;
 	while( vertex_attributes[va_size].index != -1 )
@@ -926,9 +1029,11 @@ void IKeOpenGLRenderDevice::SetProgramConstant3FV( const char* location, int cou
  */
 void IKeOpenGLRenderDevice::SetProgramConstant4FV( const char* location, int count, float* value )
 {
+	GLenum error = glGetError();
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     
     int loc = glGetUniformLocation( p->program, location );
+	OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform4fv( loc, count, value );
 }
 
@@ -1138,6 +1243,9 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
+	/* Unbind texture */
+	glBindTexture( t->target, 0 );
+
     return true;
 }
 
@@ -1201,9 +1309,13 @@ void IKeOpenGLRenderDevice::DeleteTexture( IKeTexture* texture )
  */
 void IKeOpenGLRenderDevice::SetTextureData1D( int offsetx, int width, int miplevel, void* pixels, IKeTexture* texture )
 {
+    GLenum error = glGetError();
     IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>( texture );
-    
+
+    glBindTexture( t->target, t->handle );
     glTexSubImage1D( t->target, miplevel, offsetx, width, t->internal_format, t->data_type, pixels );
+    OGL_DISPDBG( KE_ERROR, "Error setting texture data!" );
+    glBindTexture( t->target, 0 );
 }
 
 /*
@@ -1212,7 +1324,7 @@ void IKeOpenGLRenderDevice::SetTextureData1D( int offsetx, int width, int miplev
  */
 void IKeOpenGLRenderDevice::SetTextureData2D( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, IKeTexture* texture )
 {
-	GLenum error = glGetError( );
+	GLenum error = glGetError();
     IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>( texture );
     
 	//glEnable( t->target );
@@ -1241,8 +1353,42 @@ void IKeOpenGLRenderDevice::SetTextureData3D( int offsetx, int offsety, int offs
 bool IKeOpenGLRenderDevice::CreateRenderTarget( int width, int height, int depth, uint32_t flags, IKeRenderTarget** rendertarget )
 {
     GLenum error = glGetError();
+	(*rendertarget) = new IKeOpenGLRenderTarget;
     IKeOpenGLRenderTarget* rt = static_cast<IKeOpenGLRenderTarget*>( *rendertarget );
     
+#if 1
+	/* Generate a texture as our colour buffer */
+	if( !this->CreateTexture2D( KE_TEXTURE_2D, width, height, 0, KE_TEXTUREFORMAT_RGBA, KE_UNSIGNED_BYTE, &rt->texture ) )
+	{
+		DISPDBG_RB( KE_ERROR, "Error creating render target texture!" );
+	}
+
+	/* Get OpenGL texture handle */
+	uint32_t texture_handle = static_cast<IKeOpenGLTexture*>( rt->texture )->handle;
+
+	/* Depth buffer */
+	glGenRenderbuffers( 1, &rt->depth_buffer );
+	glBindRenderbuffer( GL_RENDERBUFFER, rt->depth_buffer );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height );
+	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+
+	/* Framebuffer to link everything together */
+	glGenFramebuffers( 1, &rt->fbo);
+	glBindFramebuffer( GL_FRAMEBUFFER, rt->fbo );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_handle, 0 );
+	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rt->depth_buffer );
+	
+	/* Did it work? */
+	GLenum status;
+	if( ( status = glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) != GL_FRAMEBUFFER_COMPLETE )
+	{
+		OGL_DISPDBG( KE_ERROR, "Error linking framebuffer (status: " << status << ")" );
+		return 0;
+	}
+
+	/* Unbind the fbo */
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+#else
     /* Generate frame buffer object */
     glGenFramebuffers( 1, &rt->frame_buffer_object );
     OGL_DISPDBG_RB( 1, "Error creating FBO!" );
@@ -1279,6 +1425,7 @@ bool IKeOpenGLRenderDevice::CreateRenderTarget( int width, int height, int depth
         error = glGetError();
         DISPDBG_RB( 1, "Error during rendertarget creation!" );
     }
+#endif
     
     return true;
 }
@@ -1295,8 +1442,8 @@ void IKeOpenGLRenderDevice::DeleteRenderTarget( IKeRenderTarget* rendertarget )
     this->DeleteTexture( static_cast<IKeOpenGLTexture*>( rt->texture ) );
     
     /* Delete the render target */
-    glDeleteRenderbuffers( 1, &rt->depth_render_buffer );
-    glDeleteFramebuffers( 1, &rt->frame_buffer_object );
+    glDeleteRenderbuffers( 1, &rt->depth_buffer );
+    glDeleteFramebuffers( 1, &rt->fbo );
 
 	delete rendertarget;
 }
@@ -1312,10 +1459,15 @@ void IKeOpenGLRenderDevice::BindRenderTarget( IKeRenderTarget* rendertarget )
     IKeOpenGLRenderTarget* rt = static_cast<IKeOpenGLRenderTarget*>( rendertarget );
     
     /* Bind the FBO */
-    glBindFramebuffer( GL_FRAMEBUFFER, rt->frame_buffer_object );
-    error = glGetError();
-    if( error != GL_NO_ERROR )
-        DISPDBG( 1, "Error binding rendertarget! (error=0x" << error << ")\n" );
+	if( rt )
+	{
+		glBindFramebuffer( GL_FRAMEBUFFER, rt->fbo );
+		error = glGetError();
+		if( error != GL_NO_ERROR )
+			DISPDBG( 1, "Error binding rendertarget! (error=0x" << error << ")\n" );
+	}
+	else
+		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 /*
@@ -1453,10 +1605,12 @@ bool IKeOpenGLRenderDevice::SetRenderStateBuffer( IKeRenderStateBuffer* state_bu
                 
             case KE_RS_CULLMODE:
                 if( sb->states[i].param1 )
+                {
                     glEnable( GL_CULL_FACE );
+                    glCullFace( cull_modes[sb->states[i].param2] );
+                }
                 else
                     glDisable( GL_CULL_FACE );
-                glCullFace( cull_modes[sb->states[i].param2] );
                 break;
                 
             default:
@@ -1727,6 +1881,18 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
 				glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
 				break;
 
+			case KE_TS_WRAPU:
+				glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			case KE_TS_WRAPV:
+				glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
+				break;
+
+			case KE_TS_WRAPW:
+				glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
+				break;
+
 			default:
 				DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
 					"param1: " << samplers[texture_stage][i].param1 << "\n"
@@ -1942,6 +2108,49 @@ void IKeOpenGLRenderDevice::SetProjectionMatrix( const nv::matrix4f* projection 
 {
     /* Copy over the incoming projection matrix */
     memmove( projection_matrix._array, projection->_array, sizeof( float ) * 16 );
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_view_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetViewMatrix( nv::matrix4f* view )
+{
+    /* Copy over the incoming view matrix */
+    memmove( view->_array, view_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_world_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetWorldMatrix( nv::matrix4f* world )
+{
+    /* Copy over the incoming world matrix */
+    memmove( world->_array, world_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_modelview_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetModelviewMatrix( nv::matrix4f* modelview )
+{
+    /* Copy over the incoming modelview matrix */
+    memmove( modelview->_array, modelview_matrix._array, sizeof( float ) * 16 );
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::set_projection_matrix
+ * Desc:
+ */
+void IKeOpenGLRenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
+{
+    /* Copy over the incoming projection matrix */
+    memmove( projection->_array, projection_matrix._array, sizeof( float ) * 16 );
 }
 
 

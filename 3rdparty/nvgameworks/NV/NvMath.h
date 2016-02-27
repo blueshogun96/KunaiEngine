@@ -76,6 +76,7 @@ typedef vec2<float> vec2f; ///< float 2-vectors
 typedef vec2<int32_t> vec2i; ///< signed integer 2-vectors
 typedef vec2<uint32_t> vec2ui; ///< unsigned integer 2-vectors
 typedef vec3<float> vec3f; ///< float 3-vectors
+typedef vec3<double> vec3d; ///< float 3-vectors
 typedef vec3<int32_t> vec3i; ///< signed integer 3-vectors
 typedef vec3<uint32_t> vec3ui; ///< unsigned integer 4-vectors
 typedef vec4<float> vec4f; ///< float 4-vectors

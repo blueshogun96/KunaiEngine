@@ -45,6 +45,12 @@ uint64_t KeGetCpuSpeed();
 int KeGetCpuCount();
 
 /*
+ * Name: KeGetCpuCapabilities
+ * Desc: Checks this CPU's capabilities via CPUID (for x86)
+ */
+bool KeGetCpuCapabilities();
+
+/*
  * Name: KeGetPhysicalMemoryStatus
  * Desc: Returns the amount of physical memory installed and the amount that is currently used
  */

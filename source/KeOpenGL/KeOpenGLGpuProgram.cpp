@@ -18,7 +18,19 @@ void IKeOpenGLGpuProgram::Destroy()
 {
     /* Delete this GLSL program */
     glDeleteProgram( program );
+
+	/* Delete vertex attributes */
+	delete this->va;
     
     /* Delete this instance */
     delete this;
+}
+
+/*
+ * Name: IKeOpenGLGpuProgram::GetVertexAttributes
+ * Desc: 
+ */
+void IKeOpenGLGpuProgram::GetVertexAttributes( KeVertexAttribute* vertex_attributes )
+{
+	vertex_attributes = va;
 }

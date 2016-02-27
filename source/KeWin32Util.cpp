@@ -7,14 +7,19 @@
 
 #include "KePlatform.h"
 #include "KeWin32Util.h"
+#include "KeDebug.h"
 #include <ShlObj.h>
 #include <tchar.h>
 
+#include "InstructionSet.h"
+
+const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
+
 
 /*
-* Name: KeSetCurrentPathToResourceDirectory
-* Desc: Sets the current path to the resource directory of the app.
-*/
+ * Name: KeSetCurrentPathToResourceDirectory
+ * Desc: Sets the current path to the resource directory of the app.
+ */
 int KeSetCurrentPathToResourceDirectory()
 {
 	printf("Resource path redirection not yet supported...\n");
@@ -105,6 +110,86 @@ int KeGetCpuCount()
 
 	return sysinfo.dwNumberOfProcessors;
 }
+
+/*
+ * Name: KeGetCpuCapabilities
+ * Desc: Checks this CPU's capabilities via CPUID (for x86)
+ */
+#define BOOL2STR(b) (b?" Yes":" No")
+bool KeGetCpuCapabilities()
+{
+	std::stringstream sstr;
+	sstr << KeGetCpuCount();
+    sstr << "\n\tVendor: " <<  InstructionSet::Vendor() <<
+		"\n\tBrand: " <<	   InstructionSet::Brand() <<
+		"\n\tProcessors: " <<  KeGetCpuCount() <<
+    
+	    "\n\t\t3DNOW      " << BOOL2STR(InstructionSet::_3DNOW()) <<
+        "\n\t\t3DNOWEXT   " << BOOL2STR(InstructionSet::_3DNOWEXT()) <<
+        "\n\t\tABM        " << BOOL2STR(InstructionSet::ABM()) <<
+        "\n\t\tADX        " << BOOL2STR(InstructionSet::ADX()) <<
+        "\n\t\tAES        " << BOOL2STR(InstructionSet::AES()) <<
+        "\n\t\tAVX        " << BOOL2STR(InstructionSet::AVX()) <<
+        "\n\t\tAVX2       " << BOOL2STR(InstructionSet::AVX2()) <<
+        "\n\t\tAVX512CD   " << BOOL2STR(InstructionSet::AVX512CD()) <<
+        "\n\t\tAVX512ER   " << BOOL2STR(InstructionSet::AVX512ER()) <<
+        "\n\t\tAVX512F    " << BOOL2STR(InstructionSet::AVX512F()) <<
+        "\n\t\tAVX512PF   " << BOOL2STR(InstructionSet::AVX512PF()) <<
+        "\n\t\tBMI1       " << BOOL2STR(InstructionSet::BMI1()) <<
+        "\n\t\tBMI2       " << BOOL2STR(InstructionSet::BMI2()) <<
+        "\n\t\tCLFSH      " << BOOL2STR(InstructionSet::CLFSH()) <<
+        "\n\t\tCMPXCHG16B " << BOOL2STR(InstructionSet::CMPXCHG16B()) <<
+        "\n\t\tCX8        " << BOOL2STR(InstructionSet::CX8()) <<
+        "\n\t\tERMS       " << BOOL2STR(InstructionSet::ERMS()) <<
+        "\n\t\tF16C       " << BOOL2STR(InstructionSet::F16C()) <<
+        "\n\t\tFMA        " << BOOL2STR(InstructionSet::FMA()) <<
+        "\n\t\tFSGSBASE   " << BOOL2STR(InstructionSet::FSGSBASE()) <<
+        "\n\t\tFXSR       " << BOOL2STR(InstructionSet::FXSR()) <<
+        "\n\t\tHLE        " << BOOL2STR(InstructionSet::HLE()) <<
+        "\n\t\tINVPCID    " << BOOL2STR(InstructionSet::INVPCID()) <<
+        "\n\t\tLAHF       " << BOOL2STR(InstructionSet::LAHF()) <<
+        "\n\t\tLZCNT      " << BOOL2STR(InstructionSet::LZCNT()) <<
+        "\n\t\tMMX        " << BOOL2STR(InstructionSet::MMX()) <<
+        "\n\t\tMMXEXT     " << BOOL2STR(InstructionSet::MMXEXT()) <<
+        "\n\t\tMONITOR    " << BOOL2STR(InstructionSet::MONITOR()) <<
+        "\n\t\tMOVBE      " << BOOL2STR(InstructionSet::MOVBE()) <<
+        "\n\t\tMSR        " << BOOL2STR(InstructionSet::MSR()) <<
+        "\n\t\tOSXSAVE    " << BOOL2STR(InstructionSet::OSXSAVE()) <<
+        "\n\t\tPCLMULQDQ  " << BOOL2STR(InstructionSet::PCLMULQDQ()) <<
+        "\n\t\tPOPCNT     " << BOOL2STR(InstructionSet::POPCNT()) <<
+        "\n\t\tPREFETCHWT1" << BOOL2STR(InstructionSet::PREFETCHWT1()) <<
+        "\n\t\tRDRAND     " << BOOL2STR(InstructionSet::RDRAND()) <<
+        "\n\t\tRDSEED     " << BOOL2STR(InstructionSet::RDSEED()) <<
+        "\n\t\tRDTSCP     " << BOOL2STR(InstructionSet::RDTSCP()) <<
+        "\n\t\tRTM        " << BOOL2STR(InstructionSet::RTM()) <<
+        "\n\t\tSEP        " << BOOL2STR(InstructionSet::SEP()) <<
+        "\n\t\tSHA        " << BOOL2STR(InstructionSet::SHA()) <<
+        "\n\t\tSSE        " << BOOL2STR(InstructionSet::SSE()) <<
+        "\n\t\tSSE2       " << BOOL2STR(InstructionSet::SSE2()) <<
+        "\n\t\tSSE3       " << BOOL2STR(InstructionSet::SSE3()) <<
+        "\n\t\tSSE4.1     " << BOOL2STR(InstructionSet::SSE41()) <<
+        "\n\t\tSSE4.2     " << BOOL2STR(InstructionSet::SSE42()) <<
+        "\n\t\tSSE4a      " << BOOL2STR(InstructionSet::SSE4a()) <<
+        "\n\t\tSSSE3      " << BOOL2STR(InstructionSet::SSSE3()) <<
+        "\n\t\tSYSCALL    " << BOOL2STR(InstructionSet::SYSCALL()) <<
+        "\n\t\tTBM        " << BOOL2STR(InstructionSet::TBM()) <<
+        "\n\t\tXOP        " << BOOL2STR(InstructionSet::XOP()) <<
+        "\n\t\tXSAVE      " << BOOL2STR(InstructionSet::XSAVE()) <<
+	    "\n";
+
+	/*while( i < extension_count )
+    {
+		ext_str += "\t\t";
+        ext_str += (const char*) glGetStringi( GL_EXTENSIONS, i );
+		ext_str += "\n";
+        i++;
+    }*/
+
+	DISPDBG( KE_DBGLVL(0), sstr.str() );
+
+	return true;
+}
+
 
 /*
  * Name: KeGetPhysicalMemoryStatus

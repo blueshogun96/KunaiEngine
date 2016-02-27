@@ -19,3 +19,28 @@ void IKeOpenGLRenderTarget::Destroy()
     /* Delete this instance */
     delete this;
 }
+
+void* IKeOpenGLRenderTarget::MapData( uint32_t flags )
+{
+	/* TODO */
+
+	return NULL;
+}
+
+void IKeOpenGLRenderTarget::UnmapData( void* data_ptr )
+{
+	/* TODO */
+}
+
+
+bool IKeOpenGLRenderTarget::GetTexture( IKeTexture** texture )
+{
+	if( !texture )
+		return false;
+
+	*texture = this->texture;
+
+	return true;
+}
+
+IKeTexture* IKeOpenGLRenderTarget::GetTexture2() { return texture; }

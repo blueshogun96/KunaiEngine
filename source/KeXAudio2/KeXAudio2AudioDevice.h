@@ -9,6 +9,7 @@
 #define __ke_xa2_audiodevice__
 
 #include <xaudio2.h>
+#include <xaudio2fx.h>
 #include <comip.h>
 #include <comdef.h>
 #include "KeAudioDevice.h"
@@ -18,7 +19,7 @@
 /*
 * Non-ATL based smart COM pointer types
 */
-typedef _com_ptr_t<_com_IIID<IXAudio2, &IID_IXAudio2>>			CXAudio2;
+typedef _com_ptr_t<_com_IIID<IXAudio2, &__uuidof(IXAudio2)>>			CXAudio2;
 
 
 

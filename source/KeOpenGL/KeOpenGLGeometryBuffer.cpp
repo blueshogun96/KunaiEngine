@@ -120,3 +120,18 @@ bool IKeOpenGLGeometryBuffer::SetIndexData( uint32_t offset, uint32_t size, void
     
     return true;
 }
+
+void IKeOpenGLGeometryBuffer::GetDesc( KeGeometryBufferDesc* desc )
+{
+	if( desc )
+	{
+		desc->vertex_data_size = this->vd_length;
+		desc->index_data_size = this->id_length;
+		desc->vertex_size = this->vertex_size;
+		desc->index_type = this->index_type;
+
+		return;
+	}
+
+	DISPDBG( KE_WARNING, "Invalid pointer..." );
+}

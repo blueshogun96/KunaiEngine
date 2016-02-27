@@ -59,12 +59,15 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
     
     virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
+	virtual void GetDesc( KeGeometryBufferDesc* desc );
     
-    uint32_t vbo[2];    /* Vertex and index buffer */
-    uint32_t vao;       /* Vertex array object */
-    uint32_t length;    /* Length of vertex data (in bytes) */
-    uint32_t index_type;/* Data type for index data */
-    uint32_t lock_flags;/* Buffer lock flags */
+    uint32_t vbo[2];		/* Vertex and index buffer */
+    uint32_t vao;			/* Vertex array object */
+    uint32_t vd_length;		/* Length of vertex data (in bytes) */
+	uint32_t id_length;		/* Length of index data (in bytes) */
+	uint32_t vertex_size;	/* Size of each vertex (in bytes) */
+    uint32_t index_type;	/* Data type for index data */
+    uint32_t lock_flags;	/* Buffer lock flags */
 };
 
 /*
@@ -81,6 +84,7 @@ struct IKeOpenGLCommandList : public IKeCommandList
 struct IKeOpenGLGpuProgram : public IKeGpuProgram
 {
     virtual void Destroy();
+	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes );
     
     uint32_t program;       /* GPU program handle */
     uint32_t matrices[3];   /* Handles to the world, view, and projection matrices (respectively) */
@@ -98,8 +102,10 @@ struct IKeOpenGLTexture : public IKeTexture
     virtual void UnmapData( void* );
     
     virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels );
+	virtual bool GetTextureDesc( KeTextureDesc* texture_desc );
     
     uint32_t handle;            /* Handle to the OpenGL texture */
+	uint32_t mipmap;			
     uint32_t width, height;     /* Texture width/height */
     uint32_t depth;             /* Texture depth (for 3D and array textures) */
     uint32_t depth_format;      /* See glTexImageXD */
@@ -115,9 +121,15 @@ struct IKeOpenGLRenderTarget : public IKeRenderTarget
 {
     virtual void Destroy();
     
-    uint32_t    frame_buffer_object;    /* Frame buffer object handle */
-    uint32_t    depth_render_buffer;    /* Depth render buffer */
-    /* TODO: Stencil? */
+	virtual void* MapData( uint32_t flags );
+	virtual void UnmapData( void* );
+
+	virtual bool GetTexture( IKeTexture** texture );
+	virtual IKeTexture* GetTexture2();
+
+    uint32_t    fbo;				/* Frame buffer object handle */
+    uint32_t    depth_buffer;		/* Depth render buffer */
+    uint32_t	stencil_buffer;		/* Stencil buffer */
     
     IKeTexture* texture;
 };
@@ -181,9 +193,11 @@ public:
     virtual void SetClearColourFV( float* colour );
     virtual void SetClearColourUBV( uint8_t* colour );
     virtual void SetClearDepth( float depth );
+	virtual void SetClearStencil( uint32_t stencil );
     virtual void ClearColourBuffer();
     virtual void ClearDepthBuffer();
     virtual void ClearStencilBuffer();
+	virtual void Clear( uint32_t buffers );
     virtual void Swap();
     
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer );
@@ -239,11 +253,14 @@ public:
     virtual void GetViewport( int* x, int* y, int* width, int* height );
     virtual void GetViewportV( int* viewport );
     virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
-    //virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z );
     virtual void SetViewMatrix( const nv::matrix4f* view );
     virtual void SetWorldMatrix( const nv::matrix4f* world );
     virtual void SetModelviewMatrix( const nv::matrix4f* modelview );
     virtual void SetProjectionMatrix( const nv::matrix4f* projection );
+	virtual void GetViewMatrix( nv::matrix4f* view );
+    virtual void GetWorldMatrix( nv::matrix4f* world );
+    virtual void GetModelviewMatrix( nv::matrix4f* modelview );
+    virtual void GetProjectionMatrix( nv::matrix4f* projection );
     
     /* Synchronization */
     virtual void BlockUntilVerticalBlank();

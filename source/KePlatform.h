@@ -6,10 +6,6 @@
 #ifdef _WIN32
 #undef UNICODE
 
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
-
 #include <windows.h>
 #include <mmsystem.h>
 #include <aclapi.h>

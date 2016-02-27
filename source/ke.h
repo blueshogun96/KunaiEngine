@@ -22,6 +22,7 @@
  * Kunai engine basics
  */
 bool KeInitialize();
+bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDevice** ad );
 void KeUninitialize();
 bool KeCreateWindowAndDevice( KeRenderDeviceDesc* device_desc, IKeRenderDevice** device );
 void KeDestroyWindowAndDevice( IKeRenderDevice* device );
