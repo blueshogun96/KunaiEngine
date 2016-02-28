@@ -3,7 +3,11 @@
 #include "Ke.h"
 #include "KeRenderDevice.h"
 
+#ifdef __APPLE__
+#include <SDL2_ttf/SDL_ttf.h>
+#else
 #include <SDL_ttf.h>
+#endif
 #include <stb_truetype.h>
 
 

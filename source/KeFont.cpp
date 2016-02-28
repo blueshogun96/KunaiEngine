@@ -135,10 +135,10 @@ bool KeCreateCompiledFontString( const char* string, uint32_t colour, IKeGpuProg
 
 	SDL_Colour sdl_colour = 
 	{
-		(colour>>16)&0xFF,
-		(colour>> 8)&0xFF,
-		(colour    )&0xFF,
-		(colour>>24)&0xFF,
+		static_cast<Uint8>((colour>>16)&0xFF),
+		static_cast<Uint8>((colour>> 8)&0xFF),
+		static_cast<Uint8>((colour    )&0xFF),
+		static_cast<Uint8>((colour>>24)&0xFF),
 	};
 
 	/* Generate pixel data */
@@ -167,14 +167,15 @@ bool KeCreateCompiledFontString( const char* string, uint32_t colour, IKeGpuProg
 	float vertices [] = 
 	{
 		0, 0, 0, 0,	/* xy uv */
-		surface->w, 0, 1, 0,
-		0, surface->h, 0, 1, 
-		surface->w, surface->h, 1, 1, 
+		static_cast<float>(surface->w), 0, 1, 0,
+		0, static_cast<float>(surface->h), 0, 1,
+		static_cast<float>(surface->w), static_cast<float>(surface->h), 1, 1,
 	};
 
 	ret = KeGetRenderDevice()->CreateGeometryBuffer( vertices, 16*sizeof(float), NULL, 0, 0, KE_USAGE_STATIC_WRITE, va, &(*compiled_string)->gb );
 	if( !ret )
 	{
+        (*compiled_string)->tex->Destroy();
 		delete *compiled_string;
 		SDL_FreeSurface( surface );
 		return false;
