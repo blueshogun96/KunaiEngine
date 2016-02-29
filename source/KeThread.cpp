@@ -28,8 +28,9 @@ KeThread::KeThread( KeThreadPfn pfn, void* context, bool suspended )
 #ifdef __APPLE__
 	if( suspended )
 		pthread_create_suspended_np( &thread, NULL, (void *(*)(void *)) pfn, context );
+    else
 #endif
-    pthread_create( &thread, NULL, (void *(*)(void *)) pfn, context );
+        pthread_create( &thread, NULL, (void *(*)(void *)) pfn, context );
 #else
 	/* Create mutex */
 	mutex = CreateMutex( NULL, TRUE, NULL );
@@ -73,7 +74,42 @@ bool KeThread::Wait( uint32_t timeout )
 	if( last_error != WAIT_OBJECT_0 )
 		return false;
 #else
-	
+    if( timeout == static_cast<uint32_t>(-1) )  /* Block the current thread until this thread is finished */
+        pthread_join( thread, NULL );
+    else if( timeout == 0 )
+    {
+        /* Test the thread by sending no signal */
+        int ret = pthread_kill( thread, 0 );
+        last_error = ret;
+        
+        /* ESRCH means no valid thread; which means either the thread was not initialized or it completed */
+        if( ret == ESRCH )
+            return true;
+        else if( ret != 0 ) /* Anything else besides 0 is not an expected error */
+            return false;
+    }
+    else
+    {
+        struct timeval now;
+        
+        gettimeofday( &now, NULL );
+        uint32_t start = now.tv_usec / 1000;
+        uint32_t stop = start + timeout;
+        
+        do
+        {
+            /* Test the thread by sending no signal */
+            int ret = pthread_kill( thread, 0 );
+            last_error = ret;
+            
+            /* ESRCH means no valid thread; which means either the thread was not initialized or it completed */
+            if( ret == ESRCH )
+                return true;
+            else if( ret != 0 ) /* Anything else besides 0 is not an expected error */
+                return false;
+            
+        } while( ( now.tv_usec / 1000 ) < stop );
+    }
 #endif
 
 	return true;
@@ -102,12 +138,13 @@ void KeThread::Suspend()
 	thread_suspend( pthread_mach_thread_np( thread ) );
 #else
     /* TODO: Linux */
+    /* http://boinc.berkeley.edu/android-boinc/boinc/lib/susp.cpp */
 #endif
 } 
 
 
 /*
- * Name: KeThread::REsume
+ * Name: KeThread::Resume
  * Desc: Resumes the thread.
  */
 void KeThread::Resume()
