@@ -12,6 +12,7 @@
 #include <OpenGL/gl3.h>
 
 #include <AppKit/NSOpenGL.h>
+#include <vector>
 
 
 /*
@@ -20,6 +21,7 @@
 struct KeVideoAdapterOSX
 {
     char vendor_string[64];
+    char renderer_string[64];
     int  device_id;
     int  vendor_id;
     int  adapter_id;
