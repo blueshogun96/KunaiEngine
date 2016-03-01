@@ -5,7 +5,9 @@
 //  Copyright (c) 2014 Shogun3D. All rights reserved.
 //
 
+#ifdef _WIN32
 #pragma warning( disable:4800 )	/* Disable casting warning */
+#endif
 
 #include "KeCriticalSection.h"
 

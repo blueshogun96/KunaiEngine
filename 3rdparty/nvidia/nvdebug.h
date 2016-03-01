@@ -61,10 +61,10 @@
 #define __trap  __asm__("int $3")
 #endif
 
-#ifdef __APPLE__
+#ifndef _WIN32
 #define __KE_FUNCTION__ __PRETTY_FUNCTION__
 #else
-#define __KE_FUNCTION__ __FUNCTION__
+#define __KE_FUNCTION__ __FUNCSIG__
 #endif
 
 

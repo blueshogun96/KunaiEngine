@@ -11,7 +11,10 @@
 #include <OpenGL/CGLTypes.h>
 #include <OpenGL/gl3.h>
 
+#ifdef __OBJC__
 #include <AppKit/NSOpenGL.h>
+#endif
+
 #include <vector>
 
 
@@ -29,3 +32,16 @@ struct KeVideoAdapterOSX
     int  video_memory;
     int  texture_memory;
 };
+
+
+/*
+ * Name: KeGetTotalVideoMemoryOSX
+ * Desc: Returns the amount of video memory for the GPU that currently active virtual screen
+ *       is representing.
+ */
+
+int KeGetTotalVideoMemoryOSX();
+
+bool KeGetCurrentVideoAdapterInformationOSX( KeVideoAdapterOSX* video_adapter );
+
+bool KeEnumerateVideoAdaptersOSX( std::vector<KeVideoAdapterOSX>& video_adapters );

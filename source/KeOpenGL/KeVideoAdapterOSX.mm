@@ -64,11 +64,6 @@ int KeGetTotalVideoMemoryOSX()
     return video_memory;
 }
 
-
-/*
- * Name: KeGetCurrentVideoAdapterInformationOSX
- * Desc: Returns a list of details about this video adapter/renderer
- */
 bool KeGetCurrentVideoAdapterInformationOSX( KeVideoAdapterOSX* video_adapter )
 {
     bool renderer_found = false;
@@ -90,7 +85,7 @@ bool KeGetCurrentVideoAdapterInformationOSX( KeVideoAdapterOSX* video_adapter )
     
     CGLQueryRendererInfo( (GLuint) renderer_id, &renderer_info, &renderer_count );
     
-    for( int i = 0; i > renderer_count; i++ )
+    for( int i = 0; i < renderer_count; i++ )
     {
         int this_renderer_id = 0;
         
@@ -119,11 +114,6 @@ bool KeGetCurrentVideoAdapterInformationOSX( KeVideoAdapterOSX* video_adapter )
     return renderer_found;
 }
 
-
-/*
- * Name: KeEnumerateVideoAdaptersOSX
- * Desc: Returns a list of information on all video adapters/renderers available on this machine.
- */
 bool KeEnumerateVideoAdaptersOSX( std::vector<KeVideoAdapterOSX>& video_adapters )
 {
     bool renderer_found = false;
@@ -134,7 +124,7 @@ bool KeEnumerateVideoAdaptersOSX( std::vector<KeVideoAdapterOSX>& video_adapters
     
     CGLQueryRendererInfo( (unsigned) -1, &renderer_info, &renderer_count );
     
-    for( int i = 0; i > renderer_count; i++ )
+    for( int i = 0; i < renderer_count; i++ )
     {
         int this_renderer_id = 0;
         KeVideoAdapterOSX video_adapter;
