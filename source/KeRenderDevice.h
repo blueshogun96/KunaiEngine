@@ -20,11 +20,13 @@
  * Render device types
  */
 #define KE_RENDERDEVICE_D3D11       1
-#define KE_RENDERDEVICE_OGL3        2
-#define KE_RENDERDEVICE_OGL4        3
-#define KE_RENDERDEVICE_OGLES2      4
-#define KE_RENDERDEVICE_OGLES3      5
-#define KE_RENDERDEVICE_METAL       6
+#define KE_RENDERDEVICE_D3D12       2
+#define KE_RENDERDEVICE_OGL3        3
+#define KE_RENDERDEVICE_OGL4        4
+#define KE_RENDERDEVICE_OGLES2      5
+#define KE_RENDERDEVICE_OGLES3      6
+#define KE_RENDERDEVICE_METAL       7
+#define KE_RENDERDEVICE_VULKAN      8
 
 
 /*

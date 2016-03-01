@@ -10,7 +10,7 @@
 
 #include "KePlatform.h"
 #include "KeUnknown.h"
-
+#include <Nv/NvMath.h>
 
 /*
  * Audio device types
@@ -86,8 +86,8 @@ struct IKeSoundBuffer : public IKeUnknown
     virtual void Stop() PURE;
     virtual void Pause() PURE;
     
-    virtual void SetPosition( float* position ) PURE;
-    virtual void SetVelocity( float* velocity ) PURE;
+    virtual void SetPosition( nv::vec3f& position ) PURE;
+    virtual void SetVelocity( nv::vec3f& velocity ) PURE;
     virtual void SetVolume( float volume ) PURE;
     virtual void SetPitch( float pitch ) PURE;
 
@@ -127,16 +127,16 @@ public:
     virtual bool ConfirmDevice() PURE;
     virtual bool CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer** sound_buffer ) PURE;
     
-    virtual void SetListenerPosition( float* position ) PURE;
-    virtual void SetListenerVelocity( float* velocity ) PURE;
-    virtual void SetListenerOrientation( float* at, float* up ) PURE;
+    virtual void SetListenerPosition( nv::vec3f& position ) PURE;
+    virtual void SetListenerVelocity( nv::vec3f& velocity ) PURE;
+    virtual void SetListenerOrientation( nv::vec3f& at, nv::vec3f& up ) PURE;
 
 protected:
     bool initialized;
-    float listener_position[3];
-    float listener_velocity[3];
-    float listener_orientation_at[3];
-    float listener_orientation_up[3];
+    nv::vec3f listener_position;
+    nv::vec3f listener_velocity;
+    nv::vec3f listener_orientation_at;
+    nv::vec3f listener_orientation_up;
 };
 
 

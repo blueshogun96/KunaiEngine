@@ -165,8 +165,8 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer*
 	alSourcei( sb->source, AL_BUFFER, sb->buffer );
 	alSourcef( sb->source, AL_PITCH,  1.0f );
 	alSourcef( sb->source, AL_GAIN,	 1.0f );
-	alSourcefv( sb->source, AL_POSITION, (float*) &sb->position );
-	alSourcefv( sb->source, AL_VELOCITY, (float*) &sb->velocity );
+	alSourcefv( sb->source, AL_POSITION, sb->position._array );
+	alSourcefv( sb->source, AL_VELOCITY, sb->velocity._array );
 	alSourcei( sb->source, AL_LOOPING, 0 );
     
     return true;
@@ -174,25 +174,25 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer*
 
 
 
-void IKeOpenALAudioDevice::SetListenerPosition( float* position )
+void IKeOpenALAudioDevice::SetListenerPosition( nv::vec3f& position )
 {
     /* Set the listener position */
-    alListenerfv( AL_POSITION, position );
+    alListenerfv( AL_POSITION, position._array );
 }
 
-void IKeOpenALAudioDevice::SetListenerVelocity( float* velocity )
+void IKeOpenALAudioDevice::SetListenerVelocity( nv::vec3f& velocity )
 {
     /* Set the listener velocity */
-    alListenerfv( AL_VELOCITY, velocity );
+    alListenerfv( AL_VELOCITY, velocity._array );
 }
 
-void IKeOpenALAudioDevice::SetListenerOrientation( float* at, float* up )
+void IKeOpenALAudioDevice::SetListenerOrientation( nv::vec3f& at, nv::vec3f& up )
 {
     float orientation[6];
     
     /* Set the listener orientation */
-    memmove( orientation, at, sizeof( float ) * 3 );
-    memmove( &orientation[3], up, sizeof( float ) * 3 );
+    memmove( orientation, at._array, sizeof( float ) * 3 );
+    memmove( &orientation[3], up._array, sizeof( float ) * 3 );
     
     alListenerfv( AL_ORIENTATION, orientation );
 }

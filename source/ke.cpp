@@ -202,9 +202,11 @@ bool KeInitializeEx( std::string settings_file, IKeRenderDevice** rd, IKeAudioDe
 						if( valueval == "OpenGL3" )		rddesc.device_type = KE_RENDERDEVICE_OGL3;
 						if( valueval == "OpenGL4" )		rddesc.device_type = KE_RENDERDEVICE_OGL4;
 						if( valueval == "Direct3D11" )	rddesc.device_type = KE_RENDERDEVICE_D3D11;
+                        if( valueval == "Direct3D12" )	rddesc.device_type = KE_RENDERDEVICE_D3D12;
 						if( valueval == "OpenGLES2" )	rddesc.device_type = KE_RENDERDEVICE_OGLES2;
 						if( valueval == "OpenGLES3" )	rddesc.device_type = KE_RENDERDEVICE_OGLES3;
 						if( valueval == "Metal" )		rddesc.device_type = KE_RENDERDEVICE_METAL;
+                        if( valueval == "Vulkan" )      rddesc.device_type = KE_RENDERDEVICE_VULKAN;
 					}
 					else if( keyval == "Fullscreen" )
 						rddesc.fullscreen = valueval == "Yes" ? Yes : No;

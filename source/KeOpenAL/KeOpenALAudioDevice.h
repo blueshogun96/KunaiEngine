@@ -9,20 +9,20 @@
 #define __ke_al_audiodevice__
 
 #ifdef __APPLE__
-#ifndef __MOBILE_OS__
-#include <OpenAL-Soft/al.h>
-#include <OpenAL-Soft/alc.h>
-#include <OpenAL-Soft/alext.h>
+ #ifndef __MOBILE_OS__
+  #include <OpenAL-Soft/al.h>
+  #include <OpenAL-Soft/alc.h>
+  #include <OpenAL-Soft/alext.h>
+ #else
+  #include <OpenAL/al.h>
+  #include <OpenAL/alc.h>
+  #include <OpenAL/oalMacOSX_OALExtensions.h>
+  #include <OpenAL/oalStaticBufferExtension.h>
+ #endif
 #else
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-#include <OpenAL/oalMacOSX_OALExtensions.h>
-#include <OpenAL/oalStaticBufferExtension.h>
-#endif
-#else
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/alext.h>
+ #include <AL/al.h>
+ #include <AL/alc.h>
+ #include <AL/alext.h>
 #endif
 #include "KeAudioDevice.h"
 
@@ -40,8 +40,8 @@ struct IKeOpenALSoundBuffer : public IKeSoundBuffer
     virtual void Stop();
     virtual void Pause();
     
-    virtual void SetPosition( float* position );
-    virtual void SetVelocity( float* velocity );
+    virtual void SetPosition( nv::vec3f& position );
+    virtual void SetVelocity( nv::vec3f& velocity );
     virtual void SetVolume( float volume );
     virtual void SetPitch( float pitch );
 
@@ -49,8 +49,8 @@ struct IKeOpenALSoundBuffer : public IKeSoundBuffer
     uint32_t    source;
 	float       volume;
 	float       pitch;
-    float       position[3];
-    float       velocity[3];
+    nv::vec3f   position;
+    nv::vec3f   velocity;
 };
 
 /*
@@ -123,9 +123,9 @@ public:
     virtual bool ConfirmDevice();
     virtual bool CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer** sound_buffer );
     
-    virtual void SetListenerPosition( float* position );
-    virtual void SetListenerVelocity( float* velocity );
-    virtual void SetListenerOrientation( float* at, float* up );
+    virtual void SetListenerPosition( nv::vec3f& position );
+    virtual void SetListenerVelocity( nv::vec3f& velocity );
+    virtual void SetListenerOrientation( nv::vec3f& at, nv::vec3f& up );
     
 private:
     ALCcontext* context;
