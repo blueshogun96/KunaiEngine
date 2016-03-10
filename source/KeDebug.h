@@ -24,7 +24,7 @@ void KeCallStackPush( std::string function );
 void KeCallStackPop();
 
 #if _DEBUG
-#define _pushfn     KeCallStackPush(__FUNCTION__)
+#define _pushfn     KeCallStackPush(__KE_FUNCTION__)
 #define _popfn      KeCallStackPop()
 #else
 #define _pushfn

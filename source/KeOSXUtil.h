@@ -11,6 +11,39 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CGDirectDisplay.h>
 
+#include <mach/mach_traps.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/vmmeter.h>
+#include <mach/mach_init.h>
+#include <mach/mach_host.h>
+#include <mach/mach_port.h>
+#include <mach/mach_traps.h>
+#include <mach/task_info.h>
+#include <mach/thread_info.h>
+#include <mach/thread_act.h>
+#include <mach/vm_region.h>
+#include <mach/vm_map.h>
+#include <mach/task.h>
+#include <mach/shared_memory_server.h>
+
+
+/*
+ * System memory status
+ */
+struct KeSystemMemoryStatus
+{
+    uint64_t total_virtual_memory;          /* Total virtual memory allocated for this machine */
+    uint64_t free_virtual_memory;           /* Free virtual memory */
+    uint64_t system_used_virtual_memory;    /* The amount of virtual memory used by the OS */
+    uint64_t program_used_virtual_memory;   /* The amount of virtual memory used by the program */
+    uint64_t total_physical_memory;         /* Total physical memory installed on this machine */
+    uint64_t free_physical_memory;          /* The amount of physical memory that is free on this machine */
+    uint64_t system_used_physical_memory;   /* The amount of physical memory used by the OS */
+    uint64_t program_used_physical_memory;  /* The amount of physical memory used by the program */
+};
+
+
 /*
  * Name: KeSetCurrentPathToResourceDirectory
  * Desc: Sets the current path to the resource directory of the app.
@@ -59,5 +92,13 @@ int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free );
  * Desc: Returns the amount of virtual memory installed and the amount that is currently used
  */
 int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free );
+
+/*
+ * Name: KeQuerySystemMemoryStatus
+ * Desc: Returns various details about the state of the target machine's virtual and physical
+ *       memory totals, usage, etc.
+ */
+bool KeQuerySystemMemoryStatus( KeSystemMemoryStatus* memory_status );
+
 
 #endif /* defined(__ke_osx_util__) */

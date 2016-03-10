@@ -93,13 +93,13 @@ void IKeOpenALSoundBuffer::Pause()
     OAL_DISPDBG( KE_ERROR, "Error pausing sound buffer!" );
 }
 
-void IKeOpenALSoundBuffer::SetPosition( float* position )
+void IKeOpenALSoundBuffer::SetPosition( nv::vec3f& position )
 {
     alSourcefv( source, AL_POSITION, position );
     memmove( this->position, position, sizeof( float ) * 3 );
 }
 
-void IKeOpenALSoundBuffer::SetVelocity( float* velocity )
+void IKeOpenALSoundBuffer::SetVelocity( nv::vec3f& velocity )
 {
     alSourcefv( source, AL_VELOCITY, velocity );
     memmove( this->velocity, velocity, sizeof( float ) * 3 );
