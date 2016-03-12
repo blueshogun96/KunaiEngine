@@ -33,14 +33,14 @@ KeSemaphore semaphore;
 int KeSetCurrentPathToResourceDirectory()
 {
     CFBundleRef main_bundle = CFBundleGetMainBundle();
-    CFURLRef resources_url = CFBundleCopyResourcesDirectoryURL(main_bundle);
+    CFURLRef resources_url = CFBundleCopyResourcesDirectoryURL( main_bundle );
     char path[PATH_MAX];
-    if (!CFURLGetFileSystemRepresentation(resources_url, TRUE, (UInt8 *)path, PATH_MAX))
+    if( !CFURLGetFileSystemRepresentation( resources_url, TRUE, (UInt8*) path, PATH_MAX ) )
     {
         // error!
         return 0;
     }
-    CFRelease(resources_url);
+    CFRelease( resources_url );
     
     chdir(path);
     printf( "Current directory changed to: %s\n", path );
@@ -56,14 +56,14 @@ int KeSetCurrentPathToResourceDirectory()
 int KeGetCurrentPathToResourceDirectory( char* resource_path )
 {
     CFBundleRef main_bundle = CFBundleGetMainBundle();
-    CFURLRef resources_url = CFBundleCopyResourcesDirectoryURL(main_bundle);
+    CFURLRef resources_url = CFBundleCopyResourcesDirectoryURL( main_bundle );
     char path[PATH_MAX];
-    if (!CFURLGetFileSystemRepresentation(resources_url, TRUE, (UInt8 *)path, PATH_MAX))
+    if( !CFURLGetFileSystemRepresentation( resources_url, TRUE, (UInt8*) path, PATH_MAX ) )
     {
         // error!
         return 0;
     }
-    CFRelease(resources_url);
+    CFRelease( resources_url );
     
     strcpy( resource_path, path );
     
@@ -181,23 +181,6 @@ int KeGetCpuCount()
     return count;
 }
 
-/*
- * Name: KeGetPhysicalMemoryStatus
- * Desc: Returns the amount of physical memory installed and the amount that is currently used
- */
-int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free )
-{
-    return 0;
-}
-
-/*
- * Name: KeGetVirtualMemoryStatus
- * Desc: Returns the amount of virtual memory installed and the amount that is currently used
- */
-int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free )
-{
-    return 0;
-}
 
 /*
  * Name: KeQuerySystemMemoryStatus
@@ -345,4 +328,66 @@ bool KeQuerySystemMemoryStatus( KeSystemMemoryStatus* memory_status )
     }
     
     return !error;
+}
+
+/* Source: https://github.com/adobe/chromium/blob/master/content/gpu/gpu_info_collector_mac.mm */
+
+CFTypeRef SearchPortForProperty( io_registry_entry_t DisplayPort, CFStringRef PropertyName )
+{
+    return IORegistryEntrySearchCFProperty( DisplayPort,
+                                            kIOServicePlane,
+                                            PropertyName,
+                                            kCFAllocatorDefault,
+                                            kIORegistryIterateRecursively |
+                                            kIORegistryIterateParents );
+}
+
+UInt32 IntValueOfCFData( CFDataRef data_ref )
+{
+    UInt32 value = 0;
+    const UInt32* value_pointer = reinterpret_cast<const UInt32*>( CFDataGetBytePtr( data_ref ) );
+    if( value_pointer != NULL )
+        value = *value_pointer;
+    return value;
+}
+
+/*
+ * Name: KeGetVideoCardInfo
+ * Desc: Gets the device/vendor ID for the currently active video card.
+ */
+bool KeGetVideoCardInfo( KeVideoCardInfo* video_card_info )
+{
+    UInt32 vendor_id = 0, device_id = 0;
+    
+    if( !video_card_info )
+        return false;
+    
+    io_registry_entry_t display_port = CGDisplayIOServicePort( kCGDirectMainDisplay );
+    
+    CFTypeRef vendor_id_ref = SearchPortForProperty( display_port, CFSTR("vendor-id") );
+    if( vendor_id_ref )
+    {
+        vendor_id = IntValueOfCFData( (CFDataRef) vendor_id_ref );
+        CFRelease(vendor_id_ref);
+    }
+    
+    CFTypeRef device_id_ref = SearchPortForProperty( display_port, CFSTR("device-id") );
+    if( device_id_ref )
+    {
+        device_id = IntValueOfCFData( (CFDataRef) device_id_ref );
+        CFRelease( device_id_ref );
+    }
+    
+    return true;
+}
+
+/*
+ * Name: KeGetVideoCardInfoList
+ * Desc: Returns a list of device/vendor IDs for all available video cards
+ */
+bool KeGetVideoCardInfoList( std::vector<KeVideoCardInfo> video_card_info_list )
+{
+    /* TODO: Enumerate using CGGetActiveDisplayList()? */
+    
+    return true;
 }

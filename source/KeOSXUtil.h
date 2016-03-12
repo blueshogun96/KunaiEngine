@@ -10,6 +10,8 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CGDirectDisplay.h>
+#include <CoreGraphics/CGDisplayConfiguration.h>
+#include <IOKit/IOKitLib.h>
 
 #include <mach/mach_traps.h>
 #include <sys/types.h>
@@ -27,6 +29,7 @@
 #include <mach/task.h>
 #include <mach/shared_memory_server.h>
 
+#include <vector>
 
 /*
  * System memory status
@@ -41,6 +44,15 @@ struct KeSystemMemoryStatus
     uint64_t free_physical_memory;          /* The amount of physical memory that is free on this machine */
     uint64_t system_used_physical_memory;   /* The amount of physical memory used by the OS */
     uint64_t program_used_physical_memory;  /* The amount of physical memory used by the program */
+};
+
+/*
+ * Video card info
+ */
+struct KeVideoCardInfo
+{
+    uint32_t device_id;
+    uint32_t vendor_id;
 };
 
 
@@ -99,6 +111,18 @@ int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free );
  *       memory totals, usage, etc.
  */
 bool KeQuerySystemMemoryStatus( KeSystemMemoryStatus* memory_status );
+
+/*
+ * Name: KeGetVideoCardInfo
+ * Desc: Gets the device/vendor ID for the currently active video card.
+ */
+bool KeGetVideoCardInfo( KeVideoCardInfo* video_card_info );
+
+/*
+ * Name: KeGetVideoCardInfoList
+ * Desc: Returns a list of device/vendor IDs for all available video cards
+ */
+bool KeGetVideoCardInfoList( std::vector<KeVideoCardInfo> video_card_info_list );
 
 
 #endif /* defined(__ke_osx_util__) */
