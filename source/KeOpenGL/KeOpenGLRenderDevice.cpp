@@ -7,6 +7,7 @@
 
 #include "KeOpenGLRenderDevice.h"
 #include "KeDebug.h"
+#include "KeVideoAdapterOSX.h"
 
 
 /*
@@ -517,6 +518,21 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 
 	DISPDBG( KE_DBGLVL(0), ext_str );
 
+    /* Print out more information on the video card we just initialized OpenGL for */
+#ifdef __APPLE__
+    KeVideoAdapterOSX adapter;
+    KeVideoCardInfo video_card_info;
+    
+    KeGetCurrentVideoAdapterInformationOSX( &adapter );
+    KeGetVideoCardInfo( &video_card_info );
+    
+    DISPDBG( KE_DBGLVL(0), "\n\tVideo Memory: " << adapter.video_memory << "\n"
+            "\tTexture Memory: " << adapter.texture_memory << "\n"
+            "\tAdapter ID: " << adapter.adapter_id << "\n"
+            "\tRenderer ID: " << adapter.renderer_id << "\n" );
+#endif
+    sstr.clear();
+    
 	/* TODO: Determine which fencing version to use based on vendor if needed */
 }
 
@@ -2275,7 +2291,7 @@ void IKeOpenGLRenderDevice::DeleteFence( IKeFence* fence )
 	IKeOpenGLFence* f = static_cast<IKeOpenGLFence*>( fence );
 	KeOpenGLDeleteFence[fence_vendor](f);
 
-	delete fence;
+    f->Destroy();
 }
 
 
@@ -2306,7 +2322,12 @@ void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* fre
  #endif
 #endif
 
-#ifndef __APPLE__
+#ifdef __APPLE__
+    KeVideoAdapterOSX adapter;
+    
+    KeGetCurrentVideoAdapterInformationOSX( &adapter );
+    *total_memory = adapter.video_memory;
+    *free_memory = adapter.texture_memory;
 #endif
 }
 
