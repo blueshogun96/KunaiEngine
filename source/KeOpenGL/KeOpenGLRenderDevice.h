@@ -149,8 +149,14 @@ struct IKeOpenGLFence : public IKeFence
 {
     virtual void Destroy();
     
+    virtual bool Insert();
+    virtual bool Test();
+    virtual void Block();
+    virtual bool Valid();
+    
 	uint32_t	fence;		/* GL_NV_fence, GL_APPLE_fence */
 	GLsync		sync;		/* GL_ARB_sync, GL_APPLE_sync */
+    int         vendor;     /* Fence extension vendor to use */
 };
 
 /*
@@ -268,6 +274,7 @@ public:
     virtual int GetSwapInterval();
 	virtual void BlockUntilIdle();
 	virtual void Kick();
+    virtual bool CreateFence( IKeFence** fence );
 	virtual bool InsertFence( IKeFence** fence );
 	virtual bool TestFence( IKeFence* fence );
 	virtual void BlockOnFence( IKeFence* fence );

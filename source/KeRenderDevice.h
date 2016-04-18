@@ -418,6 +418,11 @@ struct IKePalette : public IKeUnknown
 struct IKeFence : public IKeUnknown
 {
     virtual void Destroy() PURE;
+    
+    virtual bool Insert() PURE;
+    virtual bool Test() PURE;
+    virtual void Block() PURE;
+    virtual bool Valid() PURE;
 };
 
 /*
@@ -537,6 +542,7 @@ public:
     virtual int GetSwapInterval() PURE;
 	virtual void BlockUntilIdle() PURE;
 	virtual void Kick() PURE;
+    virtual bool CreateFence( IKeFence** fence ) PURE;
 	virtual bool InsertFence( IKeFence** fence ) PURE;
 	virtual bool TestFence( IKeFence* fence ) PURE;
 	virtual void BlockOnFence( IKeFence* fence ) PURE;

@@ -21,16 +21,27 @@
 /*
  * NVIDIA fencing functions (GL_NV_fence)
  */
+bool KeOpenGLCreateFenceNV( IKeOpenGLFence** fence )
+{
+#if GL_NV_fence
+    GLenum error = glGetError();
+    
+    /* Generate a new fence */
+    glGenFencesNV( 1, &(*fence)->fence );
+    OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!" );
+    
+    return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_NV_fence not supported!" );
+#endif
+}
+
 bool KeOpenGLInsertFenceNV( IKeOpenGLFence** fence )
 {
 #if GL_NV_fence
 	GLenum error = glGetError();
-
-	/* Generate a new fence */
-	glGenFencesNV( 1, &(*fence)->fence );
-	OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!" );
-
-	/* Set the fence */
+    
+    /* Set the fence */
 	glSetFenceNV( (*fence)->fence, GL_ALL_COMPLETED_NV );
 	OGL_DISPDBG_RB( KE_ERROR, "Error setting new fence!" );
 
@@ -86,6 +97,20 @@ bool KeOpenGLIsFenceNV( IKeOpenGLFence* fence )
 /*
  * APPLE fencing functions (GL_APPLE_fence)
  */
+bool KeOpenGLCreateFenceAPPLE( IKeOpenGLFence** fence )
+{
+#if GL_APPLE_fence
+    GLenum error = glGetError();
+    
+    /* Generate a new fence */
+    glGenFencesAPPLE( 1, &(*fence)->fence );
+    
+    return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_fence not supported!" );
+#endif
+}
+
 bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 {
 #if GL_APPLE_fence
@@ -155,6 +180,16 @@ bool KeOpenGLIsFenceAPPLE( IKeOpenGLFence* fence )
 /*
  * ARB synchronization functions (GL_ARB_sync)
  */
+bool KeOpenGLCreateFenceARB( IKeOpenGLFence** fence )
+{
+#if GL_ARB_fence
+    /* ARB_sync creates and inserts the fence with the same API call */
+    return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_ARB_sync not supported!" );
+#endif
+}
+
 bool KeOpenGLInsertFenceARB( IKeOpenGLFence** fence )
 {
 #if GL_ARB_fence
@@ -223,8 +258,10 @@ bool KeOpenGLIsFenceARB( IKeOpenGLFence* fence )
 #define KE_FENCE_NV		1
 #define KE_FENCE_APPLE	2
 
+bool ( *KeOpenGLCreateFence[3] )( IKeOpenGLFence** ) = { KeOpenGLCreateFenceARB, KeOpenGLCreateFenceNV, KeOpenGLCreateFenceAPPLE };
 bool ( *KeOpenGLInsertFence[3] )( IKeOpenGLFence** ) = { KeOpenGLInsertFenceARB, KeOpenGLInsertFenceNV, KeOpenGLInsertFenceAPPLE };
 bool ( *KeOpenGLTestFence[3] )( IKeOpenGLFence* ) = { KeOpenGLTestFenceARB, KeOpenGLTestFenceNV, KeOpenGLTestFenceAPPLE };
 void ( *KeOpenGLBlockOnFence[3] )( IKeOpenGLFence* ) = { KeOpenGLBlockOnFenceARB, KeOpenGLBlockOnFenceNV, KeOpenGLBlockOnFenceAPPLE };
 void ( *KeOpenGLDeleteFence[3] )( IKeOpenGLFence* ) = { KeOpenGLDeleteFenceARB, KeOpenGLDeleteFenceNV, KeOpenGLDeleteFenceAPPLE };
 bool ( *KeOpenGLIsFence[3] )( IKeOpenGLFence* ) = { KeOpenGLIsFenceARB, KeOpenGLIsFenceNV, KeOpenGLIsFenceAPPLE };
+
