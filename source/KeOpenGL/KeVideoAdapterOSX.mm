@@ -12,7 +12,7 @@
 /*
  * NOTES: This code is based off of Apple's official documentation, in particular can be found at the link below.
  *        Being OSX specific, ideally this code should be kept internal and generally inaccessable to the developer
- *        not modifying the source code directly.
+ *        that isn't modifying the source code directly.
  *
  * Reference: https://developer.apple.com/library/mac/qa/qa1168/_index.html
  */
