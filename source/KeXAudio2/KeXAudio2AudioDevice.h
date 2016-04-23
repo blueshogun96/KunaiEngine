@@ -35,15 +35,15 @@ struct IKeXAudio2SoundBuffer : public IKeSoundBuffer
     virtual void Stop();
     virtual void Pause();
     
-    virtual void SetPosition( float* position );
-    virtual void SetVelocity( float* velocity );
+    virtual void SetPosition( nv::vec3f& position );
+    virtual void SetVelocity( nv::vec3f& velocity );
     virtual void SetVolume( float volume );
     virtual void SetPitch( float pitch );
 
 	float					volume;
 	float					pitch;
-    float					position[3];
-    float					velocity[3];
+    nv::vec3f				position;
+    nv::vec3f				velocity;
 	IXAudio2SourceVoice*	subvoice;
 	uint8_t*				buffer_data;
 	int						buffer_size;
@@ -119,9 +119,9 @@ public:
     virtual bool ConfirmDevice();
     virtual bool CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer** sound_buffer );
 
-    virtual void SetListenerPosition( float* position );
-    virtual void SetListenerVelocity( float* velocity );
-    virtual void SetListenerOrientation( float* at, float* up );
+    virtual void SetListenerPosition( nv::vec3f& position );
+    virtual void SetListenerVelocity( nv::vec3f& velocity );
+    virtual void SetListenerOrientation( nv::vec3f& at, nv::vec3f& up );
     
 private:
 	bool initialized;

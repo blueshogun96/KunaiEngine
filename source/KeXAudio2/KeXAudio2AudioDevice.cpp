@@ -104,21 +104,17 @@ bool IKeXAudio2AudioDevice::CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer
 }
 
 
-void IKeXAudio2AudioDevice::SetListenerPosition( float* position )
+void IKeXAudio2AudioDevice::SetListenerPosition( nv::vec3f& position )
 {
     /* Set the listener position */
 }
 
-void IKeXAudio2AudioDevice::SetListenerVelocity( float* velocity )
+void IKeXAudio2AudioDevice::SetListenerVelocity( nv::vec3f& velocity )
 {
     /* Set the listener velocity */
 }
 
-void IKeXAudio2AudioDevice::SetListenerOrientation( float* at, float* up )
+void IKeXAudio2AudioDevice::SetListenerOrientation( nv::vec3f& at, nv::vec3f& up )
 {
-    float orientation[6];
     
-    /* Set the listener orientation */
-    memmove( orientation, at, sizeof( float ) * 3 );
-    memmove( &orientation[3], up, sizeof( float ) * 3 );
 }

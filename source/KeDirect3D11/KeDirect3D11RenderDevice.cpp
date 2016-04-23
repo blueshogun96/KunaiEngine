@@ -1855,6 +1855,39 @@ void IKeDirect3D11RenderDevice::Kick()
 
 
 /*
+ * Name: IKeDirect3D11RenderDevice::CreateFence
+ * Desc: Creates a new GPU fence object.
+ */
+bool IKeDirect3D11RenderDevice::CreateFence( IKeFence** fence )
+{
+    if( !fence )
+        return false;
+    
+    /* Create a new fence */
+    (*fence) = new IKeDirect3D11Fence();
+    IKeDirect3D11Fence* f = static_cast<IKeDirect3D11Fence*>( *fence );
+
+	/* Save a copy of the device context */
+    f->context = d3ddevice_context;
+
+	/* Create a query object */
+	HRESULT hr = S_OK;
+    D3D11_QUERY_DESC query_desc;
+    query_desc.Query = D3D11_QUERY_EVENT;
+    query_desc.MiscFlags = 0;
+
+	hr = d3ddevice->CreateQuery( &query_desc, &f->query );
+	if( FAILED( hr ) )
+	{
+		f->Destroy();
+		D3D_DISPDBG_RB( KE_ERROR, "Error creating GPU fence!", hr );;
+	}
+
+    return true;
+}
+
+//#if 0
+/*
  * Name: IKeDirect3D11RenderDevice::insert_fence
  * Desc: Creates a new GPU fence object and sets it in place.
  */
@@ -1968,6 +2001,7 @@ bool IKeDirect3D11RenderDevice::IsFence( IKeFence* fence )
 
 	return true;
 }
+//#endif
 
 
 /*

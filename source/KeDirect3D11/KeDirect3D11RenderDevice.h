@@ -185,7 +185,13 @@ struct IKeDirect3D11Fence : public IKeFence
 {
 	virtual void Destroy();
     
-	CD3D11Query query;
+	virtual bool Insert();
+    virtual bool Test();
+    virtual void Block();
+    virtual bool Valid();
+
+	CD3D11Query			query;
+	CD3D11DeviceContext context;	/* Copy of the render device's context */
 };
 
 /*
@@ -303,6 +309,7 @@ public:
     virtual int GetSwapInterval();
 	virtual void BlockUntilIdle();
 	virtual void Kick();
+	virtual bool CreateFence( IKeFence** fence );
 	virtual bool InsertFence( IKeFence** fence );
 	virtual bool TestFence( IKeFence* fence );
 	virtual void BlockOnFence( IKeFence* fence );

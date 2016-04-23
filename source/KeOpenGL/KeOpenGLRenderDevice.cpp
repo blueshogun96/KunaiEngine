@@ -7,8 +7,10 @@
 
 #include "KeOpenGLRenderDevice.h"
 #include "KeDebug.h"
-#include "KeVideoAdapterOSX.h"
 
+#ifdef __APPLE__
+#include "KeVideoAdapterOSX.h"
+#endif
 
 /*
  * DirectDraw stuff

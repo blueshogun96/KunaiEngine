@@ -86,11 +86,11 @@ void IKeXAudio2SoundBuffer::Pause()
 	XA2_DISPDBG_R( KE_ERROR, "Error pausing sound effect!" );
 }
 
-void IKeXAudio2SoundBuffer::SetPosition( float* position )
+void IKeXAudio2SoundBuffer::SetPosition( nv::vec3f& position )
 {
 }
 
-void IKeXAudio2SoundBuffer::SetVelocity( float* velocity )
+void IKeXAudio2SoundBuffer::SetVelocity( nv::vec3f& velocity )
 {
 }
 
