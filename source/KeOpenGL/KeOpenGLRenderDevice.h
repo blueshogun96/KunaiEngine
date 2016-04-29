@@ -206,6 +206,7 @@ public:
 	virtual void Clear( uint32_t buffers );
     virtual void Swap();
     
+    virtual void SetIMCacheSize( uint32_t cache_size, KeVertexAttribute* va );
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer );
     virtual void DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer );
     virtual void SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer );
@@ -246,7 +247,7 @@ public:
 	virtual bool SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer );
 	virtual void SetRenderStates( KeState* states );
 	virtual void SetSamplerStates( int stage, KeState* states );
-    virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data );
+    virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data );
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count );
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count );
     virtual void DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count );
@@ -275,11 +276,13 @@ public:
 	virtual void BlockUntilIdle();
 	virtual void Kick();
     virtual bool CreateFence( IKeFence** fence );
+#if 0
 	virtual bool InsertFence( IKeFence** fence );
 	virtual bool TestFence( IKeFence* fence );
 	virtual void BlockOnFence( IKeFence* fence );
 	virtual void DeleteFence( IKeFence* fence );
 	virtual bool IsFence( IKeFence* fence );
+#endif
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory );
@@ -293,6 +296,8 @@ protected:
 	void*		dd;
 	KeState		samplers[8][16];
 	int			dirty_samplers[8][16];
+    uint32_t    im_cache_size;
+    IKeGeometryBuffer* im_gb;
 };
 
 

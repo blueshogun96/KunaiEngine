@@ -43,7 +43,7 @@ void KeZipResourceArchive::Close()
         mz_zip_reader_end( (mz_zip_archive*) archive );
         
         /* Delete the archive pointer */
-        delete archive;
+        delete static_cast<mz_zip_archive*>(archive);
         archive = nullptr;
     }
 }
@@ -68,7 +68,7 @@ bool KeZipResourceArchive::ReadString( std::string filename, void** ptr, size_t*
 	*ptr = realloc( *ptr, (*size) + 1 );
 	/* Set that extra byte to 0 to terminate the string */
 	((char*)(*ptr))[*size] = 0;
-	*size++;
+	(*size)++;
 
 	return true;
 }

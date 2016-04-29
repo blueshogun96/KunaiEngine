@@ -9,6 +9,10 @@
 #ifndef _KeUnknown_h
 #define _KeUnknown_h
 
+#define KEMETHOD        virtual void
+#define _KEMETHOD(T)    virtual T
+
+
 /*
  * Unknown (default base) structure
  */

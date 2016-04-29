@@ -172,7 +172,7 @@ uint32_t texture_formats[] =
 uint32_t internal_texture_formats[] = 
 {
 	GL_RGBA,
-	GL_BGRA,
+	GL_RGBA8,
 	GL_R8,
 	GL_RGB,
 	GL_RGB
@@ -335,7 +335,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice()
  * Name: IKeOpenGLRenderDevice::IKeOpenGLRenderDevice
  * Desc: Appropriate constructor used for initialization of OpenGL via SDL.
  */
-IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : fence_vendor( KE_FENCE_ARB ), dd(NULL)
+IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : fence_vendor( KE_FENCE_ARB ), dd(NULL), im_gb(NULL), im_cache_size(0)
 {
     /* Until we are finished initializing, mark this flag as false */
     initialized = false;
@@ -550,6 +550,13 @@ IKeOpenGLRenderDevice::~IKeOpenGLRenderDevice()
     /* Kill the default vertex and fragment program */
     ke_uninitialize_default_shaders();
     
+    /* Destroy the immediate mode geometry buffer if it exists */
+    if( im_gb )
+    {
+        im_gb->Destroy();
+        im_gb = nullptr;
+    }
+    
     /* Uninitialize and close OpenGL and SDL */
     SDL_GL_DeleteContext( context );
     SDL_DestroyWindow( window );
@@ -694,6 +701,38 @@ void IKeOpenGLRenderDevice::Swap()
     SDL_GL_SwapWindow( window );
 }
 
+
+/* 
+ * Name: IKeOpenGLRenderDevice::SetIMCacheSize
+ * Desc: Sets the size of the internally managed geometry buffer (in bytes) used for immediate
+ *       mode rendering.
+ * NOTE: When changing the cache size, this function checks whether the immediate mode geometry-
+ *       buffer was already created.  If it exists and the size of the buffer size requested differs
+ *       from the curent size, the buffer will be destroyed and recreated.  To avoid performance issues,
+ *       avoid calling this function unless you actually need to.
+ */
+void IKeOpenGLRenderDevice::SetIMCacheSize( uint32_t cache_size, KeVertexAttribute* va )
+{
+    /* Does this buffer already exist? */
+    if( im_gb )
+    {
+        /* If so, does the buffer size requested actually match the current buffer size or not? */
+        if( cache_size != this->im_cache_size )
+        {
+            DISPDBG( KE_WARNING, "Changing IM Cache size from " << im_cache_size << " bytes to " << cache_size << " bytes..." );
+        }
+        
+        /* Destroy this geometry buffer... */
+        im_gb->Destroy();
+    }
+    
+    /* And create a new one */
+    bool res = CreateGeometryBuffer( NULL, cache_size, NULL, cache_size, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, va, &im_gb );
+    if( !res )
+    {
+        DISPDBG( KE_ERROR, "Error resizing IM geometry buffer!" );
+    }
+}
 
 /*
  * Name: IKeOpenGLRenderDevice::create_geometry_buffer
@@ -1825,11 +1864,32 @@ void IKeOpenGLRenderDevice::SetSamplerStates( int stage, KeState* states )
 #endif
 }
 
-void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data )
+/*
+ * Name: IKeOpenGLRenderDevice::DrawVerticesIM
+ * Desc: Draws raw vertices without the need for a geometry buffer.  
+ * TODO: This isn't actually working right now, FIX IT!!
+ */
+void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data )
 {
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
     GLenum error = glGetError();
     
+    /* If the IM geometry buffer was never even created, then exit now */
+    if( !im_gb )
+    {
+        DISPDBG_R( KE_ERROR, "The IM Geometry Buffer was not created! Call IKeRenderDevice::SetIMCacheSize first!" );
+    }
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Set the VAO of the IM geometry buffer now */
+    glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
+    OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+    
+#if 0
     /* Set the vertex attributes for this geometry buffer */
     for( int i = 0; vertex_attributes[i].index != -1; i++ )
     {
@@ -1843,6 +1903,60 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
         glEnableVertexAttribArray(vertex_attributes[i].index);
         error = glGetError();
     }
+#endif
+    
+    /* Handle texture stages */
+    for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
+    {
+        /* Don't bother setting samplers to texture stages not being used */
+        if( current_texture[texture_stage] == NULL )
+            continue;
+        
+        /* Change the active texture unit before making changes */
+        glActiveTexture( GL_TEXTURE0 + texture_stage );
+        //glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
+        //	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
+        
+        IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
+        
+        int i = 0;
+        while( samplers[texture_stage][i].state != -1 )
+        {
+            switch( samplers[texture_stage][i].state )
+            {
+                case KE_TS_MAGFILTER:
+                    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_MINFILTER:
+                    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPU:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPV:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPW:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                default:
+                    DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
+                            "param1: " << samplers[texture_stage][i].param1 << "\n"
+                            "param2: " << samplers[texture_stage][i].param2 << "\n"
+                            "param3: " << samplers[texture_stage][i].param3 << "\n"
+                            "fparam: " << samplers[texture_stage][i].fparam << "\n"
+                            "dparam: " << samplers[texture_stage][i].dparam << "\n" );
+                    break;
+            }
+            
+            i++;
+        }
+    }
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
@@ -1852,13 +1966,27 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
     error = glGetError();
     
-    /* Unbind any VBO or IBO bound */
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    /* Now bind the VBO that is designated for immediate mode rendering */
+    glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+    
+    /* Set the vertex data into the immediate mode geometry buffer */
+    im_gb->SetVertexData( 0, stride*count, vertex_data );
     
     /* Draw the vertices */
     glDrawArrays( primitive_types[primtype], first, count );
     OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!" );
+    
+    /* Re-bind the previous geometry buffer if it existed */
+    if( gb )
+    {
+        glBindVertexArray( gb->vao );
+        OGL_DISPDBG( KE_ERROR, "Error re-binding vertex array object!" );
+        glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding vertex buffer!" );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding index buffer!" );
+    }
 }
 
 
@@ -2266,6 +2394,7 @@ bool IKeOpenGLRenderDevice::CreateFence( IKeFence** fence )
     return true;
 }
 
+#if 0
 /*
  * Name: IKeOpenGLRenderDevice::insert_fence
  * Desc: Creates a new GPU fence object and sets it in place.
@@ -2335,6 +2464,8 @@ bool IKeOpenGLRenderDevice::IsFence( IKeFence* fence )
 
 	return KeOpenGLIsFence[fence_vendor]( static_cast<IKeOpenGLFence*>(fence) );;
 }
+#endif
+
 
 /*
  * Name: IKeOpenGLRenderDevice::gpu_memory_info

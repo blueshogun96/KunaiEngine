@@ -105,6 +105,7 @@ bool IKeOpenGLGeometryBuffer::SetVertexData( uint32_t offset, uint32_t size, voi
 {
     /* Set our vertex buffer data */
     glBindBuffer( GL_ARRAY_BUFFER, vbo[0] );
+    OGL_DISPDBG_RB( KE_ERROR, "Error binding vertex buffer!", glGetError() );
     glBufferSubData( GL_ARRAY_BUFFER, offset, size, ptr );
     OGL_DISPDBG_RB( KE_ERROR, "Error setting vertex buffer data!", glGetError() );
     

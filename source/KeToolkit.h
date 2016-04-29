@@ -13,6 +13,16 @@
 
 
 /*
+ * Texture formats (from KeRenderDevice.h)
+ */
+#define KE_TEXTUREFORMAT_RGBA   0
+#define KE_TEXTUREFORMAT_BGRA   1
+#define KE_TEXTUREFORMAT_R8		2
+#define KE_TEXTUREFORMAT_RGB	3
+#define KE_TEXTUREFORMAT_BGR	4
+
+
+/*
  * Image palette entry (XRGB)
  */
 struct KePaletteEntry
@@ -28,6 +38,7 @@ struct KeImageData
     uint32_t width;
     uint32_t height;
     uint32_t bpp;
+    uint32_t format;
     
     void* pixels;
     KePaletteEntry palette[256];

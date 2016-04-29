@@ -12,8 +12,8 @@
 #include "KePlatform.h"
 #include "KeUnknown.h"
 //#include "vectormath.h"
-#include <NvFoundationMath.h>
-#include <NV/NvMath.h>
+#include "NvFoundationMath.h"
+#include "NV/NvMath.h"
 
 
 /*
@@ -474,6 +474,7 @@ public:
 	virtual void Clear( uint32_t buffers ) PURE;
     virtual void Swap() PURE;
     
+    virtual void SetIMCacheSize( uint32_t cache_size, KeVertexAttribute* va ) PURE;
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer ) PURE;
     virtual void DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
     virtual void SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
@@ -514,7 +515,7 @@ public:
 	virtual bool SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer ) PURE;
     virtual void SetRenderStates( KeState* states ) PURE;
     virtual void SetSamplerStates( int stage, KeState* states ) PURE;
-    virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data ) PURE;
+    virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data ) PURE;
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count ) PURE;
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count ) PURE;
     virtual void DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count ) PURE;
@@ -543,11 +544,13 @@ public:
 	virtual void BlockUntilIdle() PURE;
 	virtual void Kick() PURE;
     virtual bool CreateFence( IKeFence** fence ) PURE;
+#if 0
 	virtual bool InsertFence( IKeFence** fence ) PURE;
 	virtual bool TestFence( IKeFence* fence ) PURE;
 	virtual void BlockOnFence( IKeFence* fence ) PURE;
 	virtual void DeleteFence( IKeFence* fence ) PURE;
 	virtual bool IsFence( IKeFence* fence ) PURE;
+#endif
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory ) PURE;
