@@ -311,8 +311,70 @@ void ke_uninitialize_default_shaders()
 }
 
 
+/* Tells us whether a set of vertex attributes actually match another */
+bool KeVertexAttributesMatch( KeVertexAttribute* va1, KeVertexAttribute* va2 )
+{
+    if( !va1 || !va2 )
+        return false;
+    
+    int va_size1 = 0;
+    while( va1[va_size1].index != -1 )
+        va_size1++;
+    
+    int va_size2 = 0;
+    while( va2[va_size2].index != -1 )
+        va_size2++;
+    
+    if( va_size1 != va_size2 )
+        return false;
+    
+    int i = va_size1-1;
+    
+    while( i > -1 )
+    {
+        if( va1[i].index == va2[i].index &&
+            va1[i].normalize == va2[i].normalize &&
+            va1[i].offset == va2[i].offset &&
+            va1[i].size == va2[i].size &&
+            va1[i].stride == va2[i].stride )
+        {
+            i--;
+            continue;
+        }
+        else
+            return false;
+    }
+    
+    return true;
+}
 
-
+/* Sets the vertex attribute list and enables it */
+void KeSetVertexAttributes( KeVertexAttribute* va )
+{
+    GLenum error = glGetError();
+    int max_attribs = 0;
+    
+    /* Get the max number of vertex attributes this OpenGL implementation supports */
+    glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &max_attribs );
+    
+    /* Disable all vertex attributes before setting the new ones */
+    for( int i = 0; i < max_attribs; i++ )
+        glDisableVertexAttribArray(i);
+    
+    /* Set the vertex attributes for this geometry buffer */
+    for( int i = 0; va[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( va[i].index,
+                              va[i].size,
+                              data_types[va[i].type],
+                              va[i].normalize,
+                              va[i].stride,
+                              BUFFER_OFFSET(va[i].offset) );
+        OGL_DISPDBG( KE_WARNING, "Unable to set vertex attribute #" << i );
+        glEnableVertexAttribArray(va[i].index);
+        OGL_DISPDBG( KE_WARNING, "Unable to enable vertex attribute #" << i );
+    }
+}
 
 
 /*
@@ -465,6 +527,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     glDisable( GL_TEXTURE_2D );
     
     /* Set vertex attributes to their defaults */
+    ZeroMemory( current_vertexattribute, sizeof( KeVertexAttribute ) * 32 );
     current_vertexattribute[0].index = 0;
     current_vertexattribute[0].size = 3;
     current_vertexattribute[0].type = KE_FLOAT;
@@ -709,10 +772,17 @@ void IKeOpenGLRenderDevice::Swap()
  * NOTE: When changing the cache size, this function checks whether the immediate mode geometry-
  *       buffer was already created.  If it exists and the size of the buffer size requested differs
  *       from the curent size, the buffer will be destroyed and recreated.  To avoid performance issues,
- *       avoid calling this function unless you actually need to.
+ *       avoid calling this function every frame.
  */
-void IKeOpenGLRenderDevice::SetIMCacheSize( uint32_t cache_size, KeVertexAttribute* va )
+void IKeOpenGLRenderDevice::SetIMCacheSize( uint32_t cache_size )
 {
+    /* A dummy vertex attribute; this will be changed by the user later on */
+    KeVertexAttribute dummy_va[] =
+    {
+        { KE_VA_POSITION, 3, KE_FLOAT, No, sizeof(float)*3, 0 },
+        { -1, 0, 0, 0, 0, 0 },
+    };
+    
     /* Does this buffer already exist? */
     if( im_gb )
     {
@@ -727,7 +797,7 @@ void IKeOpenGLRenderDevice::SetIMCacheSize( uint32_t cache_size, KeVertexAttribu
     }
     
     /* And create a new one */
-    bool res = CreateGeometryBuffer( NULL, cache_size, NULL, cache_size, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, va, &im_gb );
+    bool res = CreateGeometryBuffer( NULL, cache_size, NULL, cache_size, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, dummy_va, &im_gb );
     if( !res )
     {
         DISPDBG( KE_ERROR, "Error resizing IM geometry buffer!" );
@@ -1866,8 +1936,7 @@ void IKeOpenGLRenderDevice::SetSamplerStates( int stage, KeState* states )
 
 /*
  * Name: IKeOpenGLRenderDevice::DrawVerticesIM
- * Desc: Draws raw vertices without the need for a geometry buffer.  
- * TODO: This isn't actually working right now, FIX IT!!
+ * Desc: Draws raw vertices without the need for a geometry buffer.
  */
 void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data )
 {
@@ -1888,22 +1957,6 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     /* Set the VAO of the IM geometry buffer now */
     glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
     OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
-    
-#if 0
-    /* Set the vertex attributes for this geometry buffer */
-    for( int i = 0; vertex_attributes[i].index != -1; i++ )
-    {
-        glVertexAttribPointer( vertex_attributes[i].index,
-                              vertex_attributes[i].size,
-                              data_types[vertex_attributes[i].type],
-                              vertex_attributes[i].normalize,
-                              vertex_attributes[i].stride,
-                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
-                              &vertex_data[vertex_attributes[i].offset]);
-        glEnableVertexAttribArray(vertex_attributes[i].index);
-        error = glGetError();
-    }
-#endif
     
     /* Handle texture stages */
     for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
@@ -1970,12 +2023,160 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
     OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
     
+#if 0
+    /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+#else
+    KeSetVertexAttributes( vertex_attributes );
+#endif
+    
     /* Set the vertex data into the immediate mode geometry buffer */
     im_gb->SetVertexData( 0, stride*count, vertex_data );
     
     /* Draw the vertices */
     glDrawArrays( primitive_types[primtype], first, count );
-    OGL_DISPDBG_R( KE_ERROR, "Vertex array rendering error (glDrawArrays)!" );
+    OGL_DISPDBG_R( KE_ERROR, "IM Vertex array rendering error (glDrawArrays)!" );
+    
+    /* Re-bind the previous geometry buffer if it existed */
+    if( gb )
+    {
+        glBindVertexArray( gb->vao );
+        OGL_DISPDBG( KE_ERROR, "Error re-binding vertex array object!" );
+        glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding vertex buffer!" );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding index buffer!" );
+    }
+}
+
+
+/*
+ * Name: IKeOpenGLRenderDevice::DrawVerticesIM
+ * Desc: Draws raw vertices without the need for a geometry buffer.
+ */
+void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data )
+{
+    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
+    GLenum error = glGetError();
+    
+    /* If the IM geometry buffer was never even created, then exit now */
+    if( !im_gb )
+    {
+        DISPDBG_R( KE_ERROR, "The IM Geometry Buffer was not created! Call IKeRenderDevice::SetIMCacheSize first!" );
+    }
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Set the VAO of the IM geometry buffer now */
+    glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
+    OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+    
+    /* Handle texture stages */
+    for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
+    {
+        /* Don't bother setting samplers to texture stages not being used */
+        if( current_texture[texture_stage] == NULL )
+            continue;
+        
+        /* Change the active texture unit before making changes */
+        glActiveTexture( GL_TEXTURE0 + texture_stage );
+        //glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
+        //	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
+        
+        IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
+        
+        int i = 0;
+        while( samplers[texture_stage][i].state != -1 )
+        {
+            switch( samplers[texture_stage][i].state )
+            {
+                case KE_TS_MAGFILTER:
+                    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_MINFILTER:
+                    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPU:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPV:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPW:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                default:
+                    DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
+                            "param1: " << samplers[texture_stage][i].param1 << "\n"
+                            "param2: " << samplers[texture_stage][i].param2 << "\n"
+                            "param3: " << samplers[texture_stage][i].param3 << "\n"
+                            "fparam: " << samplers[texture_stage][i].fparam << "\n"
+                            "dparam: " << samplers[texture_stage][i].dparam << "\n" );
+                    break;
+            }
+            
+            i++;
+        }
+    }
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Now bind the VBO and IBO that is designated for immediate mode rendering */
+    glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[1] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM index buffer!" );
+    
+#if 0
+    /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+#else
+    KeSetVertexAttributes( vertex_attributes );
+#endif
+    
+    /* Set the vertex data into the immediate mode geometry buffer */
+    im_gb->SetVertexData( 0, stride*count, vertex_data );
+    im_gb->SetIndexData( 0, count*sizeof(uint16_t), index_data );
+    
+    /* Draw the vertices */
+    glDrawElements( primitive_types[primtype], count, data_types[gb->index_type], NULL );
+    OGL_DISPDBG_R( KE_ERROR, "IM Indexed geometry rendering error (glDrawElements)!" );
     
     /* Re-bind the previous geometry buffer if it existed */
     if( gb )

@@ -206,7 +206,7 @@ public:
 	virtual void Clear( uint32_t buffers );
     virtual void Swap();
     
-    virtual void SetIMCacheSize( uint32_t cache_size, KeVertexAttribute* va );
+    virtual void SetIMCacheSize( uint32_t cache_size );
     virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer );
     virtual void DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer );
     virtual void SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer );
@@ -248,6 +248,7 @@ public:
 	virtual void SetRenderStates( KeState* states );
 	virtual void SetSamplerStates( int stage, KeState* states );
     virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data );
+    virtual void DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data );
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count );
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count );
     virtual void DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count );

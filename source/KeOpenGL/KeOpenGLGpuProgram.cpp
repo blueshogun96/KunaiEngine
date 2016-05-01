@@ -32,5 +32,12 @@ void IKeOpenGLGpuProgram::Destroy()
  */
 void IKeOpenGLGpuProgram::GetVertexAttributes( KeVertexAttribute* vertex_attributes )
 {
-	vertex_attributes = va;
+	//vertex_attributes = va;
+    
+    /* Copy vertex attributes */
+    int va_size = 0;
+    while( va[va_size].index != -1 )
+        va_size++;
+    
+    memmove( vertex_attributes, va, sizeof( KeVertexAttribute ) * (va_size+1) );
 }
