@@ -853,6 +853,8 @@ void IKeOpenGLRenderDevice::SetIMCacheSize( uint32_t cache_size )
         im_gb->Destroy();
     }
     
+	im_cache_size = cache_size;
+
     /* And create a new one */
     bool res = CreateGeometryBuffer( NULL, cache_size, NULL, cache_size, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, dummy_va, &im_gb );
     if( !res )

@@ -235,7 +235,7 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice()
 * Name: IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice
 * Desc: Appropriate constructor used for initialization of Direct3D and a window via SDL.
 */
-IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : swap_interval(0)
+IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : swap_interval(0), im_gb(NULL), im_cache_size(4096)
 {
 	/* Until we are finished initializing, mark this flag as false */
 	initialized = false;
@@ -314,7 +314,8 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
         D3D_DISPDBG_R( KE_ERROR, "Error getting back buffer!", hr );
 
     hr = d3ddevice->CreateRenderTargetView( back_buffer, NULL, &d3d_render_target_view );
-    back_buffer = 0;
+    //back_buffer = 0;
+	back_buffer->Release();
     if( FAILED( hr ) )
         D3D_DISPDBG_R( KE_ERROR, "Error creating render target view!", hr );
 
@@ -514,6 +515,48 @@ void IKeDirect3D11RenderDevice::Swap()
 	HRESULT hr = dxgi_swap_chain->Present( swap_interval, 0 );
 	if( FAILED( hr ) )
 		DISPDBG( KE_ERROR, "IDXGISwapChain::Present(): Error = 0x" << hr << "\n" );
+}
+
+
+/* 
+ * Name: IKeDirect3D11RenderDevice::SetIMCacheSize
+ * Desc: Sets the size of the internally managed geometry buffer (in bytes) used for immediate
+ *       mode rendering.
+ * NOTE: When changing the cache size, this function checks whether the immediate mode geometry-
+ *       buffer was already created.  If it exists and the size of the buffer size requested differs
+ *       from the curent size, the buffer will be destroyed and recreated.  To avoid performance issues,
+ *       avoid calling this function every frame.
+ */
+void IKeDirect3D11RenderDevice::SetIMCacheSize( uint32_t cache_size )
+{
+    /* A dummy vertex attribute; this will be changed by the user later on */
+    KeVertexAttribute dummy_va[] =
+    {
+        { KE_VA_POSITION, 3, KE_FLOAT, No, sizeof(float)*3, 0 },
+        { -1, 0, 0, 0, 0, 0 },
+    };
+    
+    /* Does this buffer already exist? */
+    if( im_gb )
+    {
+        /* If so, does the buffer size requested actually match the current buffer size or not? */
+        if( cache_size != this->im_cache_size )
+        {
+            DISPDBG( KE_WARNING, "Changing IM Cache size from " << im_cache_size << " bytes to " << cache_size << " bytes..." );
+        }
+        
+        /* Destroy this geometry buffer... */
+        im_gb->Destroy();
+    }
+    
+	im_cache_size = cache_size;
+
+    /* And create a new one */
+    bool res = CreateGeometryBuffer( NULL, cache_size, NULL, cache_size, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, dummy_va, &im_gb );
+    if( !res )
+    {
+        DISPDBG( KE_ERROR, "Error resizing IM geometry buffer!" );
+    }
 }
 
 
@@ -1518,8 +1561,251 @@ void IKeDirect3D11RenderDevice::SetSamplerStates( int stage, KeState* states )
 	
 }
 
-void IKeDirect3D11RenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, uint8_t* vertex_data )
+
+/*
+ * Name: IKeDirect3D11RenderDevice::DrawVerticesIM
+ * Desc: Draws raw vertices without the need for a geometry buffer.
+ */
+void IKeDirect3D11RenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data )
 {
+#if 0
+    IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>( current_gpu_program );
+    IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>( current_geometrybuffer );
+    GLenum error = glGetError();
+    
+    /* If the IM geometry buffer was never even created, then exit now */
+    if( !im_gb )
+    {
+        DISPDBG_R( KE_ERROR, "The IM Geometry Buffer was not created! Call IKeRenderDevice::SetIMCacheSize first!" );
+    }
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Set the VAO of the IM geometry buffer now */
+    glBindVertexArray( static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vao );
+    OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+    
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Now bind the VBO that is designated for immediate mode rendering */
+    glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vbo[0] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+    
+#if 0
+    /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+#else
+    KeSetVertexAttributes( vertex_attributes );
+#endif
+    
+    /* Set the vertex data into the immediate mode geometry buffer */
+    im_gb->SetVertexData( 0, stride*count, vertex_data );
+    
+    /* Draw the vertices */
+    glDrawArrays( primitive_types[primtype], first, count );
+    OGL_DISPDBG_R( KE_ERROR, "IM Vertex array rendering error (glDrawArrays)!" );
+    
+    /* Re-bind the previous geometry buffer if it existed */
+    if( gb )
+    {
+        glBindVertexArray( gb->vao );
+        OGL_DISPDBG( KE_ERROR, "Error re-binding vertex array object!" );
+        glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding vertex buffer!" );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding index buffer!" );
+    }
+#endif
+
+	DISPDBG( KE_ERROR, "Functionality not yet implemented!" );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::DrawIndexedVerticesIM
+ * Desc: Draws raw indexed vertices without the need for a geometry buffer.
+ */
+void IKeDirect3D11RenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data )
+{
+#if 0
+    IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>( current_gpu_program );
+    IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>( current_geometrybuffer );
+    GLenum error = glGetError();
+    
+    /* If the IM geometry buffer was never even created, then exit now */
+    if( !im_gb )
+    {
+        DISPDBG_R( KE_ERROR, "The IM Geometry Buffer was not created! Call IKeRenderDevice::SetIMCacheSize first!" );
+    }
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Set the VAO of the IM geometry buffer now */
+    glBindVertexArray( static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vao );
+    OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+    
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Now bind the VBO and IBO that is designated for immediate mode rendering */
+    glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vbo[0] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vbo[1] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM index buffer!" );
+    
+#if 0
+    /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+#else
+    KeSetVertexAttributes( vertex_attributes );
+#endif
+    
+    /* Set the vertex data into the immediate mode geometry buffer */
+    im_gb->SetVertexData( 0, stride*count, vertex_data );
+    im_gb->SetIndexData( 0, count*sizeof(uint16_t), index_data );
+    
+    /* Draw the vertices */
+    glDrawElements( primitive_types[primtype], count, data_types[gb->index_type], NULL );
+    OGL_DISPDBG_R( KE_ERROR, "IM Indexed geometry rendering error (glDrawElements)!" );
+    
+    /* Re-bind the previous geometry buffer if it existed */
+    if( gb )
+    {
+        glBindVertexArray( gb->vao );
+        OGL_DISPDBG( KE_ERROR, "Error re-binding vertex array object!" );
+        glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding vertex buffer!" );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding index buffer!" );
+    }
+#endif
+
+	DISPDBG( KE_ERROR, "Functionality not yet implemented!" );
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::DrawIndexedVerticesRangeIM
+ * Desc: Draws raw indexed vertices without the need for a geometry buffer.
+ */
+void IKeDirect3D11RenderDevice::DrawIndexedVerticesRangeIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int start, int end, int count, void* vertex_data, void* index_data )
+{
+#if 0
+    IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>( current_gpu_program );
+    IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>( current_geometrybuffer );
+    GLenum error = glGetError();
+    
+    /* If the IM geometry buffer was never even created, then exit now */
+    if( !im_gb )
+    {
+        DISPDBG_R( KE_ERROR, "The IM Geometry Buffer was not created! Call IKeRenderDevice::SetIMCacheSize first!" );
+    }
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Set the VAO of the IM geometry buffer now */
+    glBindVertexArray( static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vao );
+    OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+    
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Now bind the VBO and IBO that is designated for immediate mode rendering */
+    glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vbo[0] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast<IKeDirect3D11GeometryBuffer*>(im_gb)->vbo[1] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM index buffer!" );
+    
+#if 0
+    /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+#else
+    KeSetVertexAttributes( vertex_attributes );
+#endif
+    
+    /* Set the vertex data into the immediate mode geometry buffer */
+    im_gb->SetVertexData( 0, stride*count, vertex_data );
+    im_gb->SetIndexData( 0, count*sizeof(uint16_t), index_data );
+    
+    /* Draw the vertices */
+    glDrawRangeElements( primitive_types[primtype], start, end, count, data_types[gb->index_type], NULL );
+    OGL_DISPDBG_R( KE_ERROR, "Indexed geometry rendering error (glDrawRangeElements)!" );
+    
+    /* Re-bind the previous geometry buffer if it existed */
+    if( gb )
+    {
+        glBindVertexArray( gb->vao );
+        OGL_DISPDBG( KE_ERROR, "Error re-binding vertex array object!" );
+        glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding vertex buffer!" );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding index buffer!" );
+    }
+#endif
+
 	DISPDBG( KE_ERROR, "Functionality not yet implemented!" );
 }
 
