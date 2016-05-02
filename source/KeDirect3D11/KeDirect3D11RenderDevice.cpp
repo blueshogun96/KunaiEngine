@@ -2136,24 +2136,10 @@ void IKeDirect3D11RenderDevice::BlockUntilIdle()
 /*
  * Name: IKeDirect3D11RenderDevice::Kick
  * Desc: Sends all pending GPU commands to the pipeline.
- * NOTE: In order to have force all pending GPU commands to the pipeline for Direct3D,
- *		 the back buffer has to be locked and unlocked.  Don't call this unless you absolutely
- *		 have to though.  It's there if you ever need it though.
  */
 void IKeDirect3D11RenderDevice::Kick()
 {
-	CD3D11Texture2D back_buffer = NULL;
-    HRESULT hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
-    if( FAILED( hr ) )
-        D3D_DISPDBG_R( KE_ERROR, "Error getting back buffer!", hr );
-
-	D3D11_MAPPED_SUBRESOURCE res;
-	hr = d3ddevice_context->Map( back_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res );
-	D3D_DISPDBG_R( KE_ERROR, "Error locking back buffer!", hr );
-	if( SUCCEEDED( hr ) )
-	{
-		d3ddevice_context->Unmap( back_buffer, 0 );
-	}
+	d3ddevice_context->Flush();
 }
 
 
