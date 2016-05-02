@@ -517,6 +517,7 @@ public:
     virtual void SetSamplerStates( int stage, KeState* states ) PURE;
     virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data ) PURE;
     virtual void DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data ) PURE;
+    virtual void DrawIndexedVerticesRangeIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int start, int end, int count, void* vertex_data, void* index_data ) PURE;
     virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count ) PURE;
     virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count ) PURE;
     virtual void DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count ) PURE;

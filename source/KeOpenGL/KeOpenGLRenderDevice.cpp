@@ -377,6 +377,65 @@ void KeSetVertexAttributes( KeVertexAttribute* va )
 }
 
 
+/* Applies sampler states to their respective texture stages */
+/* TODO: Implement dirty states to prevent redundant setting of texture states */
+void IKeOpenGLRenderDevice::PVT_ApplySamplerStates()
+{
+    /* Handle texture stages */
+    for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
+    {
+        /* Don't bother setting samplers to texture stages not being used */
+        if( current_texture[texture_stage] == NULL )
+            continue;
+        
+        /* Change the active texture unit before making changes */
+        glActiveTexture( GL_TEXTURE0 + texture_stage );
+        //glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
+        //	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
+        
+        IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
+        
+        int i = 0;
+        while( samplers[texture_stage][i].state != -1 )
+        {
+            switch( samplers[texture_stage][i].state )
+            {
+                case KE_TS_MAGFILTER:
+                    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_MINFILTER:
+                    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPU:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPV:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                case KE_TS_WRAPW:
+                    glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
+                    break;
+                    
+                default:
+                    DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
+                            "param1: " << samplers[texture_stage][i].param1 << "\n"
+                            "param2: " << samplers[texture_stage][i].param2 << "\n"
+                            "param3: " << samplers[texture_stage][i].param3 << "\n"
+                            "fparam: " << samplers[texture_stage][i].fparam << "\n"
+                            "dparam: " << samplers[texture_stage][i].dparam << "\n" );
+                    break;
+            }
+            
+            i++;
+        }
+    }
+}
+
+
 /*
  * Name: IKeOpenGLRenderDevice::IKeOpenGLRenderDevice
  * Desc: Default constructor
@@ -511,9 +570,6 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 		DISPDBG_R( KE_ERROR, "Error initializing glew!\n" );
 	}
 #endif
-
-    /* Initialize default OpenGL vertex and fragment program */
-    ke_initialize_default_shaders();
     
     /* Set default OpenGL render states */
 	glClearDepth( 1.0f );
@@ -755,6 +811,7 @@ void IKeOpenGLRenderDevice::Clear( uint32_t buffers )
 	glClear( flags );
 }
 
+
 /*
  * Name: IKeOpenGLRenderDevice::swap
  * Desc: Swaps the double buffer.
@@ -844,16 +901,7 @@ bool IKeOpenGLRenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_t ve
     OGL_DISPDBG_RB( KE_ERROR, "Error setting vertex buffer data!" );
      
 	/* Set the vertex attributes for this geometry buffer */
-	for( int i = 0; va[i].index != -1; i++ )
-	{
-		glVertexAttribPointer( va[i].index,
-								va[i].size,
-								data_types[va[i].type],
-								va[i].normalize,
-								va[i].stride,
-								BUFFER_OFFSET(va[i].offset) );
-		glEnableVertexAttribArray(va[i].index);
-	}
+    KeSetVertexAttributes(va);
 
 	/* Save vertex data size and vertex stride */
 	gb->vd_length = vertex_data_size;
@@ -1958,58 +2006,8 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
     OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
     
-    /* Handle texture stages */
-    for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
-    {
-        /* Don't bother setting samplers to texture stages not being used */
-        if( current_texture[texture_stage] == NULL )
-            continue;
-        
-        /* Change the active texture unit before making changes */
-        glActiveTexture( GL_TEXTURE0 + texture_stage );
-        //glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
-        //	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
-        
-        IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
-        
-        int i = 0;
-        while( samplers[texture_stage][i].state != -1 )
-        {
-            switch( samplers[texture_stage][i].state )
-            {
-                case KE_TS_MAGFILTER:
-                    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_MINFILTER:
-                    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_WRAPU:
-                    glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_WRAPV:
-                    glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_WRAPW:
-                    glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                default:
-                    DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
-                            "param1: " << samplers[texture_stage][i].param1 << "\n"
-                            "param2: " << samplers[texture_stage][i].param2 << "\n"
-                            "param3: " << samplers[texture_stage][i].param3 << "\n"
-                            "fparam: " << samplers[texture_stage][i].fparam << "\n"
-                            "dparam: " << samplers[texture_stage][i].dparam << "\n" );
-                    break;
-            }
-            
-            i++;
-        }
-    }
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
@@ -2062,8 +2060,8 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
 
 
 /*
- * Name: IKeOpenGLRenderDevice::DrawVerticesIM
- * Desc: Draws raw vertices without the need for a geometry buffer.
+ * Name: IKeOpenGLRenderDevice::DrawIndexedVerticesIM
+ * Desc: Draws raw indexed vertices without the need for a geometry buffer.
  */
 void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data )
 {
@@ -2085,58 +2083,8 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t s
     glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
     OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
     
-    /* Handle texture stages */
-    for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
-    {
-        /* Don't bother setting samplers to texture stages not being used */
-        if( current_texture[texture_stage] == NULL )
-            continue;
-        
-        /* Change the active texture unit before making changes */
-        glActiveTexture( GL_TEXTURE0 + texture_stage );
-        //glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
-        //	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
-        
-        IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
-        
-        int i = 0;
-        while( samplers[texture_stage][i].state != -1 )
-        {
-            switch( samplers[texture_stage][i].state )
-            {
-                case KE_TS_MAGFILTER:
-                    glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_MINFILTER:
-                    glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_WRAPU:
-                    glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_WRAPV:
-                    glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                case KE_TS_WRAPW:
-                    glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
-                    break;
-                    
-                default:
-                    DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
-                            "param1: " << samplers[texture_stage][i].param1 << "\n"
-                            "param2: " << samplers[texture_stage][i].param2 << "\n"
-                            "param3: " << samplers[texture_stage][i].param3 << "\n"
-                            "fparam: " << samplers[texture_stage][i].fparam << "\n"
-                            "dparam: " << samplers[texture_stage][i].dparam << "\n" );
-                    break;
-            }
-            
-            i++;
-        }
-    }
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
@@ -2190,6 +2138,85 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t s
     }
 }
 
+/*
+ * Name: IKeOpenGLRenderDevice::DrawIndexedVerticesRangeIM
+ * Desc: Draws raw indexed vertices without the need for a geometry buffer.
+ */
+void IKeOpenGLRenderDevice::DrawIndexedVerticesRangeIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int start, int end, int count, void* vertex_data, void* index_data )
+{
+    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
+    GLenum error = glGetError();
+    
+    /* If the IM geometry buffer was never even created, then exit now */
+    if( !im_gb )
+    {
+        DISPDBG_R( KE_ERROR, "The IM Geometry Buffer was not created! Call IKeRenderDevice::SetIMCacheSize first!" );
+    }
+    
+    /* Unbind any VBO or IBO bound */
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    
+    /* Set the VAO of the IM geometry buffer now */
+    glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
+    OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+    
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    error = glGetError();
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    error = glGetError();
+    
+    /* Now bind the VBO and IBO that is designated for immediate mode rendering */
+    glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[1] );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding IM index buffer!" );
+    
+#if 0
+    /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
+    for( int i = 0; vertex_attributes[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( vertex_attributes[i].index,
+                              vertex_attributes[i].size,
+                              data_types[vertex_attributes[i].type],
+                              vertex_attributes[i].normalize,
+                              vertex_attributes[i].stride,
+                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
+                              &vertex_data[vertex_attributes[i].offset]);
+        glEnableVertexAttribArray(vertex_attributes[i].index);
+        error = glGetError();
+    }
+#else
+    KeSetVertexAttributes( vertex_attributes );
+#endif
+    
+    /* Set the vertex data into the immediate mode geometry buffer */
+    im_gb->SetVertexData( 0, stride*count, vertex_data );
+    im_gb->SetIndexData( 0, count*sizeof(uint16_t), index_data );
+    
+    /* Draw the vertices */
+    glDrawRangeElements( primitive_types[primtype], start, end, count, data_types[gb->index_type], NULL );
+    OGL_DISPDBG_R( KE_ERROR, "Indexed geometry rendering error (glDrawRangeElements)!" );
+    
+    /* Re-bind the previous geometry buffer if it existed */
+    if( gb )
+    {
+        glBindVertexArray( gb->vao );
+        OGL_DISPDBG( KE_ERROR, "Error re-binding vertex array object!" );
+        glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding vertex buffer!" );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gb->vbo[1] );
+        OGL_DISPDBG_R( KE_ERROR, "Error re-binding index buffer!" );
+    }
+}
+
 
 /*
  * Name: IKeOpenGLRenderDevice::draw_vertices
@@ -2201,59 +2228,9 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
    
-
-	for( int texture_stage = 0; texture_stage < 8; texture_stage++ )
-	{
-		/* Don't bother setting samplers to texture stages not being used */
-		if( current_texture[texture_stage] == NULL )
-			continue;
-
-		/* Change the active texture unit before making changes */
-		glActiveTexture( GL_TEXTURE0 + texture_stage );
-		//glBindTexture( static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->target,
-		//	static_cast<IKeOpenGLTexture*>(current_texture[texture_stage])->handle );
-
-		IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>(current_texture[texture_stage]);
-
-		int i = 0;
-		while( samplers[texture_stage][i].state != -1 )
-		{
-			switch( samplers[texture_stage][i].state )
-			{
-			case KE_TS_MAGFILTER:
-				glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
-				break;
-
-			case KE_TS_MINFILTER:
-				glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, texture_filter_modes[samplers[texture_stage][i].param1] );
-				break;
-
-			case KE_TS_WRAPU:
-				glTexParameteri( t->target, GL_TEXTURE_WRAP_S, texture_wrap_modes[samplers[texture_stage][i].param1] );
-				break;
-
-			case KE_TS_WRAPV:
-				glTexParameteri( t->target, GL_TEXTURE_WRAP_T, texture_wrap_modes[samplers[texture_stage][i].param1] );
-				break;
-
-			case KE_TS_WRAPW:
-				glTexParameteri( t->target, GL_TEXTURE_WRAP_R, texture_wrap_modes[samplers[texture_stage][i].param1] );
-				break;
-
-			default:
-				DISPDBG( KE_WARNING, "Bad texture state!\nstate: " << samplers[texture_stage][i].state << "\n"
-					"param1: " << samplers[texture_stage][i].param1 << "\n"
-					"param2: " << samplers[texture_stage][i].param2 << "\n"
-					"param3: " << samplers[texture_stage][i].param3 << "\n"
-					"fparam: " << samplers[texture_stage][i].fparam << "\n"
-					"dparam: " << samplers[texture_stage][i].dparam << "\n" );
-				break;
-			}
-
-			i++;
-		}
-	}
-
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
     error = glGetError();
@@ -2282,6 +2259,9 @@ void IKeOpenGLRenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t str
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
     
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
     glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
@@ -2309,6 +2289,9 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesRange( uint32_t primtype, uint32_
     IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
    
+    /* Apply sampler states */
+    PVT_ApplySamplerStates();
+    
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
     glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
