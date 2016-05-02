@@ -2114,14 +2114,17 @@ void IKeDirect3D11RenderDevice::BlockUntilIdle()
 {
 	IKeFence* fence = NULL;
 
-	/* Insert a new fence into the pipeline. */
-	if( InsertFence( &fence ) )
+	/* Create a new fence */
+	if( CreateFence( &fence ) )
 	{
+		/* Insert the new fence into the pipeline. */
+		fence->Insert();
+
 		/* Wait until the fence has been crossed */
-		BlockOnFence( fence );
+		fence->Block();
 
 		/* Delete this fence */
-		DeleteFence( fence );
+		fence->Destroy();
 
 		return;
 	}
@@ -2133,10 +2136,24 @@ void IKeDirect3D11RenderDevice::BlockUntilIdle()
 /*
  * Name: IKeDirect3D11RenderDevice::Kick
  * Desc: Sends all pending GPU commands to the pipeline.
+ * NOTE: In order to have force all pending GPU commands to the pipeline for Direct3D,
+ *		 the back buffer has to be locked and unlocked.  Don't call this unless you absolutely
+ *		 have to though.  It's there if you ever need it though.
  */
 void IKeDirect3D11RenderDevice::Kick()
 {
-	/* TODO */
+	CD3D11Texture2D back_buffer = NULL;
+    HRESULT hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
+    if( FAILED( hr ) )
+        D3D_DISPDBG_R( KE_ERROR, "Error getting back buffer!", hr );
+
+	D3D11_MAPPED_SUBRESOURCE res;
+	hr = d3ddevice_context->Map( back_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res );
+	D3D_DISPDBG_R( KE_ERROR, "Error locking back buffer!", hr );
+	if( SUCCEEDED( hr ) )
+	{
+		d3ddevice_context->Unmap( back_buffer, 0 );
+	}
 }
 
 
@@ -2172,7 +2189,7 @@ bool IKeDirect3D11RenderDevice::CreateFence( IKeFence** fence )
     return true;
 }
 
-//#if 0
+#if 0
 /*
  * Name: IKeDirect3D11RenderDevice::insert_fence
  * Desc: Creates a new GPU fence object and sets it in place.
@@ -2287,7 +2304,7 @@ bool IKeDirect3D11RenderDevice::IsFence( IKeFence* fence )
 
 	return true;
 }
-//#endif
+#endif
 
 
 /*

@@ -313,11 +313,13 @@ public:
 	virtual void BlockUntilIdle();
 	virtual void Kick();
 	virtual bool CreateFence( IKeFence** fence );
+#if 0
 	virtual bool InsertFence( IKeFence** fence );
 	virtual bool TestFence( IKeFence* fence );
 	virtual void BlockOnFence( IKeFence* fence );
 	virtual void DeleteFence( IKeFence* fence );
 	virtual bool IsFence( IKeFence* fence );
+#endif
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory );
