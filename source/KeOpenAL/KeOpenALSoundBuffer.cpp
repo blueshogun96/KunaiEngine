@@ -25,13 +25,13 @@ ALenum KeGetFormat_AL( WAVEFORMATEX* wfx )
 {
 	ALenum format = 0;
 
-	if( wfx->nChannels == 8 )
+	if( wfx->nChannels == 1 )
 	{
 		if( wfx->wBitsPerSample == 8 ) format = AL_FORMAT_MONO8;
 		if( wfx->wBitsPerSample == 16 ) format = AL_FORMAT_MONO16;
 	}
 
-	if( wfx->nChannels == 16 )
+	if( wfx->nChannels == 2 )
 	{
 		if( wfx->wBitsPerSample == 8 ) format = AL_FORMAT_STEREO8;
 		if( wfx->wBitsPerSample == 16 ) format = AL_FORMAT_STEREO16;
@@ -56,11 +56,21 @@ void IKeOpenALSoundBuffer::Destroy()
 
 bool IKeOpenALSoundBuffer::SetBufferData( void* buffer_data, uint32_t buffer_size )
 {
-	ALenum error;
-
+	ALenum error = alGetError();
+    ALenum fmt = KeGetFormat_AL( &wfx );
+    
+    /* Unbind the buffer from our source before continuing.  Failing to do so will 
+       generate an AL_INVALID_OPERATION error when calling alBufferData(). */
+    alSourcei( source, AL_BUFFER, 0 );
+    OAL_DISPDBG( KE_ERROR, "Error unbinding buffer from source" );
+    
     /* Set buffer data */
-    alBufferData( source, KeGetFormat_AL( &wfx ), buffer_data, buffer_size, wfx.nSamplesPerSec );
+    alBufferData( buffer, fmt, buffer_data, buffer_size, wfx.nSamplesPerSec );
     OAL_DISPDBG_RB( KE_ERROR, "Error setting sound buffer data!" );
+    
+    /* Rebind the buffer to the source */
+    alSourcei( source, AL_BUFFER, buffer );
+    OAL_DISPDBG( KE_ERROR, "Error re-binding buffer to source" );
     
     return true;
 }

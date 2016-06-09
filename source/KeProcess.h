@@ -3,6 +3,8 @@
 #include <memory>
 #include <list>
 
+#include "KePlatform.h"
+
 
 class KeProcess;
 typedef std::shared_ptr<KeProcess> KeStrongProcessPtr;
@@ -38,7 +40,7 @@ public:
 
 protected:
 	virtual void OnInit() { m_state = RUNNING; }
-	virtual void OnUpdate( uint32_t delta_miliseconds ) PURE;
+    virtual void OnUpdate( uint64_t delta_miliseconds ) PURE;
 	virtual void OnSuccess() {}
 	virtual void OnFail() {}
 	virtual void OnAbort() {}
@@ -56,7 +58,7 @@ public:
 	bool IsRemoved() const { return ( m_state == REMOVED ); }
 	bool IsPaused() const { return m_state == PAUSED; }
 
-	inline void AttachChild( KeStrongProcessPtr child );
+    inline void AttachChild( KeStrongProcessPtr child ) { m_child = child; }
 	KeStrongProcessPtr RemoveChild();
 	KeStrongProcessPtr PeekChild() { return m_child; }
 
@@ -70,17 +72,19 @@ protected:
  */
 class KeProcessManager
 {
+public:
 	typedef std::list<KeStrongProcessPtr> KeProcessList;
 	KeProcessList m_process_list;
 
 public:
 	~KeProcessManager();
 
-	uint32_t UpdateProcesses( uint32_t delta_ms );
+	uint32_t UpdateProcesses( uint64_t delta_ms );
 	KeWeakProcessPtr AttachProcess( KeStrongProcessPtr process );
 	void AbortAllProcess( bool immediate );
 
 	uint32_t GetProcessCount() const { return m_process_list.size(); }
+    KeProcessList GetProcessList() const { return m_process_list; }
 
 private:
 	void ClearAllProcesses();

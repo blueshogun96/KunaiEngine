@@ -461,6 +461,7 @@ bool KeyGotAnyKey()
     {
         if( keys[i].pressed )
             return true;
+        i++;
     }
     
     return false;

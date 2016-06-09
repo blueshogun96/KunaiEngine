@@ -73,3 +73,53 @@ bool KeZipResourceArchive::ReadString( std::string filename, void** ptr, size_t*
 	return true;
 }
 
+bool KeZipResourceArchive::ReadTexture( std::string filename, uint32_t desired_target, IKeTexture** texture )
+{
+    void* buffer;
+    KeImageData img;
+    size_t size;
+    
+    if( Read( filename, &buffer, &size ) )
+    {
+        if( KeImageReadFromMemory( buffer, size, &img ) )
+        {
+            /* TODO: Auto-determine texture format */
+            KeGetRenderDevice()->CreateTexture2D( desired_target, img.width, img.height, 0, KE_TEXTUREFORMAT_BGRA, KE_UNSIGNED_BYTE, texture, img.pixels );
+        
+            KeImageClose( &img );
+            free(buffer);
+        }
+        else
+            return false;
+    }
+    else
+        return false;
+    
+    return true;
+}
+
+bool KeZipResourceArchive::ReadSoundBuffer( std::string filename, IKeSoundBuffer** soundbuffer )
+{
+    void* buffer;
+    size_t size;
+    KeSoundData snd;
+    
+    if( Read( filename, &buffer, &size ) )
+    {
+        if( KeSoundReadWAVFromMemory( buffer, &snd ) )
+        {
+            bool ret = KeGetAudioDevice()->CreateSoundBuffer( &snd.wfx, soundbuffer );
+            if( ret )
+                (*soundbuffer)->SetBufferData( snd.ptr, snd.bytes );
+            
+            KeSoundClose( &snd );
+            free(buffer);
+        }
+        else
+            return false;
+    }
+    else
+        return false;
+    
+    return true;
+}

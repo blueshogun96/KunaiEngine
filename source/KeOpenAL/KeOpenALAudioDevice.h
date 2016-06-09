@@ -13,6 +13,9 @@
   #include <OpenAL-Soft/al.h>
   #include <OpenAL-Soft/alc.h>
   #include <OpenAL-Soft/alext.h>
+  /*#include <AL/al.h>
+  #include <AL/alc.h>
+  #include <AL/alext.h>*/
  #else
   #include <OpenAL/al.h>
   #include <OpenAL/alc.h>

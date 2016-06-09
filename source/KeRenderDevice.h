@@ -297,6 +297,19 @@ struct KeState
     double   dparam;
 };
 
+struct CKeState : public KeState
+{
+    CKeState( uint32_t state, uint32_t param1, uint32_t param2, uint32_t param3, float fparam, double dparam )
+    {
+        this->state = state;
+        this->param1 = param1;
+        this->param2 = param2;
+        this->param3 = param3;
+        this->fparam = fparam;
+        this->dparam = dparam;
+    }
+};
+
 
 /* 
  * Geometry buffer description 

@@ -50,9 +50,10 @@ struct KeImageData
 struct KeSoundData
 {
     uint32_t bytes;     /* Length of this buffer in bytes */
-    uint32_t frequency; /* Sound frequency */
-    uint32_t bit_rate;  /* Bit rate */
+    //uint32_t frequency; /* Sound frequency */
+    //uint32_t bit_rate;  /* Bit rate */
     void* ptr;          /* Pointer to raw sound data */
+    WAVEFORMATEX wfx;   /* Waveformat structure */
 };
 
 /*

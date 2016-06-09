@@ -1670,12 +1670,19 @@ void IKeOpenGLRenderDevice::SetTexture( int stage, IKeTexture* texture )
     }
     else
     {
-        glDisable( GL_TEXTURE_1D );
+        /*glDisable( GL_TEXTURE_1D );
         glDisable( GL_TEXTURE_2D );
         glDisable( GL_TEXTURE_3D );
         glDisable( GL_TEXTURE_1D_ARRAY );
         glDisable( GL_TEXTURE_2D_ARRAY );
-        glDisable( GL_TEXTURE_RECTANGLE );
+        glDisable( GL_TEXTURE_RECTANGLE );*/
+        
+        glBindTexture( GL_TEXTURE_1D, 0 );
+        glBindTexture( GL_TEXTURE_2D, 0 );
+        glBindTexture( GL_TEXTURE_3D, 0 );
+        glBindTexture( GL_TEXTURE_1D_ARRAY, 0 );
+        glBindTexture( GL_TEXTURE_2D_ARRAY, 0 );
+        glBindTexture( GL_TEXTURE_RECTANGLE, 0 );
     }
 }
 

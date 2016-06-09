@@ -16,7 +16,7 @@ KeProcessManager::~KeProcessManager()
  * Name: KeProcessManager::UpdateProcess
  * Desc: Update all processes in the list.
  */
-uint32_t KeProcessManager::UpdateProcesses( uint32_t delta_ms )
+uint32_t KeProcessManager::UpdateProcesses( uint64_t delta_ms )
 {
 	unsigned short int success_count = 0;
 	unsigned short int fail_count = 0;

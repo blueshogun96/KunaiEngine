@@ -21,7 +21,17 @@ LPALDELETEEFFECTS   alDeleteEffects = NULL;
 LPALISEFFECT        alIsEffect = NULL;
 #endif
 
-
+/*
+ * Debugging macros
+ */
+#define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
+#define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
+#define OAL_DISPDBG( a, b ) error = alGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
+#define OAL_DISPDBG_R( a, b ) error = alGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
+#define OAL_DISPDBG_RB( a, b ) error = alGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
+#define OALC_DISPDBG( a, b ) error = alcGetError(device); if(error) { DISPDBG( a, b << "\nALC error code: (" << error << ")" ); }
+#define OALC_DISPDBG_R( a, b ) error = alcGetError(device); if(error) { DISPDBG( a, b << "\nALC error code: (" << error << ")" ); return; }
+#define OALC_DISPDBG_RB( a, b ) error = alcGetError(device); if(error) { DISPDBG( a, b << "\nALC error code: (" << error << ")" ); return false; }
 
 /*
  * Name: ke_al_renderdevice::
@@ -36,16 +46,19 @@ IKeOpenALAudioDevice::IKeOpenALAudioDevice(): device(NULL), context(NULL)
 IKeOpenALAudioDevice::IKeOpenALAudioDevice( KeAudioDeviceDesc* audiodevice_desc ): device(NULL), context(NULL)
 {
     ALint attributes[4] = {0};
+    ALenum error = 0;
+    
     initialized = No;
     
     /* Create the default OpenAL device */
     device = alcOpenDevice( NULL );
 	if( !device )
-		return;
-    
-    DISPDBG( 1, "alcOpenDevice() = OK\n" );
+    {
+        DISPDBG_R( KE_ERROR, "Error initializing OpenAL audio device!" );
+    }
     
 #if defined(__APPLE__) && defined(__MOBILE_OS__)
+    /* Not available for iOS afaik */
 #else
     /* Does the user want to initialize EFX? */
     if( audiodevice_desc->aux_sends != 0 )
@@ -69,26 +82,28 @@ IKeOpenALAudioDevice::IKeOpenALAudioDevice( KeAudioDeviceDesc* audiodevice_desc 
     
     /* Create an OpenAL context */
 	context = alcCreateContext( device, audiodevice_desc->aux_sends == 0 ? NULL : attributes );
+    OALC_DISPDBG( KE_ERROR, "Error initializing OpenAL context!" );
 	if( !context )
 	{
 		alcCloseDevice( device );
 		return;
 	}
     
-    DISPDBG( 1, "alcCreateContext() = OK\n" );
-    
     /* Set the newly created OpenAL context */
-	if( !alcMakeContextCurrent( context ) )
+    ALboolean res = alcMakeContextCurrent( context );
+	if( !res )
     {
+        OALC_DISPDBG( KE_ERROR, "An error occured setting OpenAL context!" );
         alcDestroyContext( context );
         alcCloseDevice( device );
 		return;
     }
     
-	/* Clear the error bit (why doesn't OpenAL do this for us?) */
-	alGetError();
+	/* So far, so good, right? */
+	error = alGetError();
     
 #if defined(__APPLE__) && defined(__MOBILE_OS__)
+    /* Not available for iOS afaik */
 #else
     /* Verify that we get the desired number of auxiliry sends */
     if( audiodevice_desc->aux_sends != 0 )
@@ -103,11 +118,43 @@ IKeOpenALAudioDevice::IKeOpenALAudioDevice( KeAudioDeviceDesc* audiodevice_desc 
     }
 #endif
     
+    const ALCchar* extensions = alcGetString( device, ALC_EXTENSIONS );
+    int extension_count = 0;
+    std::vector<ALCchar> ext;
+    
+    ext.push_back('\t');
+    ext.push_back('\t');
+    
+    /* Count extensions */
+    for( int i = 0; i < strlen( extensions )+1; i++ )
+    {
+        if( extensions[i] == ' ' || extensions[i] == '\0' )
+        {
+            extension_count++;
+            
+            ext.push_back('\n');
+            ext.push_back('\t');
+            ext.push_back('\t');
+        }
+        else
+            ext.push_back(extensions[i]);
+    }
+    
+    ext.push_back('\n');
+    
 	/* Print OpenAL driver/implementation details */
     DISPDBG( 1, "\n\tOpenAL Vendor: " << alGetString( AL_VENDOR ) << 
 		"\n\tOpenAL Version: " << alGetString( AL_VERSION ) << 
 		"\n\tOpenAL Renderer: " << alGetString( AL_RENDERER ) << "\n" );
 
+    /* Print extensions */
+    std::stringstream sstr;
+    sstr << extension_count;
+    std::string ext_str = "\n\tOpenAL Extensions (" + sstr.str() + "):\n";
+    ext_str += ext.data();
+    
+    DISPDBG( KE_DBGLVL(0), ext_str );
+    
     initialized = Yes;
 }
 
@@ -158,13 +205,17 @@ bool IKeOpenALAudioDevice::CreateSoundBuffer( WAVEFORMATEX* wfx, IKeSoundBuffer*
 	}
 
     /* Default 3D sound position and velocity */
-    memset( sb->position, 0, sizeof( float ) * 3 );
-	memset( sb->velocity, 0, sizeof( float ) * 3 );
+    //memset( sb->position, 0, sizeof( float ) * 3 );
+	//memset( sb->velocity, 0, sizeof( float ) * 3 );
+    sb->position = nv::vec3f( 0.0f, 0.0f, 0.0f );
+    sb->velocity = nv::vec3f( 0.0f, 0.0f, 0.0f );
     
 	/* Set the sound source's default attributes */
+    sb->volume = 1.0f;
+    sb->pitch = 1.0f;
 	alSourcei( sb->source, AL_BUFFER, sb->buffer );
-	alSourcef( sb->source, AL_PITCH,  1.0f );
-	alSourcef( sb->source, AL_GAIN,	 1.0f );
+	alSourcef( sb->source, AL_PITCH,  sb->volume );
+	alSourcef( sb->source, AL_GAIN,	 sb->pitch );
 	alSourcefv( sb->source, AL_POSITION, sb->position._array );
 	alSourcefv( sb->source, AL_VELOCITY, sb->velocity._array );
 	alSourcei( sb->source, AL_LOOPING, 0 );

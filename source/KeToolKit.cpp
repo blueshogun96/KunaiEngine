@@ -304,8 +304,11 @@ bool KeSoundReadWAV( char* wav_path, KeSoundData* sound_data )
     if( UnpackWAVData( riff.get(), &wfx, (uint8_t**) &chunk_data, &sound_data->bytes ) )
     {
         sound_data->ptr = malloc( sound_data->bytes );
-        sound_data->frequency = wfx->nAvgBytesPerSec;
-        sound_data->bit_rate = wfx->wBitsPerSample;
+        memcpy( sound_data->ptr, chunk_data, sound_data->bytes );
+        memcpy( &sound_data->wfx, wfx, sizeof( WAVEFORMATEX ) );
+        
+        /*sound_data->frequency = wfx->nAvgBytesPerSec;
+        sound_data->bit_rate = wfx->wBitsPerSample;*/
         
         return true;
     }
@@ -324,8 +327,11 @@ bool KeSoundReadWAVFromMemory( void* wav_file_ptr, KeSoundData* sound_data )
     if( UnpackWAVData( wav_file_ptr, &wfx, (uint8_t**) &chunk_data, &sound_data->bytes ) )
     {
         sound_data->ptr = malloc( sound_data->bytes );
-        sound_data->frequency = wfx->nAvgBytesPerSec;
-        sound_data->bit_rate = wfx->wBitsPerSample;
+        memcpy( sound_data->ptr, chunk_data, sound_data->bytes );
+        memcpy( &sound_data->wfx, wfx, sizeof( WAVEFORMATEX ) );
+        
+        /*sound_data->frequency = wfx->nAvgBytesPerSec;
+        sound_data->bit_rate = wfx->wBitsPerSample;*/
         
         return true;
     }
