@@ -15,6 +15,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <vector>
 #ifndef __ANDROID__	/* Skip these on android devices */
 /*#include <thread>
 #include <mutex>

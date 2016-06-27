@@ -11,7 +11,6 @@
 
 #include "KePlatform.h"
 #include "KeUnknown.h"
-//#include "vectormath.h"
 #include "NvFoundationMath.h"
 #include "NV/NvMath.h"
 

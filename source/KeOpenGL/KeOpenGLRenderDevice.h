@@ -14,7 +14,9 @@
  #ifdef __MOBILE_OS__
   #include "SDL.h"
   #include <OpenGLES/ES2/gl.h>
+  #include <OpenGLES/ES3/gl.h>
   #include <OpenGLES/ES2/glext.h>
+  #include <OpenGLES/ES3/glext.h>
  #else
   #include <SDL2/SDL.h>
   #include <OpenGL/OpenGL.h>
@@ -291,6 +293,7 @@ public:
     
 private:    /* Private, internal use only */
     void PVT_ApplySamplerStates();
+    void PVT_SetWorldViewProjectionMatrices();
     
 protected:
     SDL_GLContext context;

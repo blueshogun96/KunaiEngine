@@ -7,7 +7,7 @@
  * Set to log only errors by default
  */
 #ifndef KE_DBG_LEVEL
-#define KE_DBG_LEVEL 3
+#define KE_DBG_LEVEL 4
 #endif
 
 /*

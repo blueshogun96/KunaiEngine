@@ -180,7 +180,7 @@ bool KeOpenGLIsFenceAPPLE( IKeOpenGLFence* fence )
 {
 #if GL_APPLE_fence
     if( glTestFenceAPPLE( fence->fence ) )
-    return true;
+        return true;
     
     return false;
 #else

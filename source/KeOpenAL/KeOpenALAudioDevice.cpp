@@ -140,7 +140,7 @@ IKeOpenALAudioDevice::IKeOpenALAudioDevice( KeAudioDeviceDesc* audiodevice_desc 
             ext.push_back(extensions[i]);
     }
     
-    ext.push_back('\n');
+    ext.push_back('\n\0');
     
 	/* Print OpenAL driver/implementation details */
     DISPDBG( 1, "\n\tOpenAL Vendor: " << alGetString( AL_VENDOR ) << 

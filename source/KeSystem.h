@@ -90,7 +90,7 @@ void KeOnGamepad( void* context, void* input_context );
 void KeResetKeys();
 void KeResetMouse();
 void KeGetKeyState( KeButton* _keys );
-bool KeyGotAnyKey();
+bool KeGotAnyKey();
 void KeGetMouseState( KeMouse* _mouse );
 
 

@@ -454,7 +454,7 @@ void KeGetKeyState( KeButton* _keys )
  * Name: KeyGotAnyKey
  * Desc: Return true if any keyboard keys were pressed.
  */
-bool KeyGotAnyKey()
+bool KeGotAnyKey()
 {
     int i = 0;
     while( i < 256 )

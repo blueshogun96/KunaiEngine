@@ -120,7 +120,8 @@ Compiler define
 #elif __GNUC__ || __SNC__
 #	define NV_GNUC
 #else
-#	error "Unknown compiler"
+//#	error "Unknown compiler"
+#   define NV_GNUC  /* Hack: iOS9 */
 #endif
 
 /**
@@ -177,7 +178,8 @@ Platform define
 #       define NV_PPC
 #	define NV_PPC64
 #   else
-#	error "Unknown platform"
+//#	error "Unknown platform"
+#       define NV_ARM   /* Hack: iOS9 */
 #   endif
 #	if defined(ANDROID)
 #   	define NV_ANDROID

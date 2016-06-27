@@ -7,11 +7,11 @@
 
 #include "KeRenderDevice.h"
 
-#ifdef __MOBILE_OS__
-#include "KeOpenGLES/KeOpenGLESRenderDevice.h"
-#else
+//#ifdef __MOBILE_OS__
+//#include "KeOpenGLES/KeOpenGLESRenderDevice.h"
+//#else
 #include "KeOpenGL/KeOpenGLRenderDevice.h"
-#endif
+//#endif
 
 #ifdef _WIN32
 #include "KeDirect3D11/KeDirect3D11RenderDevice.h"
@@ -25,13 +25,13 @@
  */
 IKeRenderDevice* KeCreateRenderDevice( KeRenderDeviceDesc* renderdevice_desc )
 {
-#ifndef __MOBILE_OS__
-    if( renderdevice_desc->device_type == KE_RENDERDEVICE_OGL3 || renderdevice_desc->device_type == KE_RENDERDEVICE_OGL4 )
+//#ifndef __MOBILE_OS__
+    if( renderdevice_desc->device_type == KE_RENDERDEVICE_OGL3 || renderdevice_desc->device_type == KE_RENDERDEVICE_OGL4 || renderdevice_desc->device_type == KE_RENDERDEVICE_OGLES2 || renderdevice_desc->device_type == KE_RENDERDEVICE_OGLES3 )
         return new IKeOpenGLRenderDevice( renderdevice_desc );
-#else
+/*#else
     if( renderdevice_desc->device_type == KE_RENDERDEVICE_OGLES2 )
        return new IKeOpenGLESRenderDevice( renderdevice_desc );
-#endif
+#endif*/
     
 #ifdef _WIN32
 	if( renderdevice_desc->device_type == KE_RENDERDEVICE_D3D11 )

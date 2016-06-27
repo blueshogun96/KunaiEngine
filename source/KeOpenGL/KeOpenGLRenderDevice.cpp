@@ -8,8 +8,10 @@
 #include "KeOpenGLRenderDevice.h"
 #include "KeDebug.h"
 
+#ifndef __MOBILE_OS__
 #ifdef __APPLE__
 #include "KeVideoAdapterOSX.h"
+#endif
 #endif
 
 /*
@@ -30,6 +32,11 @@
 #define OGL_DISPDBG( a, b ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
 #define OGL_DISPDBG_R( a, b ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return; }
 #define OGL_DISPDBG_RB( a, b ) error = glGetError(); if(error) { DISPDBG( a, b << "\nError code: (" << error << ")" ); return false; }
+
+/* Other macros */
+#ifdef __MOBILE_OS__
+#define glClearDepth glClearDepthf
+#endif
 
 
 /* GPU fencing routines */
@@ -103,21 +110,25 @@ uint32_t data_types[] =
     GL_INT,
     GL_UNSIGNED_INT,
     GL_FLOAT,
-    GL_DOUBLE
+#ifndef __MOBILE_OS__
+    GL_DOUBLE   /* Not supported on OpenGL ES */
+#else
+    0
+#endif
 };
 
 /* OpenGL buffer usage types */
 uint32_t buffer_usage_types[] = 
 {
 	GL_STATIC_DRAW,
-	GL_STATIC_READ,
-	GL_STATIC_COPY,
+	GL_STATIC_READ,     /* OpenGL ES 3.0+ only */
+	GL_STATIC_COPY,     /* OpenGL ES 3.0+ only */
 	GL_DYNAMIC_DRAW,
-	GL_DYNAMIC_READ,
-	GL_DYNAMIC_COPY,
+	GL_DYNAMIC_READ,    /* OpenGL ES 3.0+ only */
+	GL_DYNAMIC_COPY,    /* OpenGL ES 3.0+ only */
 	GL_STREAM_DRAW,
-	GL_STREAM_READ,
-	GL_STREAM_COPY,
+	GL_STREAM_READ,     /* OpenGL ES 3.0+ only */
+	GL_STREAM_COPY,     /* OpenGL ES 3.0+ only */
 };
 
 /* OpenGL depth/alpha test functions */
@@ -136,12 +147,20 @@ uint32_t test_funcs[] =
 /* OpenGL texture targets */
 uint32_t texture_targets[] =
 {
-    GL_TEXTURE_1D,
-    GL_TEXTURE_1D_ARRAY,
+#ifndef __MOBILE_OS__
+    GL_TEXTURE_1D,          /* Not supported on OpenGL ES */
+    GL_TEXTURE_1D_ARRAY,    /* Not supported on OpenGL ES */
+#else
+    0, 0,
+#endif
     GL_TEXTURE_2D,
-    GL_TEXTURE_2D_ARRAY,
-    GL_TEXTURE_3D,
-    GL_TEXTURE_RECTANGLE,
+    GL_TEXTURE_2D_ARRAY,    /* OpenGL ES 3.0+ only */
+    GL_TEXTURE_3D,          /* OpenGL ES 3.0+ only */
+#ifndef __MOBILE_OS__
+    GL_TEXTURE_RECTANGLE,   /* Not supported on OpenGL ES */
+#else
+    0,
+#endif
 };
 
 /* OpenGL polygon modes */
@@ -155,9 +174,13 @@ uint32_t polygon_modes[] =
 /* OpenGL fill modes */
 uint32_t fill_modes[] =
 {
-    GL_POINT,
-    GL_LINE,
-    GL_FILL,
+#ifndef __MOBILE_OS__
+    GL_POINT,   /* Not supported on OpenGL ES */
+    GL_LINE,    /* Not supported on OpenGL ES */
+    GL_FILL,    /* Not supported on OpenGL ES */
+#else
+    0, 0, 0
+#endif
 };
 
 /* OpenGL texture formats */
@@ -165,15 +188,20 @@ uint32_t texture_formats[] =
 {
     GL_RGBA,
     GL_BGRA,
-	GL_RED,
+	GL_RED,     /* OpenGL ES 3.0+ only */
 	GL_RGB,
-	GL_BGR
+#ifndef __MOBILE_OS__
+	GL_BGR,     /* Not supported on OpenGL ES */
+#else
+    0,
+#endif
 };
-uint32_t internal_texture_formats[] = 
+
+uint32_t internal_texture_formats[] =
 {
 	GL_RGBA,
 	GL_RGBA8,
-	GL_R8,
+	GL_R8,      /* OpenGL ES 3.0+ only */
 	GL_RGB,
 	GL_RGB
 };
@@ -218,8 +246,8 @@ uint32_t blend_modes[] =
 uint32_t blend_equations[]
 {
     GL_FUNC_ADD,
-    GL_MIN,
-    GL_MAX,
+    GL_MIN,                     /* OpenGL ES 3.0+ only */
+    GL_MAX,                     /* OpenGL ES 3.0+ only */
     GL_FUNC_SUBTRACT,
     GL_FUNC_REVERSE_SUBTRACT
 };
@@ -245,7 +273,11 @@ uint32_t texture_wrap_modes[] =
     0,
 #endif
 	GL_CLAMP_TO_EDGE,
-	GL_CLAMP_TO_BORDER,
+#ifndef __MOBILE_OS__
+	GL_CLAMP_TO_BORDER,     /* Not supported on OpenGL ES */
+#else
+    0,
+#endif
 	GL_MIRRORED_REPEAT
 };
 
@@ -435,6 +467,21 @@ void IKeOpenGLRenderDevice::PVT_ApplySamplerStates()
     }
 }
 
+void IKeOpenGLRenderDevice::PVT_SetWorldViewProjectionMatrices()
+{
+    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    
+    GLenum error = glGetError();
+    
+    /* Assuming there is already a GPU program bound, attempt to set the current matrices */
+    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
+    OGL_DISPDBG( KE_DBGLVL(1), "Could not set world matrix..." );
+    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
+    OGL_DISPDBG( KE_DBGLVL(1), "Could not set projection matrix..." );
+    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    OGL_DISPDBG( KE_DBGLVL(1), "Could not set projection matrix..." );
+}
+
 
 /*
  * Name: IKeOpenGLRenderDevice::IKeOpenGLRenderDevice
@@ -474,7 +521,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     memmove( device_desc, renderdevice_desc, sizeof( KeRenderDeviceDesc ) );
     
     /* Verify device type */
-    if( device_desc->device_type == KE_RENDERDEVICE_D3D11 || device_desc->device_type == KE_RENDERDEVICE_OGLES2 || device_desc->device_type == KE_RENDERDEVICE_OGLES3 )
+    if( device_desc->device_type == KE_RENDERDEVICE_D3D11 )
         DISPDBG_R( KE_ERROR, "Invalid rendering device type specified!" );
     
 #if defined(USE_DDRAW_VMEM) || defined(USE_DDRAW_VBLANK)
@@ -509,6 +556,22 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, major_version );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, minor_version );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+    }
+    else if( device_desc->device_type == KE_RENDERDEVICE_OGLES2 )
+    {
+        major_version = 2;
+        minor_version = 0;
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, major_version );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, minor_version );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
+    }
+    else if( device_desc->device_type == KE_RENDERDEVICE_OGLES3 )
+    {
+        major_version = 3;
+        minor_version = 1;
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, major_version );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, minor_version );
+        SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
     }
     else
     {
@@ -576,7 +639,9 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
     
+#ifndef __MOBILE_OS__
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
+#endif
 
 	glDisable( GL_BLEND );
 	glDisable( GL_CULL_FACE );
@@ -612,6 +677,9 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 		memmove( &samplers[i], &empty, sizeof( KeState ) );
 	ZeroMemory( dirty_samplers, sizeof( int ) * 8 * 16 );
 
+    /* Setup default viewport */
+    this->SetViewport( 0, 0, renderdevice_desc->width, renderdevice_desc->height );
+    
     /* Mark as initialized */
     initialized = Yes;
     
@@ -622,7 +690,49 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
         "\n\tGLSL Version: " << glGetString( GL_SHADING_LANGUAGE_VERSION ) << "\n" );
     
     /* Print a list of available OpenGL extensions for this OpenGL implementation */
-    int extension_count, i = 0;
+    int extension_count = 0, i = 0;
+#ifdef __MOBILE_OS__
+    char* extension_string = (char*) glGetString( GL_EXTENSIONS );
+    /*size_t length = strlen( extension_string );
+    
+    while( i < length )
+    {
+        if( extension_string[i] == ' ' )
+        {
+            extension_string[i] = '\n';
+            extension_count++;
+        }
+        
+        i++;
+    }*/
+    
+    std::vector<GLchar> ext;
+    
+    ext.push_back('\t');
+    ext.push_back('\t');
+    
+    /* Count extensions */
+    for( int i = 0; i < strlen( extension_string )+1; i++ )
+    {
+        if( extension_string[i] == ' ' || extension_string[i] == '\0' )
+        {
+            extension_count++;
+            
+            ext.push_back('\n');
+            ext.push_back('\t');
+            ext.push_back('\t');
+        }
+        else
+        ext.push_back(extension_string[i]);
+    }
+    
+    ext.push_back('\n\0');
+    
+    std::stringstream sstr;
+    sstr << extension_count;
+    std::string ext_str = "\n\tOpenGL Extensions (" + sstr.str() + "):\n";
+    ext_str += ext.data();
+#else
 	glGetIntegerv( GL_NUM_EXTENSIONS, &extension_count );
 
 	std::stringstream sstr;
@@ -636,10 +746,12 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 		ext_str += "\n";
         i++;
     }
-
+#endif
+    
 	DISPDBG( KE_DBGLVL(0), ext_str );
 
     /* Print out more information on the video card we just initialized OpenGL for */
+#ifndef __MOBILE_OS__
 #ifdef __APPLE__
     KeVideoAdapterOSX adapter;
     KeVideoCardInfo video_card_info;
@@ -651,6 +763,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
             "\tTexture Memory: " << adapter.texture_memory << "\n"
             "\tAdapter ID: " << adapter.adapter_id << "\n"
             "\tRenderer ID: " << adapter.renderer_id << "\n" );
+#endif
 #endif
     sstr.clear();
     
@@ -982,9 +1095,15 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     GLenum error = glGetError();
 	int Fail = No;
     
+    /* Nullify vertex attribute list */
+    gp->va = NULL;
+    
 	v = glCreateShader( GL_VERTEX_SHADER );
 	f = glCreateShader( GL_FRAGMENT_SHADER );
+    
+#ifndef __MOBILE_OS__
     g = glCreateShader( GL_GEOMETRY_SHADER );
+#endif
     
 	glShaderSource( v, 1, &vertex_shader, NULL );
 	glShaderSource( f, 1, &fragment_shader, NULL );
@@ -1171,8 +1290,10 @@ void IKeOpenGLRenderDevice::SetProgram( IKeGpuProgram* gpu_program )
 void IKeOpenGLRenderDevice::SetProgramConstant1FV( const char* location, int count, float* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform1fv( loc, count, value );
 }
 
@@ -1183,8 +1304,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant1FV( const char* location, int cou
 void IKeOpenGLRenderDevice::SetProgramConstant2FV( const char* location, int count, float* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform2fv( loc, count, value );
 }
 
@@ -1195,8 +1318,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant2FV( const char* location, int cou
 void IKeOpenGLRenderDevice::SetProgramConstant3FV( const char* location, int count, float* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform3fv( loc, count, value );
 }
 
@@ -1221,8 +1346,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant4FV( const char* location, int cou
 void IKeOpenGLRenderDevice::SetProgramConstant1IV( const char* location, int count, int* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform1iv( loc, count, value );
 }
 
@@ -1233,8 +1360,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant1IV( const char* location, int cou
 void IKeOpenGLRenderDevice::SetProgramConstant2IV( const char* location, int count, int* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform2iv( loc, count, value );
 }
 
@@ -1245,8 +1374,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant2IV( const char* location, int cou
 void IKeOpenGLRenderDevice::SetProgramConstant3IV( const char* location, int count, int* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform3iv( loc, count, value );
 }
 
@@ -1257,8 +1388,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant3IV( const char* location, int cou
 void IKeOpenGLRenderDevice::SetProgramConstant4IV( const char* location, int count, int* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glUniform4iv( loc, count, value );
 }
 
@@ -1269,8 +1402,10 @@ void IKeOpenGLRenderDevice::SetProgramConstant4IV( const char* location, int cou
 void IKeOpenGLRenderDevice::GetProgramConstantFV( const char* location, float* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glGetUniformfv( p->program, loc, value );
 }
 
@@ -1281,8 +1416,10 @@ void IKeOpenGLRenderDevice::GetProgramConstantFV( const char* location, float* v
 void IKeOpenGLRenderDevice::GetProgramConstantIV( const char* location, int* value )
 {
     IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    GLenum error = glGetError();
     
     int loc = glGetUniformLocation( p->program, location );
+    OGL_DISPDBG( KE_ERROR, "Error getting uniform location for \"" << location << "\"" << std::endl );
     glGetUniformiv( p->program, loc, value );
 }
 
@@ -1356,6 +1493,7 @@ void IKeOpenGLRenderDevice::SetTesselationShaderConstantBuffer( int slot, IKeCon
  */
 bool IKeOpenGLRenderDevice::CreateTexture1D( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels )
 {
+#ifndef __MOBILE_OS__
     GLenum error = glGetError();
     
     /* Allocate a new texture */
@@ -1384,6 +1522,9 @@ bool IKeOpenGLRenderDevice::CreateTexture1D( uint32_t target, int width, int mip
     glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     
     return true;
+#else
+    DISPDBG_RB( KE_ERROR, "1D textures are not supported for OpenGL ES!" );
+#endif
 }
 
 /*
@@ -1429,6 +1570,7 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
 /*
  * Name: IKeOpenGLRenderDevice::create_texture_3d
  * Desc: Creates a blank 3D texture.
+ * NOTE: Only suppotted for core and ES 3.0+
  */
 bool IKeOpenGLRenderDevice::CreateTexture3D( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels )
 {
@@ -1486,6 +1628,7 @@ void IKeOpenGLRenderDevice::DeleteTexture( IKeTexture* texture )
  */
 void IKeOpenGLRenderDevice::SetTextureData1D( int offsetx, int width, int miplevel, void* pixels, IKeTexture* texture )
 {
+#ifndef __MOBILE_OS__
     GLenum error = glGetError();
     IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>( texture );
 
@@ -1493,6 +1636,9 @@ void IKeOpenGLRenderDevice::SetTextureData1D( int offsetx, int width, int miplev
     glTexSubImage1D( t->target, miplevel, offsetx, width, t->internal_format, t->data_type, pixels );
     OGL_DISPDBG( KE_ERROR, "Error setting texture data!" );
     glBindTexture( t->target, 0 );
+#else
+    DISPDBG( KE_ERROR, "1D textures are not supported for OpenGL ES!" );
+#endif
 }
 
 /*
@@ -1677,12 +1823,14 @@ void IKeOpenGLRenderDevice::SetTexture( int stage, IKeTexture* texture )
         glDisable( GL_TEXTURE_2D_ARRAY );
         glDisable( GL_TEXTURE_RECTANGLE );*/
         
+#ifndef __MOBILE_OS__
         glBindTexture( GL_TEXTURE_1D, 0 );
+        glBindTexture( GL_TEXTURE_1D_ARRAY, 0 );
+        glBindTexture( GL_TEXTURE_RECTANGLE, 0 );
+#endif
         glBindTexture( GL_TEXTURE_2D, 0 );
         glBindTexture( GL_TEXTURE_3D, 0 );
-        glBindTexture( GL_TEXTURE_1D_ARRAY, 0 );
         glBindTexture( GL_TEXTURE_2D_ARRAY, 0 );
-        glBindTexture( GL_TEXTURE_RECTANGLE, 0 );
     }
 }
 
@@ -1780,7 +1928,9 @@ bool IKeOpenGLRenderDevice::SetRenderStateBuffer( IKeRenderStateBuffer* state_bu
                 break;
                 
             case KE_RS_POLYGONMODE:
+#ifndef __MOBILE_OS__
                 glPolygonMode( polygon_modes[sb->states[i].param1], fill_modes[sb->states[i].param2] );
+#endif
                 break;
                 
             case KE_RS_BLENDFUNC:
@@ -1909,7 +2059,9 @@ void IKeOpenGLRenderDevice::SetRenderStates( KeState* states )
                 break;
                 
             case KE_RS_POLYGONMODE:
+#ifndef __MOBILE_OS__
                 glPolygonMode( polygon_modes[states[i].param1], fill_modes[states[i].param2] );
+#endif
                 break;
                 
             case KE_RS_BLENDFUNC:
@@ -2019,34 +2171,14 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
-    error = glGetError();
+    PVT_SetWorldViewProjectionMatrices();
     
     /* Now bind the VBO that is designated for immediate mode rendering */
     glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
     OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
     
-#if 0
     /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
-    for( int i = 0; vertex_attributes[i].index != -1; i++ )
-    {
-        glVertexAttribPointer( vertex_attributes[i].index,
-                              vertex_attributes[i].size,
-                              data_types[vertex_attributes[i].type],
-                              vertex_attributes[i].normalize,
-                              vertex_attributes[i].stride,
-                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
-                              &vertex_data[vertex_attributes[i].offset]);
-        glEnableVertexAttribArray(vertex_attributes[i].index);
-        error = glGetError();
-    }
-#else
     KeSetVertexAttributes( vertex_attributes );
-#endif
     
     /* Set the vertex data into the immediate mode geometry buffer */
     im_gb->SetVertexData( 0, stride*count, vertex_data );
@@ -2074,7 +2206,6 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
  */
 void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data )
 {
-    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
     GLenum error = glGetError();
     
@@ -2096,12 +2227,7 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t s
     PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
-    error = glGetError();
+    PVT_SetWorldViewProjectionMatrices();
     
     /* Now bind the VBO and IBO that is designated for immediate mode rendering */
     glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
@@ -2109,23 +2235,8 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t s
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[1] );
     OGL_DISPDBG_R( KE_ERROR, "Error binding IM index buffer!" );
     
-#if 0
     /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
-    for( int i = 0; vertex_attributes[i].index != -1; i++ )
-    {
-        glVertexAttribPointer( vertex_attributes[i].index,
-                              vertex_attributes[i].size,
-                              data_types[vertex_attributes[i].type],
-                              vertex_attributes[i].normalize,
-                              vertex_attributes[i].stride,
-                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
-                              &vertex_data[vertex_attributes[i].offset]);
-        glEnableVertexAttribArray(vertex_attributes[i].index);
-        error = glGetError();
-    }
-#else
     KeSetVertexAttributes( vertex_attributes );
-#endif
     
     /* Set the vertex data into the immediate mode geometry buffer */
     im_gb->SetVertexData( 0, stride*count, vertex_data );
@@ -2153,7 +2264,6 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesIM( uint32_t primtype, uint32_t s
  */
 void IKeOpenGLRenderDevice::DrawIndexedVerticesRangeIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int start, int end, int count, void* vertex_data, void* index_data )
 {
-    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
     GLenum error = glGetError();
     
@@ -2175,12 +2285,7 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesRangeIM( uint32_t primtype, uint3
     PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
-    error = glGetError();
+    PVT_SetWorldViewProjectionMatrices();
     
     /* Now bind the VBO and IBO that is designated for immediate mode rendering */
     glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
@@ -2188,23 +2293,8 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesRangeIM( uint32_t primtype, uint3
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[1] );
     OGL_DISPDBG_R( KE_ERROR, "Error binding IM index buffer!" );
     
-#if 0
     /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
-    for( int i = 0; vertex_attributes[i].index != -1; i++ )
-    {
-        glVertexAttribPointer( vertex_attributes[i].index,
-                              vertex_attributes[i].size,
-                              data_types[vertex_attributes[i].type],
-                              vertex_attributes[i].normalize,
-                              vertex_attributes[i].stride,
-                              /*BUFFER_OFFSET(vertex_attributes[i].offset)*/
-                              &vertex_data[vertex_attributes[i].offset]);
-        glEnableVertexAttribArray(vertex_attributes[i].index);
-        error = glGetError();
-    }
-#else
     KeSetVertexAttributes( vertex_attributes );
-#endif
     
     /* Set the vertex data into the immediate mode geometry buffer */
     im_gb->SetVertexData( 0, stride*count, vertex_data );
@@ -2234,19 +2324,13 @@ void IKeOpenGLRenderDevice::DrawIndexedVerticesRangeIM( uint32_t primtype, uint3
 void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, int first, int count )
 {
     IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
-    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
    
     /* Apply sampler states */
     PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
-    error = glGetError();
-    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
-    error = glGetError();
+    PVT_SetWorldViewProjectionMatrices();
     
     /* Bind the vertex buffer object, but not the index buffer object */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
@@ -2265,16 +2349,13 @@ void IKeOpenGLRenderDevice::DrawVertices( uint32_t primtype, uint32_t stride, in
 void IKeOpenGLRenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count )
 {
     IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
-    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
     
     /* Apply sampler states */
     PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
-    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
-    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    PVT_SetWorldViewProjectionMatrices();
     
     /* Bind the vertex and index buffer objects */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
@@ -2293,18 +2374,14 @@ void IKeOpenGLRenderDevice::DrawIndexedVertices( uint32_t primtype, uint32_t str
  */
 void IKeOpenGLRenderDevice::DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count )
 {
-    
     IKeOpenGLGeometryBuffer* gb = static_cast<IKeOpenGLGeometryBuffer*>( current_geometrybuffer );
-    IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
     GLenum error = glGetError();
    
     /* Apply sampler states */
     PVT_ApplySamplerStates();
     
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
-    glUniformMatrix4fv( gp->matrices[0], 1, No, world_matrix._array );
-    glUniformMatrix4fv( gp->matrices[1], 1, No, view_matrix._array );
-    glUniformMatrix4fv( gp->matrices[2], 1, No, projection_matrix._array );
+    PVT_SetWorldViewProjectionMatrices();
     
     /* Bind the vertex buffer object, but not the index buffer object */
     glBindBuffer( GL_ARRAY_BUFFER, gb->vbo[0] );
@@ -2675,12 +2752,14 @@ void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* fre
  #endif
 #endif
 
+#ifndef __MOBILE_OS__
 #ifdef __APPLE__
     KeVideoAdapterOSX adapter;
     
     KeGetCurrentVideoAdapterInformationOSX( &adapter );
     *total_memory = adapter.video_memory;
     *free_memory = adapter.texture_memory;
+#endif
 #endif
 }
 
