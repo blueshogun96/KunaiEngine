@@ -408,6 +408,47 @@ void KeSetVertexAttributes( KeVertexAttribute* va )
     }
 }
 
+void KeSetVertexAttributesIM( KeVertexAttribute* va, uint8_t* vd )
+{
+    GLenum error = glGetError();
+    int max_attribs = 0;
+    
+    /* Get the max number of vertex attributes this OpenGL implementation supports */
+    glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &max_attribs );
+    
+    /* Disable all vertex attributes before setting the new ones */
+    for( int i = 0; i < max_attribs; i++ )
+    glDisableVertexAttribArray(i);
+    
+    /* Set the vertex attributes for this geometry buffer */
+    for( int i = 0; va[i].index != -1; i++ )
+    {
+        glVertexAttribPointer( va[i].index,
+                              va[i].size,
+                              data_types[va[i].type],
+                              va[i].normalize,
+                              va[i].stride,
+                              &vd[va[i].offset] );
+        OGL_DISPDBG( KE_WARNING, "Unable to set vertex attribute #" << i );
+        glEnableVertexAttribArray(va[i].index);
+        OGL_DISPDBG( KE_WARNING, "Unable to enable vertex attribute #" << i );
+    }
+}
+
+/* Disables the vertex attribute list */
+void KeDisableVertexAttributes()
+{
+    GLenum error = glGetError();
+    int max_attribs = 0;
+    
+    /* Get the max number of vertex attributes this OpenGL implementation supports */
+    glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &max_attribs );
+    
+    /* Disable all vertex attributes before setting the new ones */
+    for( int i = 0; i < max_attribs; i++ )
+        glDisableVertexAttribArray(i);
+}
+
 
 /* Applies sampler states to their respective texture stages */
 /* TODO: Implement dirty states to prevent redundant setting of texture states */
@@ -2163,9 +2204,14 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     
+#ifndef __MOBILE_OS__
     /* Set the VAO of the IM geometry buffer now */
     glBindVertexArray( static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vao );
     OGL_DISPDBG( KE_ERROR, "Error binding the IM vertex array object!" );
+#else
+    /* For OpenGL ES, let's unbind the VAO */
+    glBindVertexArray(0);
+#endif
     
     /* Apply sampler states */
     PVT_ApplySamplerStates();
@@ -2173,15 +2219,23 @@ void IKeOpenGLRenderDevice::DrawVerticesIM( uint32_t primtype, uint32_t stride, 
     /* Assuming there is already a GPU program bound, attempt to set the current matrices */
     PVT_SetWorldViewProjectionMatrices();
     
+#ifndef __MOBILE_OS__
     /* Now bind the VBO that is designated for immediate mode rendering */
     glBindBuffer( GL_ARRAY_BUFFER, static_cast<IKeOpenGLGeometryBuffer*>(im_gb)->vbo[0] );
     OGL_DISPDBG_R( KE_ERROR, "Error binding IM vertex buffer!" );
+#endif
     
+#ifndef __MOBILE_OS__
     /* Set the vertex attributes for this geometry buffer now that the VAO and VBO are in place */
     KeSetVertexAttributes( vertex_attributes );
     
     /* Set the vertex data into the immediate mode geometry buffer */
     im_gb->SetVertexData( 0, stride*count, vertex_data );
+#else
+    /* Set vertex data and vertex attributes without a dynamic VBO for OpenGL ES,
+       this has been more efficient */
+    KeSetVertexAttributesIM( vertex_attributes, (uint8_t*) vertex_data );
+#endif
     
     /* Draw the vertices */
     glDrawArrays( primitive_types[primtype], first, count );

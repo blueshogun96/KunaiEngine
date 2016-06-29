@@ -20,6 +20,16 @@
 #define OGL_DISPDBG_RB( a, b, c ) if(c) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
 
 
+/* 
+ * Laziness for compatibility with core OpenGL...
+ */
+#ifdef __MOBILE_OS__
+#define glMapBuffer glMapBufferOES
+#define glUnmapBuffer glUnmapBufferOES
+#endif
+
+
+
 /* OpenGL buffer access flags */
 uint32_t access_flags[3] =
 {
@@ -28,7 +38,9 @@ uint32_t access_flags[3] =
     GL_WRITE_ONLY,
     GL_READ_WRITE
 #else
-    0, 0, 0
+    0, //GL_READ_ONLY_OES,
+    GL_WRITE_ONLY_OES,
+    0, //GL_READ_WRITE_OES
 #endif
 };
 
@@ -57,7 +69,6 @@ void IKeOpenGLGeometryBuffer::Destroy()
 
 void* IKeOpenGLGeometryBuffer::MapData( uint32_t flags )
 {
-#ifndef __MOBILE_OS__
     /* In order to map/lock vertex or index buffer data, we have to set it as the current buffer.
        this does not seem ideal (at least to me, it isn't), so for now, be careful of any synchronization 
        issues due to Khronos's API design choices. */
@@ -90,15 +101,10 @@ void* IKeOpenGLGeometryBuffer::MapData( uint32_t flags )
     lock_flags = flags;
 
     return ptr;
-#else
-    DISPDBG( KE_ERROR, "glMapBuffer not supported for OpenGL ES!" );
-    return NULL;
-#endif
 }
 
 void IKeOpenGLGeometryBuffer::UnmapData( void* data_ptr )
 {
-#ifndef __MOBILE_OS__
     uint8_t b1 = (lock_flags&0xF0)/16;
     
     /* Which buffer are we asking for? */
@@ -109,9 +115,6 @@ void IKeOpenGLGeometryBuffer::UnmapData( void* data_ptr )
     OGL_DISPDBG( KE_ERROR, "Error unmapping buffer data!", glGetError() );
     
     /* TODO: Unbind the buffer? */
-#else
-    DISPDBG_R( KE_ERROR, "glUnmapBuffer not supported for OpenGL ES!" );
-#endif
 }
 
 bool IKeOpenGLGeometryBuffer::SetVertexData( uint32_t offset, uint32_t size, void* ptr )
@@ -129,6 +132,7 @@ bool IKeOpenGLGeometryBuffer::SetIndexData( uint32_t offset, uint32_t size, void
 {
     /* Set our vertex buffer data */
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vbo[1] );
+    OGL_DISPDBG_RB( KE_ERROR, "Error binding vertex buffer!", glGetError() );
     glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, offset, size, ptr );
     OGL_DISPDBG_RB( KE_ERROR, "Error setting indexex buffer data!", glGetError() );
     
