@@ -5,7 +5,7 @@
 //  Copyright (c) 2016 Shogun3D. All rights reserved.
 //
 
-#include <KePlatform.h>
+#include "KePlatform.h"
 #include "KeVideoAdapterOSX.h"
 
 

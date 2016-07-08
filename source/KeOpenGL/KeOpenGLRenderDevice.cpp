@@ -188,7 +188,11 @@ uint32_t texture_formats[] =
 {
     GL_RGBA,
     GL_BGRA,
-	GL_RED,     /* OpenGL ES 3.0+ only */
+#ifndef __MOBILE_OS__
+    GL_RED,
+#else
+	GL_LUMINANCE,//GL_RED_EXT,     /* OpenGL ES 3.0+ or GL_EXT_texture_rg */
+#endif
 	GL_RGB,
 #ifndef __MOBILE_OS__
 	GL_BGR,     /* Not supported on OpenGL ES */
@@ -201,7 +205,11 @@ uint32_t internal_texture_formats[] =
 {
 	GL_RGBA,
 	GL_RGBA8,
-	GL_R8,      /* OpenGL ES 3.0+ only */
+#ifndef __MOBILE_OS__
+    GL_R8,
+#else
+	GL_LUMINANCE, //GL_R8_EXT,      /* OpenGL ES 3.0+ or GL_EXT_texture_rg */
+#endif
 	GL_RGB,
 	GL_RGB
 };
@@ -1596,6 +1604,7 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     
     /* Set the initial texture attributes */
     glTexImage2D( t->target, 0, internal_texture_formats[format], width, height, 0, texture_formats[format], data_types[data_type], pixels );
+    //glTexImage2D( GL_TEXTURE_2D, 0, GL_LUMINANCE, 1024, 1024, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels );
     OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */

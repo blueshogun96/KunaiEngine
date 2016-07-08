@@ -3,7 +3,7 @@
 #include "Ke.h"
 #include "KeRenderDevice.h"
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(__MOBILE_OS__)
 #include <SDL2_ttf/SDL_ttf.h>
 #else
 #include <SDL_ttf.h>
