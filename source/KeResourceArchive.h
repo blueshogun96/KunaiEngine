@@ -55,6 +55,29 @@ protected:
 	void*	archive;
 };
 
+
+/*
+ * FastFile resource archive
+ */
+class KeFastFileResourceArchive : public KeResourceArchive
+{
+public:
+    KeFastFileResourceArchive();
+    KeFastFileResourceArchive( std::string filename );
+    virtual ~KeFastFileResourceArchive();
+    
+public:
+    virtual bool	IsOpen();
+    virtual void	Close();
+    virtual bool	Read( std::string filename, void** ptr, size_t* size );
+    virtual bool	ReadString( std::string filename, void** ptr, size_t* size );
+    virtual bool    ReadTexture( std::string filename, uint32_t desired_target, IKeTexture** texture );
+    virtual bool    ReadSoundBuffer( std::string filename, IKeSoundBuffer** soundbuffer );
+    
+protected:
+    void*	archive;
+};
+
 /*
  * Feel free to add more!
  */

@@ -360,7 +360,7 @@ KeDynamicFontString::KeDynamicFontString( const char* ttffont, float font_size, 
 
 	/* TODO: Index vertices */
 
-	bool ret = KeGetRenderDevice()->CreateGeometryBuffer( NULL, sizeof(nv::vec4f)*400, NULL, sizeof(uint16_t)*400*6, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, va, &gb );
+	bool ret = KeGetRenderDevice()->CreateGeometryBuffer( NULL, sizeof(nv::vec4f)*400, NULL, sizeof(uint16_t)*400*6, KE_UNSIGNED_SHORT, KE_USAGE_STREAM_WRITE, va, &gb );
 }
 
 KeDynamicFontString::KeDynamicFontString( void* ttffont_buffer, uint32_t buffer_length, float font_size, int tex_width, int tex_height )
@@ -387,7 +387,7 @@ KeDynamicFontString::KeDynamicFontString( void* ttffont_buffer, uint32_t buffer_
 
 	/* TODO: Index vertices */
 
-	bool ret = KeGetRenderDevice()->CreateGeometryBuffer( NULL, sizeof(nv::vec4f)*400, NULL, sizeof(uint16_t)*400*6, KE_UNSIGNED_SHORT, KE_USAGE_DYNAMIC_WRITE, va, &gb );
+	bool ret = KeGetRenderDevice()->CreateGeometryBuffer( NULL, sizeof(nv::vec4f)*400, NULL, sizeof(uint16_t)*400*6, KE_UNSIGNED_SHORT, KE_USAGE_STREAM_WRITE, va, &gb );
 }
 
 KeDynamicFontString::~KeDynamicFontString()
@@ -494,10 +494,19 @@ void KeDynamicFontString::Print( const char* text, nv::vec2f position, bool cent
         ++text;
     }
 
+#if 0
 	gb->SetVertexData( 0, sizeof(nv::vec4f)*vertices.size(), vertices.data() );
 	//gb->SetIndexData( 0, sizeof(uint16_t)*indices.size(), indices.data() );
 	renderdevice->SetGeometryBuffer(gb);
 	renderdevice->DrawVertices( KE_TRIANGLES, sizeof( nv::vec4f ), 0, vertices.size() );
+#else
+    KeVertexAttribute va[] =
+    {
+        { KE_VA_POSITION, 4, KE_FLOAT, No, 4*sizeof(float), 0 },
+        { -1, 0, 0, 0, 0, 0 },
+    };
+    renderdevice->DrawVerticesIM( KE_TRIANGLES, sizeof( nv::vec4f ), va, 0, (int) vertices.size(), vertices.data() );
+#endif
 	//renderdevice->DrawIndexedVertices( KE_TRIANGLES, sizeof( nv::vec4f ), indices.size() );
 	renderdevice->SetGeometryBuffer(NULL);
 

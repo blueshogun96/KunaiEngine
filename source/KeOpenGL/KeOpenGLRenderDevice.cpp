@@ -992,6 +992,10 @@ void IKeOpenGLRenderDevice::Swap()
  *       buffer was already created.  If it exists and the size of the buffer size requested differs
  *       from the curent size, the buffer will be destroyed and recreated.  To avoid performance issues,
  *       avoid calling this function every frame.
+ *
+ *       This function is currently not necessary to be called on embedded platforms.  A dynamic VBO for
+ *       OpenGL ES has proven to be too slow in many cases (at the time of writing) so immediate mode
+ *       for OpenGL ES uses client side vertex arrays instead.
  */
 void IKeOpenGLRenderDevice::SetIMCacheSize( uint32_t cache_size )
 {

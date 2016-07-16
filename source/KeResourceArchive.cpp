@@ -9,7 +9,12 @@
 
 #include "KeResourceArchive.h"
 #include <miniz.c>
+#include <FASTFILE.HPP>
 
+
+/*
+ * Zip archive reader
+ */
 
 KeZipResourceArchive::KeZipResourceArchive() : archive(nullptr)
 {
@@ -121,5 +126,69 @@ bool KeZipResourceArchive::ReadSoundBuffer( std::string filename, IKeSoundBuffer
     else
         return false;
     
+    return true;
+}
+
+
+/*
+ * FastFile archive reader
+ */
+
+KeFastFileResourceArchive::KeFastFileResourceArchive() : archive(nullptr)
+{
+    opened = No;
+}
+
+KeFastFileResourceArchive::KeFastFileResourceArchive( std::string filename ) : archive(nullptr)
+{
+    archive = new CFastFile;
+    
+    /* Open the desired archive */
+    opened = static_cast<CFastFile*>( archive )->Init( (char*) filename.c_str(), 63556 );
+}
+
+KeFastFileResourceArchive::~KeFastFileResourceArchive()
+{
+    Close();
+}
+
+bool KeFastFileResourceArchive::IsOpen()
+{
+    return opened;
+}
+
+void KeFastFileResourceArchive::Close()
+{
+    if( archive )
+    {
+        CFastFile* ff = static_cast<CFastFile*>( archive );
+        
+        /* Close the fastfile, if it is open. */
+        ff->Fini();
+        
+        /* Delete the archive pointer */
+        delete static_cast<CFastFile*>( archive );
+        archive = nullptr;
+    }
+}
+
+bool KeFastFileResourceArchive::Read( std::string filename, void** ptr, size_t* size )
+{
+    return true;
+}
+
+
+bool KeFastFileResourceArchive::ReadString( std::string filename, void** ptr, size_t* size )
+{
+    return true;
+}
+
+bool KeFastFileResourceArchive::ReadTexture( std::string filename, uint32_t desired_target, IKeTexture** texture )
+{
+    return true;
+}
+
+bool KeFastFileResourceArchive::ReadSoundBuffer( std::string filename, IKeSoundBuffer** soundbuffer )
+{
     return true;
 }
