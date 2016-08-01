@@ -65,12 +65,12 @@ BOOL CFastFile::Init( LPSTR fname, int max_handles )
      * get a file handle array
      */
 #ifdef _WIN32
-    lpFH = LocalAlloc( LPTR, max_handles * sizeof( FILEHANDLE ) );
+    lpFH = (LPFILEHANDLE) LocalAlloc( LPTR, max_handles * sizeof( FILEHANDLE ) );
 #else
     lpFH = (LPFILEHANDLE) malloc( max_handles * sizeof( FILEHANDLE ) );
 #endif
     if( lpFH == NULL ) {
-	return FALSE;
+		return FALSE;
     }
     dwFHCnt = max_handles;
 
@@ -78,7 +78,7 @@ BOOL CFastFile::Init( LPSTR fname, int max_handles )
      * create a memory mapped file for the master file
      */
 #ifdef _WIN32
-    hFile = CreateFile( fname, GENERIC_READ, FILE_SHARE_READ, NULL,
+    hFile = CreateFileA( fname, GENERIC_READ, FILE_SHARE_READ, NULL,
             OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, 0 );
 
     if( hFile == NULL || hFile == (HANDLE)HFILE_ERROR )
@@ -91,13 +91,13 @@ BOOL CFastFile::Init( LPSTR fname, int max_handles )
     hFileMapping = CreateFileMapping( hFile, NULL, PAGE_READONLY, 0, 0, NULL );
     if( hFileMapping == NULL ) {
         ODS( "CFastFile::Init: CreateFileMapping Failed\r\n" );
-        FastFileFini();
+        this->Fini();
         return FALSE;
     }
-    pBase = MapViewOfFile( hFileMapping, FILE_MAP_READ, 0, 0, 0 );
+    pBase = (LPBYTE) MapViewOfFile( hFileMapping, FILE_MAP_READ, 0, 0, 0 );
     if( pBase == NULL ) {
         ODS( "CFastFile::Init: MapViewOfFile Failed\r\n" );
-        FastFileFini();
+        this->Fini();
         return FALSE;
     }
 #else
@@ -179,36 +179,30 @@ HFASTFILE CFastFile::Open( LPSTR name )
     LPFILEENTRY	pfe;
 
     if( pFE == NULL ) {
-	ODS( "CFastFile::Open: not initialized\r\n" );
-	return NULL;
+		ODS( "CFastFile::Open: not initialized\r\n" );
+		return NULL;
     }
     if( name == NULL || name[0] == 0 ) {
-	ODS( "CFastFile::Open: invalid name\r\n" );
-	return NULL;
+		ODS( "CFastFile::Open: invalid name\r\n" );
+		return NULL;
     }
 
     strcpy( fe.name, name );
-    pfe = (LPFILEENTRY) bsearch( &fe, pFE, dwFECnt, sizeof( FILEENTRY ),
-#ifdef _WIN32
-                  (LPVOID) Compare
-#else
-                    (int(*)(const void*, const void*)) Compare
-#endif
-    );
+    pfe = (LPFILEENTRY) bsearch( &fe, pFE, dwFECnt, sizeof( FILEENTRY ), (int(*)(const void*, const void*)) Compare );
     if( pfe != NULL ) {
 	DWORD	i;
 	for( i=0;i<dwFHCnt;i++ ) {
 	    if( !lpFH[i].inuse ) {
-		lpFH[i].inuse = TRUE;
-		lpFH[i].pos = pfe->offset;
-		lpFH[i].size = (pfe+1)->offset - pfe->offset;
-		lpFH[i].pfe = pfe;
-		return &lpFH[i];
+			lpFH[i].inuse = TRUE;
+			lpFH[i].pos = pfe->offset;
+			lpFH[i].size = (pfe+1)->offset - pfe->offset;
+			lpFH[i].pfe = pfe;
+			return &lpFH[i];
 	    }
 	}
-	ODS( "CFastFile::Open: Out of file handles\r\n" );
+		ODS( "CFastFile::Open: Out of file handles\r\n" );
     } else {
-	ODS( "CFastFile::Open: File \"" ); ODS( name ); ODS( "\" not found\r\n" );
+		ODS( "CFastFile::Open: File \"" ); ODS( name ); ODS( "\" not found\r\n" );
     }
 
     return NULL;
@@ -223,8 +217,8 @@ HFASTFILE CFastFile::Open( LPSTR name )
 BOOL CFastFile::Close( LPFILEHANDLE pfh )
 {
     if( pfh == NULL || pfh->inuse != TRUE ) {
-	ODS( "CFastFile::Close: invalid handle\r\n" );
-	return FALSE;
+		ODS( "CFastFile::Close: invalid handle\r\n" );
+		return FALSE;
     }
     pfh->inuse = FALSE;
     return TRUE;
@@ -287,16 +281,16 @@ BOOL CFastFile::Unlock( LPFILEHANDLE pfh, int pos, int size )
 BOOL CFastFile::Read( LPFILEHANDLE pfh, LPVOID ptr, int size )
 {
     if( pfh == NULL || pfh->inuse != TRUE ) {
-	ODS( "CFastFile::Read: invalid handle\r\n" );
-	return FALSE;
+		ODS( "CFastFile::Read: invalid handle\r\n" );
+		return FALSE;
     }
     if( size < 0 ) {
-	ODS( "CFastFile::Read: invalid size\r\n" );
-	return FALSE;
+		ODS( "CFastFile::Read: invalid size\r\n" );
+		return FALSE;
     }
     if( (pfh->pos + size) > ((pfh->pfe)+1)->offset ) {
-	ODS( "CFastFile::Read: read past end of file\r\n" );
-	return FALSE;
+		ODS( "CFastFile::Read: read past end of file\r\n" );
+		return FALSE;
     }
     memcpy( ptr, pBase + pfh->pos, size );
     pfh->pos += size;

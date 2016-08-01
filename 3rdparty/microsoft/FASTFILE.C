@@ -101,7 +101,7 @@ BOOL FastFileInit( LPSTR fname, int max_handles )
      * create a memory mapped file for the master file
      */
 #ifdef _WIN32
-    hFile = CreateFile( fname, GENERIC_READ, FILE_SHARE_READ, NULL,
+    hFile = CreateFileA( fname, GENERIC_READ, FILE_SHARE_READ, NULL,
             OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, 0 );
 
     if( hFile == NULL || hFile == (HANDLE)HFILE_ERROR )
