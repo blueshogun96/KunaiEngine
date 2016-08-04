@@ -309,31 +309,31 @@ BOOL CFastFile::Seek( LPFILEHANDLE pfh, int off, int how )
     LPFILEENTRY	pfe;
 
     if( pfh == NULL || pfh->inuse != TRUE ) {
-	ODS( "CFastFile::Seek: invalid handle\r\n" );
-	return FALSE;
+		ODS( "CFastFile::Seek: invalid handle\r\n" );
+		return FALSE;
     }
     pfe = pfh->pfe;
     if( how == SEEK_SET ) {
-	if( off < 0 || off >= pfh->size ) {
-	    ODS( "CFastFile::Seek: Invalid offset\r\n" );
-	    return FALSE;
-	}
+		if( off < 0 || off >= pfh->size ) {
+			ODS( "CFastFile::Seek: Invalid offset\r\n" );
+			return FALSE;
+		}
 	off += pfe->offset;
     } else if( how == SEEK_END ) {
-	if( off < 0 || off >= pfh->size ) {
-	    ODS( "CFastFile::Seek: Invalid offset\r\n" );
-	    return FALSE;
-	}
-	off = (pfe+1)->offset - off;
+		if( off < 0 || off >= pfh->size ) {
+			ODS( "CFastFile::Seek: Invalid offset\r\n" );
+			return FALSE;
+		}
+		off = (pfe+1)->offset - off;
     } else if( how == SEEK_CUR ) {
-	off = pfh->pos + off;
-	if( off < pfe->offset || off >= (pfe+1)->offset ) {
-	    ODS( "CFastFile::Seek: Invalid offset\r\n" );
-	    return FALSE;
-	}
+		off = pfh->pos + off;
+		if( off < pfe->offset || off >= (pfe+1)->offset ) {
+			ODS( "CFastFile::Seek: Invalid offset\r\n" );
+			return FALSE;
+		}
     } else {
-	ODS( "CFastFile::Seek: Invalid 'how' field\r\n" );
-	return FALSE;
+		ODS( "CFastFile::Seek: Invalid 'how' field\r\n" );
+		return FALSE;
     }
     pfh->pos = off;
     return TRUE;
@@ -348,8 +348,8 @@ BOOL CFastFile::Seek( LPFILEHANDLE pfh, int off, int how )
 long CFastFile::Tell( LPFILEHANDLE pfh )
 {
     if( pfh == NULL || pfh->inuse != TRUE ) {
-	ODS( "CFastFile::Tell: invalid handle\r\n" );
-	return -1;
+		ODS( "CFastFile::Tell: invalid handle\r\n" );
+		return -1;
     }
     return pfh->pos - pfh->pfe->offset;
 
