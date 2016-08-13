@@ -195,7 +195,7 @@ bool KeOpenGLIsFenceAPPLE( IKeOpenGLFence* fence )
  */
 bool KeOpenGLCreateFenceARB( IKeOpenGLFence** fence )
 {
-#if GL_ARB_fence
+#if GL_ARB_sync
     /* ARB_sync creates and inserts the fence with the same API call */
     return true;
 #else
@@ -205,7 +205,7 @@ bool KeOpenGLCreateFenceARB( IKeOpenGLFence** fence )
 
 bool KeOpenGLInsertFenceARB( IKeOpenGLFence** fence )
 {
-#if GL_ARB_fence
+#if GL_ARB_sync
     GLenum error = glGetError();
     
     /* Create sync object.  It will automatically be set in the unsignaled state
@@ -292,12 +292,12 @@ void IKeOpenGLFence::Destroy()
 bool IKeOpenGLFence::Insert()
 {
     /* Sanity check */
-    if( !fence )
+    if( !fence && !sync )
         return false;
     
     IKeOpenGLFence* f = this;
     
-    return KeOpenGLInsertFence[vendor]( (IKeOpenGLFence**) &f );
+    return KeOpenGLInsertFence[vendor]( (IKeOpenGLFence**) &f ); 
 }
 
 
@@ -309,7 +309,7 @@ bool IKeOpenGLFence::Insert()
  */
 bool IKeOpenGLFence::Test()
 {
-    if( !fence )
+    if( !fence && !sync )
         return false;
     
     return KeOpenGLTestFence[vendor]( this );
@@ -332,7 +332,7 @@ void IKeOpenGLFence::Block()
  */
 bool IKeOpenGLFence::Valid()
 {
-    if( !fence )
+    if( !fence && !sync )
         return false;
     
     return KeOpenGLIsFence[vendor]( this );
