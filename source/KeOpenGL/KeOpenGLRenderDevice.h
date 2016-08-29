@@ -57,8 +57,10 @@ struct IKeOpenGLGeometryBuffer : public IKeGeometryBuffer
     virtual void Destroy();
     
     virtual void* MapData( uint32_t flags );
+	virtual void* MapDataAsync( uint32_t flags );
     virtual void UnmapData( void* );
-    
+    virtual void UnmapDataAsync( void* );
+
     virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr );
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr );
 	virtual void GetDesc( KeGeometryBufferDesc* desc );

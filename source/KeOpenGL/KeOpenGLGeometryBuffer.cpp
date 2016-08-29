@@ -44,6 +44,13 @@ uint32_t access_flags[3] =
 #endif
 };
 
+uint32_t access_flags2[3] =
+{
+	GL_MAP_READ_BIT,
+	GL_MAP_WRITE_BIT,
+	GL_MAP_READ_BIT | GL_MAP_WRITE_BIT
+};
+
 /* OpenGL buffer target */
 uint32_t buffer_target[3] =
 {
@@ -103,6 +110,45 @@ void* IKeOpenGLGeometryBuffer::MapData( uint32_t flags )
     return ptr;
 }
 
+void* IKeOpenGLGeometryBuffer::MapDataAsync( uint32_t flags )
+{
+	/* In order to map/lock vertex or index buffer data, we have to set it as the current buffer.
+       this does not seem ideal (at least to me, it isn't), so for now, be careful of any synchronization 
+       issues due to Khronos's API design choices. */
+    
+    uint8_t b1 = (flags&0xF0)/16;
+    uint8_t b2 = flags&0x0F;
+    
+    /* Which buffer are we asking for? */
+    uint32_t bo_type = buffer_target[b1];
+
+	/* Get the length of the buffer object we want to read/write */
+	uint32_t buffer_length = bo_type == GL_ELEMENT_ARRAY_BUFFER ? this->id_length : this->vd_length;
+    
+    /* Sanity check */
+    if( !bo_type )
+    {
+        DISPDBG( KE_ERROR, "No specific buffer type was specified!" );
+        return NULL;
+    }
+    
+    /* Bind the desired buffer */
+    glBindBuffer( bo_type, this->vbo[b1-1] );
+    
+    /* Lock the desired buffer */
+    void* ptr = glMapBufferRange( bo_type, 0, buffer_length, GL_MAP_UNSYNCHRONIZED_BIT | access_flags2[b2] ); //glMapBuffer( bo_type, access_flags[b2] );
+    if( !ptr )
+    {
+        OGL_DISPDBG( KE_ERROR, "Error mapping buffer data!", glGetError() );
+        return NULL;
+    }
+    
+    /* Save the flags used */
+    lock_flags = flags;
+
+    return ptr;
+}
+
 void IKeOpenGLGeometryBuffer::UnmapData( void* data_ptr )
 {
     uint8_t b1 = (lock_flags&0xF0)/16;
@@ -114,6 +160,27 @@ void IKeOpenGLGeometryBuffer::UnmapData( void* data_ptr )
     glUnmapBuffer(bo_type);
     OGL_DISPDBG( KE_ERROR, "Error unmapping buffer data!", glGetError() );
     
+    /* TODO: Unbind the buffer? */
+}
+
+void IKeOpenGLGeometryBuffer::UnmapDataAsync( void* data_ptr )
+{   
+	uint8_t b1 = (lock_flags&0xF0)/16;
+    
+    /* Which buffer are we asking for? */
+    uint32_t bo_type = buffer_target[b1];
+    
+	/* Get the length of the buffer object we want to read/write */
+	uint32_t buffer_length = bo_type == GL_ELEMENT_ARRAY_BUFFER ? this->id_length : this->vd_length;
+
+	/* Flush the buffer range */
+	glFlushMappedBufferRange( bo_type, 0, buffer_length );
+	OGL_DISPDBG( KE_ERROR, "Error occurred when flushing mapped buffer range!", glGetError() );
+
+    /* Unmap this buffer */
+    glUnmapBuffer(bo_type);
+    OGL_DISPDBG( KE_ERROR, "Error unmapping buffer data!", glGetError() );
+
     /* TODO: Unbind the buffer? */
 }
 

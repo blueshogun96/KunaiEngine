@@ -363,7 +363,9 @@ struct IKeGeometryBuffer : public IKeResourceBuffer
     virtual void Destroy() PURE;
     
     virtual void* MapData( uint32_t flags ) PURE;
+	virtual void* MapDataAsync( uint32_t flags ) PURE;
     virtual void UnmapData( void* ) PURE;
+	virtual void UnmapDataAsync( void* ) PURE;
     
     virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
     virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr ) PURE;

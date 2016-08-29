@@ -52,7 +52,17 @@ void* IKeDirect3D11GeometryBuffer::MapData( uint32_t flags )
     return NULL;
 }
 
+void* IKeDirect3D11GeometryBuffer::MapDataAsync( uint32_t flags )
+{
+    return NULL;
+}
+
 void IKeDirect3D11GeometryBuffer::UnmapData( void* data_ptr )
+{
+    
+}
+
+void IKeDirect3D11GeometryBuffer::UnmapDataAsync( void* data_ptr )
 {
     
 }

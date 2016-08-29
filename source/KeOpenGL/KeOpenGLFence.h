@@ -22,14 +22,16 @@
 /*
  * Function pointer arrays (for internal use only)
  */
-#define KE_FENCE_ARB	0
-#define KE_FENCE_NV		1
-#define KE_FENCE_APPLE	2
+#define KE_FENCE_ARB	0	/* GL_ARB_sync (core OpenGL) */
+#define KE_FENCE_NV		1	/* GL_NV_fence (NVIDIA and Android) */
+#define KE_FENCE_APPLE	2	/* GL_APPLE_fence (MacOSX) or GL_APPLE_sync (iOS) */
+#define KE_FENCE_EGL	4	/* EGL (Android, BB10, etc.) */
 
-extern bool ( *KeOpenGLCreateFence[3] )( IKeOpenGLFence** );
-extern bool ( *KeOpenGLInsertFence[3] )( IKeOpenGLFence** );
-extern bool ( *KeOpenGLTestFence[3] )( IKeOpenGLFence* );
-extern void ( *KeOpenGLBlockOnFence[3] )( IKeOpenGLFence* );
-extern void ( *KeOpenGLDeleteFence[3] )( IKeOpenGLFence* );
-extern bool ( *KeOpenGLIsFence[3] )( IKeOpenGLFence* );
+
+extern bool ( *KeOpenGLCreateFence[4] )( IKeOpenGLFence** );
+extern bool ( *KeOpenGLInsertFence[4] )( IKeOpenGLFence** );
+extern bool ( *KeOpenGLTestFence[4] )( IKeOpenGLFence* );
+extern void ( *KeOpenGLBlockOnFence[4] )( IKeOpenGLFence* );
+extern void ( *KeOpenGLDeleteFence[4] )( IKeOpenGLFence* );
+extern bool ( *KeOpenGLIsFence[4] )( IKeOpenGLFence* );
 

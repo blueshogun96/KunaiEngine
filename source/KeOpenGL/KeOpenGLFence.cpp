@@ -117,6 +117,7 @@ bool KeOpenGLCreateFenceAPPLE( IKeOpenGLFence** fence )
     
     /* Generate a new fence */
     glGenFencesAPPLE( 1, &(*fence)->fence );
+	OGL_DISPDBG_RB( KE_ERROR, "Error creating new fence!" );
     
     return true;
 #else
@@ -128,10 +129,6 @@ bool KeOpenGLInsertFenceAPPLE( IKeOpenGLFence** fence )
 {
 #if GL_APPLE_fence
     GLenum error = glGetError();
-    
-    /* Generate a new fence */
-    glGenFencesAPPLE( 1, &(*fence)->fence );
-    OGL_DISPDBG_RB( KE_ERROR, "Error generating new fence!" );
     
     /* Set the fence */
     glSetFenceAPPLE( (*fence)->fence );
@@ -211,7 +208,7 @@ bool KeOpenGLInsertFenceARB( IKeOpenGLFence** fence )
     /* Create sync object.  It will automatically be set in the unsignaled state
      if successful. */
     (*fence)->sync = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
-    OGL_DISPDBG_RB( KE_ERROR, "Error creating and setting new sync object!", glGetError() );
+    OGL_DISPDBG_RB( KE_ERROR, "Error creating and setting new sync object!" );
     
     return true;
 #else
@@ -264,12 +261,86 @@ bool KeOpenGLIsFenceARB( IKeOpenGLFence* fence )
 }
 
 
-bool ( *KeOpenGLCreateFence[3] )( IKeOpenGLFence** ) = { KeOpenGLCreateFenceARB, KeOpenGLCreateFenceNV, KeOpenGLCreateFenceAPPLE };
-bool ( *KeOpenGLInsertFence[3] )( IKeOpenGLFence** ) = { KeOpenGLInsertFenceARB, KeOpenGLInsertFenceNV, KeOpenGLInsertFenceAPPLE };
-bool ( *KeOpenGLTestFence[3] )( IKeOpenGLFence* ) = { KeOpenGLTestFenceARB, KeOpenGLTestFenceNV, KeOpenGLTestFenceAPPLE };
-void ( *KeOpenGLBlockOnFence[3] )( IKeOpenGLFence* ) = { KeOpenGLBlockOnFenceARB, KeOpenGLBlockOnFenceNV, KeOpenGLBlockOnFenceAPPLE };
-void ( *KeOpenGLDeleteFence[3] )( IKeOpenGLFence* ) = { KeOpenGLDeleteFenceARB, KeOpenGLDeleteFenceNV, KeOpenGLDeleteFenceAPPLE };
-bool ( *KeOpenGLIsFence[3] )( IKeOpenGLFence* ) = { KeOpenGLIsFenceARB, KeOpenGLIsFenceNV, KeOpenGLIsFenceAPPLE };
+/*
+ * APPLE synchronization functions (GL_APPLE_sync)
+ */
+bool KeOpenGLCreateFenceAPPLEiOS( IKeOpenGLFence** fence )
+{
+#if GL_APPLE_sync
+    /* ARB_sync creates and inserts the fence with the same API call */
+    return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_sync not supported!" );
+#endif
+}
+
+bool KeOpenGLInsertFenceAPPLEiOS( IKeOpenGLFence** fence )
+{
+#if GL_APPLE_sync
+    GLenum error = glGetError();
+    
+    /* Create sync object.  It will automatically be set in the unsignaled state
+     if successful. */
+    (*fence)->sync = glFenceSyncAPPLE( GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE, 0 );
+    OGL_DISPDBG_RB( KE_ERROR, "Error creating and setting new sync object!" );
+    
+    return true;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_sync not supported!" );
+#endif
+}
+
+bool KeOpenGLTestFenceAPPLEiOS( IKeOpenGLFence* fence )
+{
+#if GL_APPLE_sync
+    int signaled = GL_UNSIGNALED;
+    
+    /* Test this sync object for it's status and return the result */
+    glGetSyncivAPPLE( fence->sync, GL_SYNC_STATUS_APPLE, sizeof( int ), NULL, &signaled );
+    
+    return signaled ? true : false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_sync not supported!" );
+#endif
+}
+
+void KeOpenGLBlockOnFenceAPPLEiOS( IKeOpenGLFence* fence )
+{
+#if GL_APPLE_sync
+    /* Stall the current thread until this sync object is signaled */
+    //glWaitSync( fence->sync, 0, GL_TIMEOUT_IGNORED );
+    GLenum ret = glClientWaitSyncAPPLE( fence->sync, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED );
+#else
+    DISPDBG( KE_ERROR, "GL_APPLE_sync not supported!" );
+#endif
+    
+}
+
+void KeOpenGLDeleteFenceAPPLEiOS( IKeOpenGLFence* fence )
+{
+#if GL_APPLE_sync
+    glDeleteSyncAPPLE( fence->sync );
+#else
+    DISPDBG( KE_ERROR, "GL_APPLE_sync not supported!" );
+#endif
+}
+
+bool KeOpenGLIsFenceAPPLEiOS( IKeOpenGLFence* fence )
+{
+#if GL_APPLE_sync
+    return glIsSyncAPPLE( fence->sync ) ? true : false;
+#else
+    DISPDBG_RB( KE_ERROR, "GL_APPLE_sync not supported!" );
+#endif
+}
+
+
+bool ( *KeOpenGLCreateFence[4] )( IKeOpenGLFence** ) = { KeOpenGLCreateFenceARB, KeOpenGLCreateFenceNV, KeOpenGLCreateFenceAPPLE, KeOpenGLCreateFenceAPPLEiOS };
+bool ( *KeOpenGLInsertFence[4] )( IKeOpenGLFence** ) = { KeOpenGLInsertFenceARB, KeOpenGLInsertFenceNV, KeOpenGLInsertFenceAPPLE, KeOpenGLInsertFenceAPPLEiOS };
+bool ( *KeOpenGLTestFence[4] )( IKeOpenGLFence* ) = { KeOpenGLTestFenceARB, KeOpenGLTestFenceNV, KeOpenGLTestFenceAPPLE, KeOpenGLTestFenceAPPLEiOS };
+void ( *KeOpenGLBlockOnFence[4] )( IKeOpenGLFence* ) = { KeOpenGLBlockOnFenceARB, KeOpenGLBlockOnFenceNV, KeOpenGLBlockOnFenceAPPLE, KeOpenGLBlockOnFenceAPPLEiOS };
+void ( *KeOpenGLDeleteFence[4] )( IKeOpenGLFence* ) = { KeOpenGLDeleteFenceARB, KeOpenGLDeleteFenceNV, KeOpenGLDeleteFenceAPPLE, KeOpenGLDeleteFenceAPPLEiOS };
+bool ( *KeOpenGLIsFence[4] )( IKeOpenGLFence* ) = { KeOpenGLIsFenceARB, KeOpenGLIsFenceNV, KeOpenGLIsFenceAPPLE, KeOpenGLIsFenceAPPLEiOS };
 
 
 /*
