@@ -498,29 +498,33 @@ void KeGetMouseState( KeMouse* _mouse )
  */
 void KeProcessKeyEvent( SDL_Event* event )
 {
+	int key = 0;
+
     /* Sanity check */
     if( !event )
         return;
     
     if( event->key.keysym.sym > 255 )
-        return;
-    
+		key = event->key.keysym.scancode;
+	else
+		key = event->key.keysym.sym;
+
     /* Determine what key was pressed or released */
     //keys[event->key.keysym.sym].pressed = event->key.state = SDL_PRESSED ? true : false;
     
     /* Reset timestamps if this is the first key press */
-    if( !keys[event->key.keysym.sym].pressed && event->key.state == SDL_PRESSED )
+    if( !keys[key].pressed && event->key.state == SDL_PRESSED )
     {
-        keys[event->key.keysym.sym].timestamp.frames = 0;
-        keys[event->key.keysym.sym].timestamp.start_time = float(KeGetTickCount());
-        keys[event->key.keysym.sym].timestamp.elapsed_time = 0;
-        keys[event->key.keysym.sym].pressed = true;
+        keys[key].timestamp.frames = 0;
+        keys[key].timestamp.start_time = float(KeGetTickCount());
+        keys[key].timestamp.elapsed_time = 0;
+        keys[key].pressed = true;
     }
     
     /* Mark key as released when it's up */
     if( event->key.state == SDL_RELEASED )
     {
-        keys[event->key.keysym.sym].pressed = false;
+        keys[key].pressed = false;
     }
 }
 
