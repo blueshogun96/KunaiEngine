@@ -281,7 +281,7 @@ public:
     virtual int GetSwapInterval();
 	virtual void BlockUntilIdle();
 	virtual void Kick();
-    virtual bool CreateFence( IKeFence** fence );
+    virtual bool CreateFence( IKeFence** fence, uint32_t flags );
 #if 0
 	virtual bool InsertFence( IKeFence** fence );
 	virtual bool TestFence( IKeFence* fence );

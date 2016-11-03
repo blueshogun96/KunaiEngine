@@ -2665,7 +2665,7 @@ void IKeOpenGLRenderDevice::BlockUntilVerticalBlank()
 
 
 /*
- * Name: IKeOpenGLRenderDevice::set_swap_interval
+ * Name: IKeOpenGLRenderDevice::SetSwapInterval
  * Desc: Sets the swap interval (enables/disable vertical sync). See SDL documentation on
  *       SDL_GL_SetSwapInterval for a more detailed description.
  */
@@ -2676,7 +2676,7 @@ void IKeOpenGLRenderDevice::SetSwapInterval( int swap_interval )
 
 
 /*
- * Name: IKeOpenGLRenderDevice::get_swap_interval
+ * Name: IKeOpenGLRenderDevice::GetSwapInterval
  * Desc: Returns the vertical sync value set above.
  */
 int IKeOpenGLRenderDevice::GetSwapInterval()
@@ -2685,7 +2685,7 @@ int IKeOpenGLRenderDevice::GetSwapInterval()
 }
 
 /*
- * Name: IKeOpenGLRenderDevice::block_until_idle
+ * Name: IKeOpenGLRenderDevice::BlockUntilIdle
  * Desc: Stalls the current thread until the GPU is no longer busy.
  */
 void IKeOpenGLRenderDevice::BlockUntilIdle()
@@ -2706,11 +2706,11 @@ void IKeOpenGLRenderDevice::Kick()
 /*
  * Name: IKeOpenGLRenderDevice::CreateFence
  * Desc: Creates a new GPU fence object based on the vendor's fencing implementation.
- * NOTE: With GL_ARB_sync, the fence is inserted the moment it is created.  So if this is
- *       the chosen extension, then the fence will not literally be created until the time
- *       of it's insertion.
+ * NOTE: With sync objects (not fence objects), the fence is inserted the moment it is created.  
+ *       So if this is the chosen extension, then the fence will not literally be created until 
+ *       the time of it's insertion.
  */
-bool IKeOpenGLRenderDevice::CreateFence( IKeFence** fence )
+bool IKeOpenGLRenderDevice::CreateFence( IKeFence** fence, uint32_t flags )
 {
     if( !fence )
         return false;
@@ -2720,7 +2720,7 @@ bool IKeOpenGLRenderDevice::CreateFence( IKeFence** fence )
     IKeOpenGLFence* f = static_cast<IKeOpenGLFence*>( *fence );
     
     /* Set the device's chosen fence vendor */
-    f->vendor = fence_vendor;
+    f->vendor = flags == KE_FENCE_DEFAULT ? fence_vendor : flags;
     
     if( !KeOpenGLCreateFence[f->vendor]( &f ) )
     {

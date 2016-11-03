@@ -229,6 +229,16 @@
 #define KE_MIRRORED_REPEAT  4
 
 /*
+ * Fence types
+ */
+#define KE_FENCE_DEFAULT    -1  /* Autodetect per platform */
+#define KE_FENCE_ARB        0	/* GL_ARB_sync (core OpenGL) */
+#define KE_FENCE_NV         1	/* GL_NV_fence (NVIDIA and Android) */
+#define KE_FENCE_APPLE      2	/* GL_APPLE_fence (MacOSX) or GL_APPLE_sync (iOS) */
+#define KE_FENCE_EGL        4	/* EGL (Android, BB10, etc.) */
+#define KE_FENCE_MICROSOFT  5   /* Direct3D default (ID3D11Query for windows) */
+
+/*
  * Sprite batch settings
  */
 #define KE_DEFAULT_BATCH_SIZE (32*1024*1024)
@@ -260,6 +270,7 @@ struct KeRenderDeviceCaps
     int hardware_command_buffers_supported;
     int gpu_fencing_supported;
     int instancing_supported;
+    int default_fence_type;
     
     /* Texture capabilities */
     int texture_rectangles_supported;
@@ -559,7 +570,7 @@ public:
     virtual int GetSwapInterval() PURE;
 	virtual void BlockUntilIdle() PURE;
 	virtual void Kick() PURE;
-    virtual bool CreateFence( IKeFence** fence ) PURE;
+    virtual bool CreateFence( IKeFence** fence, uint32_t flags ) PURE;
 #if 0
 	virtual bool InsertFence( IKeFence** fence ) PURE;
 	virtual bool TestFence( IKeFence* fence ) PURE;
