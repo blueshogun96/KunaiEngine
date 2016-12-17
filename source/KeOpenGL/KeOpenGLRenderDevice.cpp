@@ -1221,6 +1221,10 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     {
         glBindAttribLocation( p, program_attributes[index].location, program_attributes[index].name );
         index++;
+        
+        /* TODO: The colour attribute doesn't appear to be working right now... */
+        OGL_DISPDBG( KE_WARNING, "Could not bind attribute! (location: " << program_attributes[index].location <<
+                    ", name: " << program_attributes[index].name << ")" );
     }
     
 	glAttachShader( p, v );

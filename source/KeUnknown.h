@@ -18,7 +18,7 @@
  */
 struct IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
 };
 
 #endif
