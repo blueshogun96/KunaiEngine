@@ -345,7 +345,7 @@ KeDynamicFontString::KeDynamicFontString( const char* ttffont, float font_size, 
     fclose(fp);
 
     /* Create a 8-bit alpha only texture */
-	KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, tex_width, tex_height, 1, KE_TEXTUREFORMAT_R8, KE_UNSIGNED_BYTE, &tex, temp_bitmap );
+	KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, tex_width, tex_height, 0, KE_TEXTUREFORMAT_R8, KE_UNSIGNED_BYTE, &tex, temp_bitmap );
 
     free(temp_bitmap);
 
@@ -372,7 +372,7 @@ KeDynamicFontString::KeDynamicFontString( void* ttffont_buffer, uint32_t buffer_
     stbtt_BakeFontBitmap( (const unsigned char*) ttffont_buffer, 0, font_size, temp_bitmap,tex_width,tex_height, 32,224, cdata ); // no guarantee this fits!
 
     /* Create a 8-bit alpha only texture */
-	KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, tex_width, tex_height, 1, KE_TEXTUREFORMAT_R8, KE_UNSIGNED_BYTE, &tex, temp_bitmap );
+	KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, tex_width, tex_height, 0, KE_TEXTUREFORMAT_R8, KE_UNSIGNED_BYTE, &tex, temp_bitmap );
 
     free(temp_bitmap);
 
@@ -509,7 +509,7 @@ void KeDynamicFontString::Print( const char* text, nv::vec2f position, bool cent
 #endif
 	//renderdevice->DrawIndexedVertices( KE_TRIANGLES, sizeof( nv::vec4f ), indices.size() );
 	renderdevice->SetGeometryBuffer(NULL);
-
+    renderdevice->SetTexture( 0, NULL );
 	renderdevice->SetProgram(NULL);
 	
 	/* Reset the matrices back to their previous states */

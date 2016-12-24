@@ -9,7 +9,7 @@
 
 #include "KeResourceArchive.h"
 #include <miniz.c>
-#include <FASTFILE.HPP>
+#include <fastfile.hpp>
 
 
 /*

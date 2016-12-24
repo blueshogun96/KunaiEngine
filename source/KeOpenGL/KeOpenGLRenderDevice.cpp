@@ -204,7 +204,7 @@ uint32_t texture_formats[] =
 uint32_t internal_texture_formats[] =
 {
 	GL_RGBA,
-	GL_RGBA8,
+	GL_RGBA,
 #ifndef __MOBILE_OS__
     GL_R8,
 #else
@@ -426,7 +426,7 @@ void KeSetVertexAttributesIM( KeVertexAttribute* va, uint8_t* vd )
     
     /* Disable all vertex attributes before setting the new ones */
     for( int i = 0; i < max_attribs; i++ )
-    glDisableVertexAttribArray(i);
+        glDisableVertexAttribArray(i);
     
     /* Set the vertex attributes for this geometry buffer */
     for( int i = 0; va[i].index != -1; i++ )
@@ -457,6 +457,30 @@ void KeDisableVertexAttributes()
         glDisableVertexAttribArray(i);
 }
 
+/* Returns true if this texture's dimensions are power of two, returns false otherwise. */
+bool KeIsPowerOfTwo( int width, int height, int depth )
+{
+    uint32_t ideal_width = 0, ideal_height = 0, ideal_depth = 0;
+    
+    for( int v = 0; v < 32; v++ )
+    {
+        int mask = 1 << v;
+        
+        if( width & mask )
+            ideal_width = mask;
+        
+        if( height & mask )
+            ideal_height = mask;
+        
+        if( depth & mask )
+            ideal_depth = mask;
+    }
+    
+    if( width != ideal_width || height != ideal_height || depth != ideal_depth )
+        return false;
+    
+    return true;
+}
 
 /* Applies sampler states to their respective texture stages */
 /* TODO: Implement dirty states to prevent redundant setting of texture states */
@@ -1559,6 +1583,7 @@ bool IKeOpenGLRenderDevice::CreateTexture1D( uint32_t target, int width, int mip
     
     /* Set texture attributes */
     t->width = width;
+    t->mipmap = mipmaps;
     t->target = texture_targets[target];
     t->data_type = data_types[data_type];
     t->depth_format = texture_formats[format];
@@ -1571,7 +1596,7 @@ bool IKeOpenGLRenderDevice::CreateTexture1D( uint32_t target, int width, int mip
     OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!" );
     
     /* Set the initial texture attributes */
-    glTexImage1D( t->target, 0, internal_texture_formats[format], width, 0, texture_formats[format], data_types[data_type], pixels );
+    glTexImage1D( t->target, 0, internal_texture_formats[format], width, mipmaps, texture_formats[format], data_types[data_type], pixels );
     OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
@@ -1599,6 +1624,7 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     /* Set texture attributes */
     t->width = width;
     t->height = height;
+    t->mipmap = mipmaps;
     t->target = texture_targets[target];
     t->data_type = data_types[data_type];
     t->depth_format = texture_formats[format];
@@ -1611,13 +1637,27 @@ bool IKeOpenGLRenderDevice::CreateTexture2D( uint32_t target, int width, int hei
     OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!" );
     
     /* Set the initial texture attributes */
-    glTexImage2D( t->target, 0, internal_texture_formats[format], width, height, 0, texture_formats[format], data_types[data_type], pixels );
+    glTexImage2D( t->target, 0, internal_texture_formats[format], width, height, mipmaps, texture_formats[format], data_types[data_type], pixels );
     //glTexImage2D( GL_TEXTURE_2D, 0, GL_LUMINANCE, 1024, 1024, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels );
     OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
     glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    
+#ifdef GL_ES_VERSION_2_0
+    /* For OpenGL ES, textures need to have GL_CLAMP_TO_EDGE set if they are not power of two. 
+       For now, we'll set it automatically, then output a warning that this was done for 
+       compatibility. The developer can change it later if necessary. */
+    
+    if( !KeIsPowerOfTwo( width, height, 0 ) )
+    {
+        glTexParameteri( t->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+        glTexParameteri( t->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+        
+        DISPDBG( KE_WARNING, "Non-pow2 texture detected; Setting texture wrap mode to GL_CLAMP_TO_EDGE by default." );
+    }
+#endif
     
 	/* Unbind texture */
 	glBindTexture( t->target, 0 );
@@ -1642,6 +1682,7 @@ bool IKeOpenGLRenderDevice::CreateTexture3D( uint32_t target, int width, int hei
     t->width = width;
     t->height = height;
     t->depth = depth;
+    t->mipmap = mipmaps;
     t->target = texture_targets[target];
     t->data_type = data_types[data_type];
     t->depth_format = texture_formats[format];
@@ -1654,12 +1695,27 @@ bool IKeOpenGLRenderDevice::CreateTexture3D( uint32_t target, int width, int hei
     OGL_DISPDBG_RB( KE_ERROR, "Error binding texture!" );
     
     /* Set the initial texture attributes */
-    glTexImage3D( t->target, 0, internal_texture_formats[format], width, height, depth, 0, texture_formats[format], data_types[data_type], pixels );
+    glTexImage3D( t->target, 0, internal_texture_formats[format], width, height, depth, mipmaps, texture_formats[format], data_types[data_type], pixels );
     OGL_DISPDBG_RB( KE_ERROR, "Error initializing texture attributes!" );
     
     /* Set texture parameters */
     glTexParameteri( t->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( t->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    
+#ifdef GL_ES_VERSION_2_0
+    /* For OpenGL ES, textures need to have GL_CLAMP_TO_EDGE set if they are not power of two.
+     For now, we'll set it automatically, then output a warning that this was done for
+     compatibility. The developer can change it later if necessary. */
+    
+    if( !KeIsPowerOfTwo( width, height, depth ) )
+    {
+        glTexParameteri( t->target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+        glTexParameteri( t->target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+        glTexParameteri( t->target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+        
+        DISPDBG( KE_WARNING, "Non-pow2 texture detected; Setting texture wrap mode to GL_CLAMP_TO_EDGE by default." );
+    }
+#endif
     
     return true;
 }

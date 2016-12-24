@@ -6,6 +6,7 @@
 //
 
 #include "KePlatform.h"
+#include "KeDebug.h"
 #include "KeVideoAdapterOSX.h"
 
 
@@ -18,6 +19,7 @@
  */
 
 
+#define CGL_DISPDBG( a, b ) if(error != kCGLNoError) { DISPDBG( a, b << "\nError code: (" << error << ")" ); }
 
 /*
  * Name: KeGetTotalVideoMemoryOSX
@@ -43,7 +45,8 @@ int KeGetTotalVideoMemoryOSX()
     int renderer_count = 0;
     CGLRendererInfoObj renderer_info;
     
-    CGLQueryRendererInfo( (GLuint) renderer_id, &renderer_info, &renderer_count );
+    CGLError error = CGLQueryRendererInfo( (GLuint) renderer_id, &renderer_info, &renderer_count );
+    CGL_DISPDBG( KE_ERROR, "Error querying renderer info!" );
     
     for( int i = 0; i > renderer_count; i++ )
     {
@@ -151,3 +154,24 @@ bool KeEnumerateVideoAdaptersOSX( std::vector<KeVideoAdapterOSX>& video_adapters
     return renderer_found;
 }
 
+void KeEnableMultithreadedEngineOSX( bool enable )
+{
+    CGLContextObj context = [[NSOpenGLContext currentContext] CGLContextObj];
+    CGLError error;
+    
+    if( enable )
+        error = CGLEnable( context, kCGLCEMPEngine );
+    else
+        error = CGLDisable( context, kCGLCEMPEngine );
+    
+    CGL_DISPDBG( KE_WARNING, "Error " << (enable ? "enabling" : "disabling") << " the OpenGL multithreading engine!" );
+}
+
+bool KeMultithreadedEngineEnabledOSX( int* enabled )
+{
+    CGLError error = CGLIsEnabled( [[NSOpenGLContext currentContext] CGLContextObj], kCGLCEMPEngine, enabled );
+    
+    CGL_DISPDBG( KE_WARNING, "Error querying OpenGL multithreading engine state!" );
+    
+    return error != kCGLNoError ? true : false;
+}
