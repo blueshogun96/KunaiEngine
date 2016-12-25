@@ -48,10 +48,10 @@
 #define KE_VA_TEXTURE1          6
 #define KE_VA_TEXTURE2          7
 #define KE_VA_TEXTURE3          8
-#define KE_VA_TEXTURE4          8
-#define KE_VA_TEXTURE5          8
-#define KE_VA_TEXTURE6          8
-#define KE_VA_TEXTURE7          8
+#define KE_VA_TEXTURE4          9
+#define KE_VA_TEXTURE5          10
+#define KE_VA_TEXTURE6          11
+#define KE_VA_TEXTURE7          12
 
 
 /*
@@ -286,7 +286,13 @@ struct KeRenderDeviceCaps
     /* Shader capabilities */
     int compute_shaders_supported;
     int constant_buffers_supported;
-    int single_constants_supported;
+    int uniform_constants_supported;
+    int max_constant_buffer_size;
+    int max_constant_buffer_bindings;
+    int max_vertex_constant_buffer_blocks;
+    int max_pixel_constant_buffer_blocks;
+    int max_geometry_constant_buffer_blocks;
+    int max_tesselation_constant_buffer_blocks;
 };
 
 /*

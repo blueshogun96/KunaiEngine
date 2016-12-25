@@ -31,19 +31,7 @@
 
 
 /* OpenGL buffer access flags */
-uint32_t access_flags[3] =
-{
-#ifndef __MOBILE_OS__
-    GL_READ_ONLY,
-    GL_WRITE_ONLY,
-    GL_READ_WRITE
-#else
-    0, //GL_READ_ONLY_OES,
-    GL_WRITE_ONLY_OES,
-    0, //GL_READ_WRITE_OES
-#endif
-};
-
+extern uint32_t access_flags[3];
 
 
 /*

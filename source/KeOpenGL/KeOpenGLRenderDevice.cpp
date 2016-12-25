@@ -1185,7 +1185,6 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
         
         glGetShaderInfoLog( v, 2048, &len, str );
 		DISPDBG( KE_ERROR, "Vertex shader not compiled.\n" << str );
-		//fprintf( stderr, "Vertex shader not compiled.\n%s\n", str);
 		Fail = Yes;
 	}
     
@@ -1198,7 +1197,6 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
         
         glGetShaderInfoLog( f, 2048, &len, str );
 		DISPDBG( KE_ERROR, "Fragment shader not compiled.\n" << str );
-		//fprintf( stderr, "Fragment shader not compiled.\n%s\n", str);
 		Fail = Yes;
 	}
     
@@ -1229,15 +1227,20 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     glBindAttribLocation( p, 11, "in_tex6" );
     glBindAttribLocation( p, 12, "in_tex7" );*/
     
+    /* Bind all attributes found within the list of vertex attributes */
     int index = 0;
     while( vertex_attributes[index].index != -1 )
     {
-        glBindAttribLocation( p, program_attributes[index].location, program_attributes[index].name );
-        index++;
+        glBindAttribLocation
+        (
+         p, program_attributes[vertex_attributes[index].index].location,
+         program_attributes[vertex_attributes[index].index].name
+        );
         
-        /* TODO: The colour attribute doesn't appear to be working right now... */
-        OGL_DISPDBG( KE_WARNING, "Could not bind attribute! (location: " << program_attributes[index].location <<
-                    ", name: " << program_attributes[index].name << ")" );
+        OGL_DISPDBG( KE_WARNING, "Could not bind attribute! (location: " <<
+                    program_attributes[vertex_attributes[index].index].location <<
+                    ", name: " << program_attributes[vertex_attributes[index].index].name << ")" );
+        index++;
     }
     
 	glAttachShader( p, v );
