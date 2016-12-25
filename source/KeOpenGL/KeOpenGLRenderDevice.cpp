@@ -388,10 +388,9 @@ bool KeVertexAttributesMatch( KeVertexAttribute* va1, KeVertexAttribute* va2 )
     return true;
 }
 
-/* Sets the vertex attribute list and enables it */
-void KeSetVertexAttributes( KeVertexAttribute* va )
+/* Disables the vertex attribute list */
+void KeDisableVertexAttributes()
 {
-    GLenum error = glGetError();
     int max_attribs = 0;
     
     /* Get the max number of vertex attributes this OpenGL implementation supports */
@@ -400,6 +399,15 @@ void KeSetVertexAttributes( KeVertexAttribute* va )
     /* Disable all vertex attributes before setting the new ones */
     for( int i = 0; i < max_attribs; i++ )
         glDisableVertexAttribArray(i);
+}
+
+/* Sets the vertex attribute list and enables it */
+void KeSetVertexAttributes( KeVertexAttribute* va )
+{
+    GLenum error = glGetError();
+    
+    /* Disable all vertex attributes */
+    KeDisableVertexAttributes();
     
     /* Set the vertex attributes for this geometry buffer */
     for( int i = 0; va[i].index != -1; i++ )
@@ -419,14 +427,9 @@ void KeSetVertexAttributes( KeVertexAttribute* va )
 void KeSetVertexAttributesIM( KeVertexAttribute* va, uint8_t* vd )
 {
     GLenum error = glGetError();
-    int max_attribs = 0;
     
-    /* Get the max number of vertex attributes this OpenGL implementation supports */
-    glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &max_attribs );
-    
-    /* Disable all vertex attributes before setting the new ones */
-    for( int i = 0; i < max_attribs; i++ )
-        glDisableVertexAttribArray(i);
+    /* Disable all vertex attributes */
+    KeDisableVertexAttributes();
     
     /* Set the vertex attributes for this geometry buffer */
     for( int i = 0; va[i].index != -1; i++ )
@@ -441,20 +444,6 @@ void KeSetVertexAttributesIM( KeVertexAttribute* va, uint8_t* vd )
         glEnableVertexAttribArray(va[i].index);
         OGL_DISPDBG( KE_WARNING, "Unable to enable vertex attribute #" << i );
     }
-}
-
-/* Disables the vertex attribute list */
-void KeDisableVertexAttributes()
-{
-    GLenum error = glGetError();
-    int max_attribs = 0;
-    
-    /* Get the max number of vertex attributes this OpenGL implementation supports */
-    glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &max_attribs );
-    
-    /* Disable all vertex attributes before setting the new ones */
-    for( int i = 0; i < max_attribs; i++ )
-        glDisableVertexAttribArray(i);
 }
 
 /* Returns true if this texture's dimensions are power of two, returns false otherwise. */
@@ -1281,7 +1270,9 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     
     glDeleteShader(v);
     glDeleteShader(f);
+#ifndef __MOBILE_OS__
     glDeleteShader(g);
+#endif
     
     GLuint uniform_tex0 = glGetUniformLocation( p, "tex0" );
     GLuint uniform_tex1 = glGetUniformLocation( p, "tex1" );
@@ -1291,6 +1282,8 @@ bool IKeOpenGLRenderDevice::CreateProgram( const char* vertex_shader, const char
     GLuint uniform_tex5 = glGetUniformLocation( p, "tex5" );
     GLuint uniform_tex6 = glGetUniformLocation( p, "tex6" );
     GLuint uniform_tex7 = glGetUniformLocation( p, "tex7" );
+    
+    error = glGetError();
     
     gp->matrices[0] = glGetUniformLocation( p, "world" );
 	OGL_DISPDBG( KE_WARNING, "Could not find the world matrix uniform location..." );
@@ -1348,15 +1341,15 @@ void IKeOpenGLRenderDevice::DeleteProgram( IKeGpuProgram* gpu_program )
 void IKeOpenGLRenderDevice::SetProgram( IKeGpuProgram* gpu_program )
 {
 	GLenum error = glGetError();
+    
+    /* Save a copy of this program */
+    current_gpu_program = gpu_program;
 
     /* Check for a valid pointer. If NULL, then we set the current program to 0. */
     if( gpu_program )
     {
         IKeOpenGLGpuProgram* gp = static_cast<IKeOpenGLGpuProgram*>(gpu_program);
-    
-        /* Save a copy of this program */
-        current_gpu_program = gpu_program;
-    
+        
         glUseProgram( gp->program );
 		OGL_DISPDBG_R( KE_ERROR, "Invalid GPU program!" );
     }
@@ -1506,12 +1499,40 @@ void IKeOpenGLRenderDevice::GetProgramConstantIV( const char* location, int* val
 
 /*
  * Name: IKeOpenGLRenderDevice::create_constant_buffer
- * Desc: Creates a constant buffer.
- * TODO: Support for OpenGL.
+ * Desc: Creates a constant buffer and initializes it with the chosen contents.
+ * NOTE: Constant buffers use Unified Buffer Objects (UBOs) and are only supported by core OpenGL 3.1+
+ *       and OpenGL ES 3.0+.
  */
-bool IKeOpenGLRenderDevice::CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer )
+bool IKeOpenGLRenderDevice::CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data )
 {
-	DISPDBG_RB( KE_ERROR, "Functionality not yet implemented for core OpenGL!" );
+    GLenum error = glGetError();
+    
+    /* Sanity check */
+    if( !desc )
+        return false;
+    
+    /* Allocate a new constant buffer interface */
+    *constant_buffer = new IKeOpenGLConstantBuffer;
+    IKeOpenGLConstantBuffer* cb = static_cast<IKeOpenGLConstantBuffer*>( *constant_buffer );
+    
+    /* Generate a new UBO */
+    glGenBuffers( 1, &cb->ubo );
+    OGL_DISPDBG_RB( KE_ERROR, "Error generating new UBO!" );
+    
+    /* Bind the UBO and setup the initial contents */
+    glBindBuffer( GL_UNIFORM_BUFFER, cb->ubo );
+    glBufferData( GL_UNIFORM_BUFFER, desc->data_size, data, buffer_usage_types[desc->flags] );
+    OGL_DISPDBG( KE_ERROR, "Error setting UBO data!" );
+    
+    /* Unbind the UBO */
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    
+    /* Copy important attributes */
+    memcpy( cb->block_name, desc->block_name, sizeof( char ) * 64 );
+    cb->data_size = desc->data_size;
+    cb->flags = desc->flags;
+    
+    return true;
 }
 
 /*
@@ -1533,40 +1554,32 @@ bool IKeOpenGLRenderDevice::SetConstantBufferData( void* data, IKeConstantBuffer
 }
 
 /*
- * Name: IKeOpenGLRenderDevice::set_vertex_shader_constant_buffer
- * Desc: 
+ * Name: IKeOpenGLRenderDevice::SetConstantBuffer
+ * Desc: Sets the constant buffer into the desired binding index if available.
+ * NOTE: For OpenGL, you are limited to the number of available uniform buffer bindings.
  */
-void IKeOpenGLRenderDevice::SetVertexShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
+void IKeOpenGLRenderDevice::SetConstantBuffer( int slot, int shader_type, IKeConstantBuffer* constant_buffer )
 {
-
+    GLenum error = glGetError();
+    
+    IKeOpenGLConstantBuffer* cb = static_cast<IKeOpenGLConstantBuffer*>( constant_buffer );
+    IKeOpenGLGpuProgram* p = static_cast<IKeOpenGLGpuProgram*>( current_gpu_program );
+    
+    if( !current_gpu_program )
+        DISPDBG_R( KE_ERROR, "A valid GPU program must be set before setting a constant buffer!" );
+    
+    /* Locate the block index so we can bind the UBO to the desired index */
+    uint32_t block_index = glGetUniformBlockIndex( p->program, cb->block_name );
+    OGL_DISPDBG_R( KE_ERROR, "Error getting uniform block index (" << cb->block_name << ")!" );
+    
+    /* Bind the UBO to an index */
+    glBindBufferBase( GL_UNIFORM_BUFFER, slot, cb->ubo );
+    OGL_DISPDBG_R( KE_ERROR, "Error binding UBO to index #" << slot << "!" );
+    
+    /* Bind the uniform block */
+    glUniformBlockBinding( p->program, block_index, slot );
 }
 
-/*
- * Name: IKeOpenGLRenderDevice::set_pixel_shader_constant_buffer
- * Desc: 
- */
-void IKeOpenGLRenderDevice::SetPixelShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
-{
-
-}
-
-/*
- * Name: IKeOpenGLRenderDevice::set_geometry_shader_constant_buffer
- * Desc: 
- */
-void IKeOpenGLRenderDevice::SetGeometryShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
-{
-
-}
-
-/*
- * Name: IKeOpenGLRenderDevice::set_tesselation_shader_constant_buffer
- * Desc: 
- */
-void IKeOpenGLRenderDevice::SetTesselationShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
-{
-
-}
 
 /*
  * Name: IKeOpenGLRenderDevice::create_texture_1d
@@ -1777,9 +1790,13 @@ void IKeOpenGLRenderDevice::SetTextureData2D( int offsetx, int offsety, int widt
  */
 void IKeOpenGLRenderDevice::SetTextureData3D( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, IKeTexture* texture )
 {
+    GLenum error = glGetError();
     IKeOpenGLTexture* t = static_cast<IKeOpenGLTexture*>( texture );
     
+    glBindTexture( t->target, t->handle );
     glTexSubImage3D( t->target, miplevel, offsetx, offsety, offsetz, width, height, depth, t->internal_format, t->data_type, pixels );
+    OGL_DISPDBG( KE_ERROR, "Error setting texture data!" );
+    glBindTexture( t->target, 0 );
 }
 
 /*

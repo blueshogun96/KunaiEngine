@@ -39,14 +39,19 @@
  */
 struct IKeOpenGLConstantBuffer : public IKeConstantBuffer
 {
-    virtual void Destroy();
+    KEMETHOD            Destroy();
     
-    void*       buffer_data;    /* Constant buffer data */
+    _KEMETHOD(void*)    MapData( uint32_t flags );
+    KEMETHOD            UnmapData( void* );
+    
+    _KEMETHOD(bool)     SetConstantData( uint32_t offset, uint32_t size, void* ptr );
+    KEMETHOD            GetDesc( KeConstantBufferDesc* desc );
+    
+    uint32_t    ubo;            /* Uniform buffer size */
     uint32_t    data_size;      /* Size of the data buffer */
-    uint32_t*   locations;      /* Constant locations (for faux constant buffers) */
-    uint32_t    location_count; /* Number of constant locations (for faux constant buffers) */
-    uint32_t*   offsets;        /* Constant offsets (for faux constant buffers) */
-    uint32_t    offset_count;   /* Number of offsets (for faux constant buffers) */
+    uint32_t    flags;          /* Buffer creation flags */
+    uint32_t    block_index;    /* Block index representing the block name we are attempting to access */
+    char        block_name[64]; /* Name of the block/struct within the GPU program we are writing data to */
 };
 
 /*
@@ -227,13 +232,10 @@ public:
     virtual void SetProgramConstant4IV( const char* location, int count, int* value );
     virtual void GetProgramConstantFV( const char* location, float* value );
     virtual void GetProgramConstantIV( const char* location, int* value );
-	virtual bool CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer );
+	virtual bool CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data = NULL );
 	virtual void DeleteConstantBuffer( IKeConstantBuffer* constant_buffer );
 	virtual bool SetConstantBufferData( void* data, IKeConstantBuffer* constant_buffer );
-	virtual void SetVertexShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
-	virtual void SetPixelShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
-	virtual void SetGeometryShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
-	virtual void SetTesselationShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
+	virtual void SetConstantBuffer( int slot, int shader_type, IKeConstantBuffer* constant_buffer );
     virtual bool CreateTexture1D( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL );
     virtual bool CreateTexture2D( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL );
     virtual bool CreateTexture3D( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL );

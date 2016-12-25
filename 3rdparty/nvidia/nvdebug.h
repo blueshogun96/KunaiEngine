@@ -78,7 +78,7 @@ public:
 		: m_GlobalDebugLevel(GlobalDebugLevel),
 		m_dbgLog(pszFileName, std::ios::out | std::ios::trunc)	// Open a log file for debug messages
 	{
-		OutputDebugString(TEXT("NVDebug::NVDebug\n"));
+		OutputDebugString(TEXT("NVDebug::NVDebug\n\n"));
 	}
 	
 	virtual ~NVDebug()
@@ -133,8 +133,8 @@ do																\
 	if (NVDebug::GetSingletonPtr() != NULL)						\
 	if (a <= NVDebug::GetSingleton().GetLevel()) {	\
 		NVDebug::GetSingleton().FlushLastMessage();	\
-		NVDebug::GetSingleton().GetLastMessage() << __KE_FUNCTION__ << ": " << b;	\
-		NVDebug::GetSingleton().GetStream() << __KE_FUNCTION__ << ": " << b;			\
+		NVDebug::GetSingleton().GetLastMessage() << __KE_FUNCTION__ << ": " << b << "\n";	\
+		NVDebug::GetSingleton().GetStream() << __KE_FUNCTION__ << ": " << b << "\n";			\
 		NVDebug::GetSingleton().EndOutput(); }				\
 } while(0)
 

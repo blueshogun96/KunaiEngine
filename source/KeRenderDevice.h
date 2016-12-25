@@ -239,6 +239,14 @@
 #define KE_FENCE_MICROSOFT  5   /* Direct3D default (ID3D11Query for windows) */
 
 /*
+ * Shader types
+ */
+#define KE_VERTEX_SHADER        0
+#define KE_PIXEL_SHADER         1
+#define KE_GEOMETRY_SHADER      2
+#define KE_TESSELATION_SHADER   3
+
+/*
  * Sprite batch settings
  */
 #define KE_DEFAULT_BATCH_SIZE (32*1024*1024)
@@ -345,6 +353,16 @@ struct KeTextureDesc
     uint32_t data_type;         /* Internal data type */
 };
 
+/*
+ * Constant buffer data description
+ */
+struct KeConstantBufferDesc
+{
+    char        block_name[64];
+    uint32_t    flags;
+    uint32_t    data_size;
+};
+
 
 /*
  * Resource base structure
@@ -361,9 +379,15 @@ struct IKeResourceBuffer : public IKeUnknown
 /*
  * Constant buffer structure
  */
-struct IKeConstantBuffer : public IKeUnknown
+struct IKeConstantBuffer : public IKeResourceBuffer
 {
-    virtual void Destroy() PURE;
+    KEMETHOD            Destroy() PURE;
+    
+    _KEMETHOD(void*)    MapData( uint32_t flags ) PURE;
+    KEMETHOD            UnmapData( void* ) PURE;
+    
+    _KEMETHOD(bool)     SetConstantData( uint32_t offset, uint32_t size, void* ptr ) PURE;
+    KEMETHOD            GetDesc( KeConstantBufferDesc* desc ) PURE;
 };
 
 /*
@@ -516,13 +540,10 @@ public:
     virtual void SetProgramConstant4IV( const char* location, int count, int* value ) PURE;
     virtual void GetProgramConstantFV( const char* location, float* value ) PURE;
     virtual void GetProgramConstantIV( const char* location, int* value ) PURE;
-	virtual bool CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer ) PURE;
+	virtual bool CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data = NULL ) PURE;
 	virtual void DeleteConstantBuffer( IKeConstantBuffer* constant_buffer ) PURE;
 	virtual bool SetConstantBufferData( void* data, IKeConstantBuffer* constant_buffer ) PURE;
-	virtual void SetVertexShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer ) PURE;
-	virtual void SetPixelShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer ) PURE;
-	virtual void SetGeometryShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer ) PURE;
-	virtual void SetTesselationShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer ) PURE;
+	virtual void SetConstantBuffer( int slot, int shader_type, IKeConstantBuffer* constant_buffer ) PURE;
     virtual bool CreateTexture1D( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
     virtual bool CreateTexture2D( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
     virtual bool CreateTexture3D( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
