@@ -7,6 +7,7 @@
 
 #include "KeOpenGLRenderDevice.h"
 #include "KeDebug.h"
+#include "KeSystem.h"
 
 #ifndef __MOBILE_OS__
 #ifdef __APPLE__
@@ -643,10 +644,30 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     }
     
     /* Initialize the SDL window */
+    uint32_t flags = SDL_WINDOW_OPENGL;
+    
+#ifdef __MOBILE_OS__
+    /* Enable high DPI support for mobile devices */
+    flags |= SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS;
+#endif
+    
     window = SDL_CreateWindow( "Kunai Engine",  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              device_desc->width, device_desc->height, SDL_WINDOW_OPENGL );
+                              device_desc->width, device_desc->height, flags );
     if( !window )
         DISPDBG_R( KE_ERROR, "Error creating SDL window!" );
+    
+    /* Set our DPI scale for mobile devices if necessary */
+#ifdef __MOBILE_OS__
+    int w, h;
+    SDL_GetWindowSize( window, &w, &h );
+    
+    float dpix = flags & SDL_WINDOW_ALLOW_HIGHDPI ? float( renderdevice_desc->width / w ) : 1.0f;
+    float dpiy = flags & SDL_WINDOW_ALLOW_HIGHDPI ? float( renderdevice_desc->height / h ) : 1.0f;
+    
+    KeSetDpiScale( dpix, dpiy );
+#else
+    KeSetDpiScale( 1.0f, 1.0f );
+#endif
     
     /* Create our OpenGL context. */
     context = SDL_GL_CreateContext( window );

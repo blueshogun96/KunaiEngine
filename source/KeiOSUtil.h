@@ -60,4 +60,15 @@ int KeGetPhysicalMemoryStatus( uint64_t* total, uint64_t* free );
  */
 int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free );
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+bool KeRetinaSupportedAPPLE();
+    
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* defined(__ke_osx_util__) */

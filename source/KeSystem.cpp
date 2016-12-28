@@ -31,6 +31,7 @@ KeMouse     mouse;
 int         display_count = 1;
 std::vector<KeDisplayInfo> displays;
 int			quitting = No;
+nv::vec2f   dpi_scale( 1.0f, 1.0f );
 
 /*uint8_t rdtsc[] = { 0x0F, 0x31, 0xC3 };
 uint32_t (*ke_rdtsc)(void) = (uint32_t(*)(void)) rdtsc;*/
@@ -540,8 +541,8 @@ void KeProcessMouseEvent( SDL_Event* event )
     
     if( event->type == SDL_MOUSEMOTION )
     {
-        mouse.x = event->motion.x;
-        mouse.y = event->motion.y;
+        mouse.x = int( event->motion.x * dpi_scale.x );
+        mouse.y = int( event->motion.y * dpi_scale.y );
     }
     
     if( event->type == SDL_MOUSEBUTTONDOWN )
@@ -602,6 +603,17 @@ int KeGatherAllDisplayInformation()
             
             /* Save this display mode */
             disp_info.display_modes.push_back( disp_mode );
+      
+            /* Check for retina display support on Apple devices */
+            /* TODO: Support OSX (macOS) and tvOS */
+#if defined(__APPLE__) && defined(__MOBILE_OS__)
+            if( KeRetinaSupportedAPPLE() )
+            {
+                disp_mode.width = disp.w*2;
+                disp_mode.height = disp.h*2;
+                disp_info.display_modes.push_back( disp_mode );
+            }
+#endif
         }
         
         /* Save the display info */
@@ -629,7 +641,7 @@ int KeGetDisplayCount()
  */
 int KeGetDisplayModeCount( int display )
 {
-    return displays[display].display_modes.size();
+    return int( displays[display].display_modes.size() );
 }
 
 /*
@@ -659,6 +671,18 @@ void KeGetDisplayModes( int display, KeDisplayMode* modes )
 const char* KeGetDisplayName( int display )
 {
     return (const char*) displays[display].display_name;
+}
+
+
+void KeSetDpiScale( float scalex, float scaley )
+{
+    dpi_scale = nv::vec2f( scalex, scaley );
+}
+
+void KeGetDpiScale( float* scalex, float* scaley )
+{
+    *scalex = dpi_scale.x;
+    *scaley = dpi_scale.y;
 }
 
 void KeMessageBox( const char* message, const char* title, uint32_t flags )

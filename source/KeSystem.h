@@ -110,6 +110,8 @@ int KeGetDisplayCount();
 int KeGetDisplayModeCount( int display );
 void KeGetDisplayModes( int display, KeDisplayMode* modes );
 const char* KeGetDisplayName( int display );
+void KeSetDpiScale( float scalex, float scaley );
+void KeGetDpiScale( float* scalex, float* scaley );
 
 
 /*
