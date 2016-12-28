@@ -71,6 +71,13 @@ struct D3D11Semantic semantic_list[] =
 	{ "BITANGENT", 0 },
 	{ "COLOR", 0 },
 	{ "TEXTURE0", 0 },
+	{ "TEXTURE1", 0 },
+	{ "TEXTURE2", 0 },
+	{ "TEXTURE3", 0 },
+	{ "TEXTURE4", 0 },
+	{ "TEXTURE5", 0 },
+	{ "TEXTURE6", 0 },
+	{ "TEXTURE7", 0 },
 };
 
 
@@ -949,7 +956,7 @@ void IKeDirect3D11RenderDevice::GetProgramConstantIV( const char* location, int*
  * Desc: Creates a constant buffer used for storing/setting constants in one call instead of one by one.
  *		 If supported, this is the recommended method for setting constants.
  */
-bool IKeDirect3D11RenderDevice::CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer )
+bool IKeDirect3D11RenderDevice::CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data )
 {
 	*constant_buffer = new IKeDirect3D11ConstantBuffer;
 	IKeDirect3D11ConstantBuffer* cb = static_cast<IKeDirect3D11ConstantBuffer*>( *constant_buffer );
@@ -957,7 +964,7 @@ bool IKeDirect3D11RenderDevice::CreateConstantBuffer( uint32_t buffer_size, IKeC
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory( &bd, sizeof( bd ) );
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = buffer_size;
+	bd.ByteWidth = desc->data_size;
 	bd.CPUAccessFlags = 0;
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
@@ -1002,40 +1009,29 @@ bool IKeDirect3D11RenderDevice::SetConstantBufferData( void* data, IKeConstantBu
 }
 
 /*
- * Name: ke_ogl_renderdevice_t::set_vertex_shader_constant_buffer
+ * Name: IKeDirect3D11RenderDevice::SetConstantBuffer
  * Desc: 
  */
-void IKeDirect3D11RenderDevice::SetVertexShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
+void IKeDirect3D11RenderDevice::SetConstantBuffer(  int slot, int shader_type, IKeConstantBuffer* constant_buffer )
 {
-	d3ddevice_context->VSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
-}
+	switch( shader_type )
+	{
+	case KE_VERTEX_SHADER:
+		d3ddevice_context->VSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
+		break;
 
+	case KE_PIXEL_SHADER:
+		d3ddevice_context->PSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
+		break;
 
-/*
- * Name: IKeDirect3D11RenderDevice::set_pixel_shader_constant_buffer
- * Desc: 
- */
-void IKeDirect3D11RenderDevice::SetPixelShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
-{
-	d3ddevice_context->PSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
-}
+	case KE_GEOMETRY_SHADER:
+		d3ddevice_context->GSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
+		break;
 
-/*
- * Name: IKeDirect3D11RenderDevice::set_geometry_shader_constant_buffer
- * Desc: 
- */
-void IKeDirect3D11RenderDevice::SetGeometryShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
-{
-	d3ddevice_context->GSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
-}
-
-/*
- * Name: IKeDirect3D11RenderDevice::set_tesselation_shader_constant_buffer
- * Desc: 
- */
-void IKeDirect3D11RenderDevice::SetTesselationShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer )
-{
-	d3ddevice_context->HSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
+	case KE_TESSELATION_SHADER: /* Hull shader */
+		d3ddevice_context->HSSetConstantBuffers( slot, 1, &static_cast<IKeDirect3D11ConstantBuffer*>( constant_buffer )->cb );
+		break;
+	}
 }
 
 /*
@@ -2115,7 +2111,7 @@ void IKeDirect3D11RenderDevice::BlockUntilIdle()
 	IKeFence* fence = NULL;
 
 	/* Create a new fence */
-	if( CreateFence( &fence ) )
+	if( CreateFence( &fence, KE_FENCE_DEFAULT ) )
 	{
 		/* Insert the new fence into the pipeline. */
 		fence->Insert();
@@ -2147,11 +2143,16 @@ void IKeDirect3D11RenderDevice::Kick()
  * Name: IKeDirect3D11RenderDevice::CreateFence
  * Desc: Creates a new GPU fence object.
  */
-bool IKeDirect3D11RenderDevice::CreateFence( IKeFence** fence )
+bool IKeDirect3D11RenderDevice::CreateFence( IKeFence** fence, uint32_t flags )
 {
     if( !fence )
         return false;
     
+	/* Warn the dev that there is only one fence type if asking for anything 
+	   other than the default. */
+	if( flags != KE_FENCE_DEFAULT )
+		DISPDBG( KE_WARNING, "For Direct3D11, there is only one fence type" );
+
     /* Create a new fence */
     (*fence) = new IKeDirect3D11Fence();
     IKeDirect3D11Fence* f = static_cast<IKeDirect3D11Fence*>( *fence );

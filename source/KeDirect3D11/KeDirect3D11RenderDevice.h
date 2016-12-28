@@ -71,9 +71,19 @@ typedef _com_ptr_t<_com_IIID<ID3D11ShaderResourceView, &IID_ID3D11ShaderResource
  */
 struct IKeDirect3D11ConstantBuffer : public IKeConstantBuffer
 {
-	virtual void Destroy();
+	KEMETHOD            Destroy();
     
-	CD3D11Buffer	cb;		/* Constant buffer */
+    _KEMETHOD(void*)    MapData( uint32_t flags );
+    KEMETHOD            UnmapData( void* );
+    
+    _KEMETHOD(bool)     SetConstantData( uint32_t offset, uint32_t size, void* ptr );
+    KEMETHOD            GetDesc( KeConstantBufferDesc* desc );
+    
+	CD3D11Buffer	cb;				/* Constant buffer */
+	uint32_t		data_size;      /* Size of the data buffer */
+    uint32_t		flags;          /* Buffer creation flags */
+    uint32_t		block_index;    /* Block index representing the block name we are attempting to access */
+    char			block_name[64]; /* Name of the block/struct within the GPU program we are writing data to */
 };
 
 /*
@@ -260,13 +270,10 @@ public:
     virtual void SetProgramConstant4IV( const char* location, int count, int* value );
     virtual void GetProgramConstantFV( const char* location, float* value );
     virtual void GetProgramConstantIV( const char* location, int* value );
-	virtual bool CreateConstantBuffer( uint32_t buffer_size, IKeConstantBuffer** constant_buffer );
+	virtual bool CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data = NULL );
 	virtual void DeleteConstantBuffer( IKeConstantBuffer* constant_buffer );
 	virtual bool SetConstantBufferData( void* data, IKeConstantBuffer* constant_buffer );
-	virtual void SetVertexShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
-	virtual void SetPixelShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
-	virtual void SetGeometryShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
-	virtual void SetTesselationShaderConstantBuffer( int slot, IKeConstantBuffer* constant_buffer );
+	virtual void SetConstantBuffer( int slot, int shader_type, IKeConstantBuffer* constant_buffer );
     virtual bool CreateTexture1D( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL );
     virtual bool CreateTexture2D( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL );
     virtual bool CreateTexture3D( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL );
@@ -314,7 +321,7 @@ public:
     virtual int GetSwapInterval();
 	virtual void BlockUntilIdle();
 	virtual void Kick();
-	virtual bool CreateFence( IKeFence** fence );
+	virtual bool CreateFence( IKeFence** fence, uint32_t flags );
 #if 0
 	virtual bool InsertFence( IKeFence** fence );
 	virtual bool TestFence( IKeFence* fence );
