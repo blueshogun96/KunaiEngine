@@ -509,7 +509,7 @@ void KeDynamicFontString::Print( const char* text, nv::vec2f position, bool cent
 #endif
 	//renderdevice->DrawIndexedVertices( KE_TRIANGLES, sizeof( nv::vec4f ), indices.size() );
 	renderdevice->SetGeometryBuffer(NULL);
-    renderdevice->SetTexture( 0, NULL );
+    //renderdevice->SetTexture( 0, NULL );
 	renderdevice->SetProgram(NULL);
 	
 	/* Reset the matrices back to their previous states */
