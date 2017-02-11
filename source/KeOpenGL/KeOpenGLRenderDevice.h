@@ -298,6 +298,10 @@ public:
 private:    /* Private, internal use only */
     void PVT_ApplySamplerStates();
     void PVT_SetWorldViewProjectionMatrices();
+	bool PVT_InititalizeDriverHooks();
+	void PVT_BlockUntilVerticalBlankDDraw();
+	void PVT_BlockUntilVerticalBlankD3DKMT();
+	void PVT_BlockUntilVerticalBlankDefault();
     
 protected:
     SDL_GLContext context;

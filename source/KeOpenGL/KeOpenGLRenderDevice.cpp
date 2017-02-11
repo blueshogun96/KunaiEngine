@@ -21,8 +21,39 @@
 #ifdef _WIN32
 #define USE_DDRAW_VMEM			/* Not guaranteed to be accurate on modern hardware */
 //#define USE_DDRAW_VBLANK		/* Not recommended, but here if you need it... */
+#define USE_D3DKMT_VBLANK		/* Use D3DKMT for vblank detection */
 
 #include <ddraw.h>
+
+
+typedef UINT  D3DDDI_VIDEO_PRESENT_SOURCE_ID;
+typedef UINT  D3DDDI_VIDEO_PRESENT_TARGET_ID;
+typedef UINT D3DKMT_HANDLE;
+
+typedef struct _D3DKMT_OPENADAPTERFROMHDC
+{
+    HDC                             hDc;            // in:  DC that maps to a single display
+    D3DKMT_HANDLE                   hAdapter;       // out: adapter handle
+    LUID                            AdapterLuid;    // out: adapter LUID
+    D3DDDI_VIDEO_PRESENT_SOURCE_ID  VidPnSourceId;  // out: VidPN source ID for that particular display
+} D3DKMT_OPENADAPTERFROMHDC;
+
+typedef struct _D3DKMT_WAITFORVERTICALBLANKEVENT
+{
+    D3DKMT_HANDLE                   hAdapter;      // in: adapter handle
+    D3DKMT_HANDLE                   hDevice;       // in: device handle [Optional]
+    D3DDDI_VIDEO_PRESENT_SOURCE_ID  VidPnSourceId; // in: adapter's VidPN Source ID
+} D3DKMT_WAITFORVERTICALBLANKEVENT;
+
+typedef struct _D3DKMT_OPENADAPTERFROMLUID
+{
+    LUID            AdapterLuid;
+    D3DKMT_HANDLE   hAdapter;
+} D3DKMT_OPENADAPTERFROMLUID;
+
+typedef NTSTATUS (APIENTRY *PFND3DKMT_WAITFORVERTICALBLANKEVENT)(_In_ CONST D3DKMT_WAITFORVERTICALBLANKEVENT*);
+typedef NTSTATUS (APIENTRY *PFND3DKMT_OPENADAPTERFROMLUID)(_Inout_ D3DKMT_OPENADAPTERFROMLUID*);
+typedef NTSTATUS (APIENTRY *PFND3DKMT_OPENADAPTERFROMHDC)(_Inout_ D3DKMT_OPENADAPTERFROMHDC*);
 #endif
 
 /*
@@ -71,24 +102,11 @@ struct KeProgramAttribute
  * Globals
  */
 
-const char default_vertex_program_v150[] =
-"#version 150\n"
-"in  vec3 in_Position;\n"
-"void main(void)\n"
-"{\n"
-"    gl_Position = vec4(in_Position, 1.0);\n"
-"}\n";
+#ifdef _WIN32
+PFND3DKMT_WAITFORVERTICALBLANKEVENT pfnD3DKMTWaitForVerticalBlankEvent;
+PFND3DKMT_OPENADAPTERFROMHDC		pfnD3DKMTOpenAdapterFromHdc;
+#endif
 
-const char default_fragment_program_v150[] =
-"#version 150\n"
-"out vec4 colour;\n"
-
-"void main(void)\n"
-"{\n"
-"	colour = vec4(1.0, 1.0, 1.0, 1.0);\n"
-"}\n";
-
-uint32_t ke_default_program;
 
 /* OpenGL primitive types */
 uint32_t primitive_types[] =
@@ -290,66 +308,7 @@ uint32_t texture_wrap_modes[] =
 	GL_MIRRORED_REPEAT
 };
 
-/*
- * Name: ke_initialize_default_shaders
- * Desc: Initializes the default shaders to be used when there is
- *       no user defined program used.
- */
-bool ke_initialize_default_shaders()
-{
-    GLuint p, f, v;
-    
-	v = glCreateShader(GL_VERTEX_SHADER);
-	f = glCreateShader(GL_FRAGMENT_SHADER);
-    
-	const char * vv = default_vertex_program_v150;
-	const char * ff = default_fragment_program_v150;
-    
-	glShaderSource(v, 1, &vv, NULL);
-	glShaderSource(f, 1, &ff, NULL);
-    
-	GLint compiled;
-    
-	glCompileShader(v);
-	glGetShaderiv(v, GL_COMPILE_STATUS, &compiled);
-	if (!compiled)
-	{
-		printf("Vertex shader not compiled.\n");
-	}
-    
-	glCompileShader(f);
-	glGetShaderiv(f, GL_COMPILE_STATUS, &compiled);
-	if (!compiled)
-	{
-		printf("Fragment shader not compiled.\n");
-	}
-    
-	p = glCreateProgram();
-    
-	glBindAttribLocation(p, 0, "in_pos");
-    
-	glAttachShader(p,v);
-	glAttachShader(p,f);
-    
-	glLinkProgram(p);
-	glUseProgram(p);
-    
-    glDeleteShader(v);
-    glDeleteShader(f);
-    
-    ke_default_program = p;
-    
-    return true;
-}
 
-/*
- * Name: ke_uninitialize_default_shaders
- * Desc:
- */
-void ke_uninitialize_default_shaders()
-{
-    glDeleteProgram( ke_default_program );
-}
 
 
 /* Tells us whether a set of vertex attributes actually match another */
@@ -545,6 +504,73 @@ void IKeOpenGLRenderDevice::PVT_SetWorldViewProjectionMatrices()
     OGL_DISPDBG( KE_DBGLVL(1), "Could not set projection matrix..." );
 }
 
+bool IKeOpenGLRenderDevice::PVT_InititalizeDriverHooks()
+{
+#ifdef _WIN32
+	/*
+	 * Initialize driver hooks for D3DKMT.  
+	 *
+	 * Grab the necessary function pointers needed to assist us in detecting vertical blank interrupts.
+	 */
+	
+	HMODULE hGdi = ::LoadLibrary( "Gdi32.dll" );
+	if( !hGdi )
+		DISPDBG_RB( KE_ERROR, "Error opening Gdi32.dll! (GetLastError(): " << GetLastError() << ")" );
+
+	pfnD3DKMTWaitForVerticalBlankEvent = (PFND3DKMT_WAITFORVERTICALBLANKEVENT) ::GetProcAddress( hGdi, "D3DKMTWaitForVerticalBlankEvent" );
+	pfnD3DKMTOpenAdapterFromHdc = (PFND3DKMT_OPENADAPTERFROMHDC) ::GetProcAddress( hGdi, "D3DKMTOpenAdapterFromHdc" );
+
+	::FreeLibrary( hGdi );
+
+	if( !pfnD3DKMTOpenAdapterFromHdc )
+		DISPDBG_RB( KE_ERROR, "Error locating function D3DKMTOpenAdapterFromHdc!" );
+	if( !pfnD3DKMTWaitForVerticalBlankEvent )
+		DISPDBG_RB( KE_ERROR, "Error locating function D3DKMTWaitForVerticalBlankEvent!" );
+#endif
+
+	return true;
+}
+
+void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankDDraw()
+{
+	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+}
+
+void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankD3DKMT()
+{
+	D3DKMT_OPENADAPTERFROMHDC oa;
+
+	/* For now, we only care about the active window */
+	oa.hDc = GetDC( GetActiveWindow() );
+	
+	NTSTATUS status = pfnD3DKMTOpenAdapterFromHdc( &oa );
+	if( BCRYPT_SUCCESS( status ) )
+	{
+		D3DKMT_WAITFORVERTICALBLANKEVENT we;
+
+		we.hAdapter = oa.hAdapter;
+		we.hDevice = 0;
+		we.VidPnSourceId = oa.VidPnSourceId;
+
+		pfnD3DKMTWaitForVerticalBlankEvent( &we );
+	}
+}
+
+void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankDefault()
+{
+	/* This is a fallback for platforms where there is no API readily available to use
+	   in order to detect vertical blank interrupts. */
+
+	SDL_DisplayMode display_mode;
+    
+    /* Get the current display mode */
+    /* TODO: Get display mode based on windowed or fullscreen mode. */
+    SDL_GetWindowDisplayMode( window, &display_mode );
+    
+    /* Stall this thread for 1000/refresh_rate milliseconds */
+    SDL_Delay( 1000 / display_mode.refresh_rate );
+}
+
 
 /*
  * Name: IKeOpenGLRenderDevice::IKeOpenGLRenderDevice
@@ -593,6 +619,10 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 	if( FAILED( hr ) )
 		DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!" );
 #endif
+
+	/* Initialize driver hooks */
+	if( !PVT_InititalizeDriverHooks() )
+		return;
 
     /* Initialize SDL video */
     if( SDL_InitSubSystem( SDL_INIT_VIDEO ) != 0 )
@@ -861,10 +891,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
 IKeOpenGLRenderDevice::~IKeOpenGLRenderDevice()
 {
     delete device_desc;
-    
-    /* Kill the default vertex and fragment program */
-    ke_uninitialize_default_shaders();
-    
+     
     /* Destroy the immediate mode geometry buffer if it exists */
     if( im_gb )
     {
@@ -2748,20 +2775,21 @@ void IKeOpenGLRenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
 void IKeOpenGLRenderDevice::BlockUntilVerticalBlank()
 {
 #ifdef _WIN32
+	/* Old DirectDraw implementation */
  #ifdef USE_DDRAW_VBLANK
-	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+	PVT_BlockUntilVerticalBlankDDraw();
+	return;
+ #endif
+
+	/* D3DKMT implementation */
+ #ifdef USE_D3DKMT_VBLANK
+	PVT_BlockUntilVerticalBlankD3DKMT();
 	return;
  #endif
 #endif
 
-    SDL_DisplayMode display_mode;
-    
-    /* Get the current display mode */
-    /* TODO: Get display mode based on windowed or fullscreen mode. */
-    SDL_GetWindowDisplayMode( window, &display_mode );
-    
-    /* Stall this thread for 1000/refresh_rate milliseconds */
-    SDL_Delay( 1000 / display_mode.refresh_rate );
+	/* Faux implementation */
+	PVT_BlockUntilVerticalBlankDefault();
 }
 
 
