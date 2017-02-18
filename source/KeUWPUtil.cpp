@@ -22,14 +22,14 @@ const InstructionSet::InstructionSet_Internal InstructionSet::CPU_Rep;
  */
 int KeSetCurrentPathToResourceDirectory()
 {
-	printf("Resource path redirection not yet supported...\n");
+	DISPDBG( KE_WARNING, "Resource path redirection not yet supported...\n" );
 
 	return 0;
 }
 
 int KeGetCurrentPathToResourceDirectory(char* resource_path)
 {
-	printf("Resource path redirection not yet supported...\n");
+	DISPDBG( KE_WARNING, "Resource path redirection not yet supported...\n" );
 
 	return 0;
 }
@@ -42,6 +42,7 @@ int KeGetCurrentPathToResourceDirectory(char* resource_path)
 bool KeIsOnlyInstance( const char* title )
 {
 	/* TODO: Implement */
+	DISPDBG( KE_WARNING, "Not yet implemented for UWP!" );
 
 	return true;
 }
@@ -53,6 +54,8 @@ bool KeIsOnlyInstance( const char* title )
 uint64_t KeGetDiskSpace()
 {
 	/* TODO: Implement */
+	DISPDBG( KE_WARNING, "Not yet implemented for UWP!" );
+
 	return 0;
 }
 
@@ -63,6 +66,8 @@ uint64_t KeGetDiskSpace()
 uint64_t KeGetCpuSpeed()
 {
     /* TODO: Implement */
+	DISPDBG( KE_WARNING, "Not yet implemented for UWP!" );
+
 	return 0;
 }
 
@@ -198,12 +203,15 @@ int KeGetVirtualMemoryStatus( uint64_t* total, uint64_t* free )
 const char* KeGetSaveGameDirectory( const char* game_app_directory )
 {
 	/* TODO: Implement */
+	DISPDBG( KE_WARNING, "Not yet implemented for UWP!" );
+
 	return "./";
 }
 
 void KeRequestUserAttention()
 {
 	/* TODO: Implement... if possible */
+	DISPDBG( KE_WARNING, "Not yet implemented for UWP!" );
 }
 
 

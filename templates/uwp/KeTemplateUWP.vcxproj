@@ -1,0 +1,1896 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0dce95cf-984f-427b-a469-a38cb45a1175}</ProjectGuid>
+    <RootNamespace>KeTemplateUWP</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+    <ApplicationType>Windows Store</ApplicationType>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.10240.0</WindowsTargetPlatformMinVersion>
+    <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <PackageCertificateKeyFile>KeTemplateUWP_TemporaryKey.pfx</PackageCertificateKeyFile>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(KunaiEngine3rdPartyDir)\d3dkmt;$(KunaiEngine3rdPartyDir)\stb;$(KunaiEngine3rdPartyDir)\freetype\include;$(KunaiEngine3rdPartyDir)\vectormath;$(KunaiEngine3rdPartyDir)\tokamak\include;$(KunaiEngine3rdPartyDir)\ezxml;$(KunaiEngine3rdPartyDir)\enet\include;$(KunaiEngine3rdPartyDir)\lzma;$(KunaiEngine3rdPartyDir)\jo_jpeg;$(KunaiEngine3rdPartyDir)\miniz;$(KunaiEngine3rdPartyDir)\angelscript\include;$(KunaiEngine3rdPartyDir)\nvgameworks;$(KunaiEngine3rdPartyDir)\openctm;$(KunaiEngine3rdPartyDir)\nvidia;$(KunaiEngine3rdPartyDir)\assimp\include;$(KunaiEngine3rdPartyDir)\microsoft;$(KunaiEngine3rdPartyDir)\assimp\contrib\openddlparser\include;$(KunaiEngine3rdPartyDir)\assimp\code\BoostWorkaround;$(KunaiEngine3rdPartyDir)\recastnavigation\Recast\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourTileCache\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourCrowd\include;$(KunaiEngine3rdPartyDir)\recastnavigation\Detour\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DebugUtils\Include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\include;$(KunaiEngine3rdPartyDir)\xiph\libtheora\include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\lib;$(KunaiEngine3rdPartyDir)\xiph\libogg\include;$(KunaiEngine3rdPartyDir)\libYAML\include;$(KunaiEngine3rdPartyDir)\boost_1_58_0\;$(KunaiEngine3rdPartyDir)\mysql++\;$(KunaiEngine3rdPartyDir)\libtomcrypt\src\headers;$(KunaiEngine3rdPartyDir)\libtommath;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\FixedPoint;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\Controllers;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Utilities\ConvexDecomposition;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Common;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Collision\Shapes;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\tristripper\include;$(KunaiEngineLibraryDir)\glew-1.11.0\include;$(KunaiEngineLibraryDir)\openal-soft-1.16.0-bin\include;$(KunaiEngineLibraryDir)\SDL2_ttf\include;$(KunaiEngineLibraryDir)\SDL2_image\include;$(KunaiEngineLibraryDir)\SDL2\include;$(KunaiEngineLibraryDir)\pthread_uwp\include;$(KunaiEngineLibraryDir)\freetype2\include;$(KunaiEngineLibraryDir)\..\windows\nvapi;$(KunaiEngineSourceDir);$(ProjectDir);$(GeneratedFilesDir);$(IntDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AS_MAX_PORTABILITY;_CRT_SECURE_NO_WARNINGS;OPENCTM_STATIC;HAVE_STRUCT_TIMESPEC;FT2_BUILD_LIBRARY;YAML_DECLARE_STATIC;ASSIMP_BUILD_NO_C4D_IMPORTER;LTM_DESC;LTC_SOURCE;USE_LTM;LTC_NO_PROTOTYPES;_UWP;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(KunaiEngine3rdPartyDir)\d3dkmt;$(KunaiEngine3rdPartyDir)\stb;$(KunaiEngine3rdPartyDir)\freetype\include;$(KunaiEngine3rdPartyDir)\vectormath;$(KunaiEngine3rdPartyDir)\tokamak\include;$(KunaiEngine3rdPartyDir)\ezxml;$(KunaiEngine3rdPartyDir)\enet\include;$(KunaiEngine3rdPartyDir)\lzma;$(KunaiEngine3rdPartyDir)\jo_jpeg;$(KunaiEngine3rdPartyDir)\miniz;$(KunaiEngine3rdPartyDir)\angelscript\include;$(KunaiEngine3rdPartyDir)\nvgameworks;$(KunaiEngine3rdPartyDir)\openctm;$(KunaiEngine3rdPartyDir)\nvidia;$(KunaiEngine3rdPartyDir)\assimp\include;$(KunaiEngine3rdPartyDir)\microsoft;$(KunaiEngine3rdPartyDir)\assimp\contrib\openddlparser\include;$(KunaiEngine3rdPartyDir)\assimp\code\BoostWorkaround;$(KunaiEngine3rdPartyDir)\recastnavigation\Recast\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourTileCache\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourCrowd\include;$(KunaiEngine3rdPartyDir)\recastnavigation\Detour\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DebugUtils\Include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\include;$(KunaiEngine3rdPartyDir)\xiph\libtheora\include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\lib;$(KunaiEngine3rdPartyDir)\xiph\libogg\include;$(KunaiEngine3rdPartyDir)\libYAML\include;$(KunaiEngine3rdPartyDir)\boost_1_58_0\;$(KunaiEngine3rdPartyDir)\mysql++\;$(KunaiEngine3rdPartyDir)\libtomcrypt\src\headers;$(KunaiEngine3rdPartyDir)\libtommath;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\FixedPoint;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\Controllers;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Utilities\ConvexDecomposition;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Common;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Collision\Shapes;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\tristripper\include;$(KunaiEngineLibraryDir)\glew-1.11.0\include;$(KunaiEngineLibraryDir)\openal-soft-1.16.0-bin\include;$(KunaiEngineLibraryDir)\SDL2_ttf\include;$(KunaiEngineLibraryDir)\SDL2_image\include;$(KunaiEngineLibraryDir)\SDL2\include;$(KunaiEngineLibraryDir)\pthread_uwp\include;$(KunaiEngineLibraryDir)\freetype2\include;$(KunaiEngineLibraryDir)\..\windows\nvapi;$(KunaiEngineSourceDir);$(ProjectDir);$(GeneratedFilesDir);$(IntDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AS_MAX_PORTABILITY;_CRT_SECURE_NO_WARNINGS;OPENCTM_STATIC;HAVE_STRUCT_TIMESPEC;FT2_BUILD_LIBRARY;YAML_DECLARE_STATIC;ASSIMP_BUILD_NO_C4D_IMPORTER;LTM_DESC;LTC_SOURCE;USE_LTM;LTC_NO_PROTOTYPES;_UWP;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(KunaiEngine3rdPartyDir)\d3dkmt;$(KunaiEngine3rdPartyDir)\stb;$(KunaiEngine3rdPartyDir)\freetype\include;$(KunaiEngine3rdPartyDir)\vectormath;$(KunaiEngine3rdPartyDir)\tokamak\include;$(KunaiEngine3rdPartyDir)\ezxml;$(KunaiEngine3rdPartyDir)\enet\include;$(KunaiEngine3rdPartyDir)\lzma;$(KunaiEngine3rdPartyDir)\jo_jpeg;$(KunaiEngine3rdPartyDir)\miniz;$(KunaiEngine3rdPartyDir)\angelscript\include;$(KunaiEngine3rdPartyDir)\nvgameworks;$(KunaiEngine3rdPartyDir)\openctm;$(KunaiEngine3rdPartyDir)\nvidia;$(KunaiEngine3rdPartyDir)\assimp\include;$(KunaiEngine3rdPartyDir)\microsoft;$(KunaiEngine3rdPartyDir)\assimp\contrib\openddlparser\include;$(KunaiEngine3rdPartyDir)\assimp\code\BoostWorkaround;$(KunaiEngine3rdPartyDir)\recastnavigation\Recast\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourTileCache\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourCrowd\include;$(KunaiEngine3rdPartyDir)\recastnavigation\Detour\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DebugUtils\Include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\include;$(KunaiEngine3rdPartyDir)\xiph\libtheora\include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\lib;$(KunaiEngine3rdPartyDir)\xiph\libogg\include;$(KunaiEngine3rdPartyDir)\libYAML\include;$(KunaiEngine3rdPartyDir)\boost_1_58_0\;$(KunaiEngine3rdPartyDir)\mysql++\;$(KunaiEngine3rdPartyDir)\libtomcrypt\src\headers;$(KunaiEngine3rdPartyDir)\libtommath;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\FixedPoint;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\Controllers;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Utilities\ConvexDecomposition;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Common;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Collision\Shapes;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\tristripper\include;$(KunaiEngineLibraryDir)\glew-1.11.0\include;$(KunaiEngineLibraryDir)\openal-soft-1.16.0-bin\include;$(KunaiEngineLibraryDir)\SDL2_ttf\include;$(KunaiEngineLibraryDir)\SDL2_image\include;$(KunaiEngineLibraryDir)\SDL2\include;$(KunaiEngineLibraryDir)\pthread_uwp\include;$(KunaiEngineLibraryDir)\freetype2\include;$(KunaiEngineLibraryDir)\..\windows\nvapi;$(KunaiEngineSourceDir);$(ProjectDir);$(GeneratedFilesDir);$(IntDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AS_MAX_PORTABILITY;_CRT_SECURE_NO_WARNINGS;OPENCTM_STATIC;HAVE_STRUCT_TIMESPEC;FT2_BUILD_LIBRARY;YAML_DECLARE_STATIC;ASSIMP_BUILD_NO_C4D_IMPORTER;LTM_DESC;LTC_SOURCE;USE_LTM;LTC_NO_PROTOTYPES;_UWP;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf\lib\x86\Debug;$(KunaiEngineLibraryDir)\SDL2\lib\x86;$(KunaiEngineLibraryDir)\pthread_uwp\lib\x86\Debug;$(KunaiEngineLibraryDir)\SDL2_image\lib\x86\Debug;$(KunaiEngineLibraryDir)\nvapi\x86;$(KunaiEngineLibraryDir)\freetype2\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;pthreads-UWP-S.lib;ws2_32.lib;dxguid.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(KunaiEngine3rdPartyDir)\d3dkmt;$(KunaiEngine3rdPartyDir)\stb;$(KunaiEngine3rdPartyDir)\freetype\include;$(KunaiEngine3rdPartyDir)\vectormath;$(KunaiEngine3rdPartyDir)\tokamak\include;$(KunaiEngine3rdPartyDir)\ezxml;$(KunaiEngine3rdPartyDir)\enet\include;$(KunaiEngine3rdPartyDir)\lzma;$(KunaiEngine3rdPartyDir)\jo_jpeg;$(KunaiEngine3rdPartyDir)\miniz;$(KunaiEngine3rdPartyDir)\angelscript\include;$(KunaiEngine3rdPartyDir)\nvgameworks;$(KunaiEngine3rdPartyDir)\openctm;$(KunaiEngine3rdPartyDir)\nvidia;$(KunaiEngine3rdPartyDir)\assimp\include;$(KunaiEngine3rdPartyDir)\microsoft;$(KunaiEngine3rdPartyDir)\assimp\contrib\openddlparser\include;$(KunaiEngine3rdPartyDir)\assimp\code\BoostWorkaround;$(KunaiEngine3rdPartyDir)\recastnavigation\Recast\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourTileCache\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourCrowd\include;$(KunaiEngine3rdPartyDir)\recastnavigation\Detour\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DebugUtils\Include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\include;$(KunaiEngine3rdPartyDir)\xiph\libtheora\include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\lib;$(KunaiEngine3rdPartyDir)\xiph\libogg\include;$(KunaiEngine3rdPartyDir)\libYAML\include;$(KunaiEngine3rdPartyDir)\boost_1_58_0\;$(KunaiEngine3rdPartyDir)\mysql++\;$(KunaiEngine3rdPartyDir)\libtomcrypt\src\headers;$(KunaiEngine3rdPartyDir)\libtommath;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\FixedPoint;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\Controllers;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Utilities\ConvexDecomposition;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Common;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Collision\Shapes;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\tristripper\include;$(KunaiEngineLibraryDir)\glew-1.11.0\include;$(KunaiEngineLibraryDir)\openal-soft-1.16.0-bin\include;$(KunaiEngineLibraryDir)\SDL2_ttf\include;$(KunaiEngineLibraryDir)\SDL2_image\include;$(KunaiEngineLibraryDir)\SDL2\include;$(KunaiEngineLibraryDir)\pthread_uwp\include;$(KunaiEngineLibraryDir)\freetype2\include;$(KunaiEngineLibraryDir)\..\windows\nvapi;$(KunaiEngineSourceDir);$(ProjectDir);$(GeneratedFilesDir);$(IntDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AS_MAX_PORTABILITY;_CRT_SECURE_NO_WARNINGS;OPENCTM_STATIC;HAVE_STRUCT_TIMESPEC;FT2_BUILD_LIBRARY;YAML_DECLARE_STATIC;ASSIMP_BUILD_NO_C4D_IMPORTER;LTM_DESC;LTC_SOURCE;USE_LTM;LTC_NO_PROTOTYPES;_UWP;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf\lib\x86;$(KunaiEngineLibraryDir)\SDL2\lib\x86;$(KunaiEngineLibraryDir)\pthread_uwp\lib\x86\Release;$(KunaiEngineLibraryDir)\SDL2_image\lib\x86;$(KunaiEngineLibraryDir)\nvapi\x86;$(KunaiEngineLibraryDir)\freetype2\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;pthreads-UWP-S.lib;ws2_32.lib;dxguid.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(KunaiEngine3rdPartyDir)\d3dkmt;$(KunaiEngine3rdPartyDir)\stb;$(KunaiEngine3rdPartyDir)\freetype\include;$(KunaiEngine3rdPartyDir)\vectormath;$(KunaiEngine3rdPartyDir)\tokamak\include;$(KunaiEngine3rdPartyDir)\ezxml;$(KunaiEngine3rdPartyDir)\enet\include;$(KunaiEngine3rdPartyDir)\lzma;$(KunaiEngine3rdPartyDir)\jo_jpeg;$(KunaiEngine3rdPartyDir)\miniz;$(KunaiEngine3rdPartyDir)\angelscript\include;$(KunaiEngine3rdPartyDir)\nvgameworks;$(KunaiEngine3rdPartyDir)\openctm;$(KunaiEngine3rdPartyDir)\nvidia;$(KunaiEngine3rdPartyDir)\assimp\include;$(KunaiEngine3rdPartyDir)\microsoft;$(KunaiEngine3rdPartyDir)\assimp\contrib\openddlparser\include;$(KunaiEngine3rdPartyDir)\assimp\code\BoostWorkaround;$(KunaiEngine3rdPartyDir)\recastnavigation\Recast\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourTileCache\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourCrowd\include;$(KunaiEngine3rdPartyDir)\recastnavigation\Detour\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DebugUtils\Include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\include;$(KunaiEngine3rdPartyDir)\xiph\libtheora\include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\lib;$(KunaiEngine3rdPartyDir)\xiph\libogg\include;$(KunaiEngine3rdPartyDir)\libYAML\include;$(KunaiEngine3rdPartyDir)\boost_1_58_0\;$(KunaiEngine3rdPartyDir)\mysql++\;$(KunaiEngine3rdPartyDir)\libtomcrypt\src\headers;$(KunaiEngine3rdPartyDir)\libtommath;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\FixedPoint;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\Controllers;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Utilities\ConvexDecomposition;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Common;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Collision\Shapes;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\tristripper\include;$(KunaiEngineLibraryDir)\glew-1.11.0\include;$(KunaiEngineLibraryDir)\openal-soft-1.16.0-bin\include;$(KunaiEngineLibraryDir)\SDL2_ttf\include;$(KunaiEngineLibraryDir)\SDL2_image\include;$(KunaiEngineLibraryDir)\SDL2\include;$(KunaiEngineLibraryDir)\pthread_uwp\include;$(KunaiEngineLibraryDir)\freetype2\include;$(KunaiEngineLibraryDir)\..\windows\nvapi;$(KunaiEngineSourceDir);$(ProjectDir);$(GeneratedFilesDir);$(IntDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AS_MAX_PORTABILITY;_CRT_SECURE_NO_WARNINGS;OPENCTM_STATIC;HAVE_STRUCT_TIMESPEC;FT2_BUILD_LIBRARY;YAML_DECLARE_STATIC;ASSIMP_BUILD_NO_C4D_IMPORTER;LTM_DESC;LTC_SOURCE;USE_LTM;LTC_NO_PROTOTYPES;_UWP;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf\lib\x64;$(KunaiEngineLibraryDir)\SDL2\lib\x64;$(KunaiEngineLibraryDir)\pthread_uwp\lib\x64\Debug;$(KunaiEngineLibraryDir)\SDL2_image\lib\x64;$(KunaiEngineLibraryDir)\nvapi\amd64;$(KunaiEngineLibraryDir)\freetype2\lib\x64</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(KunaiEngine3rdPartyDir)\d3dkmt;$(KunaiEngine3rdPartyDir)\stb;$(KunaiEngine3rdPartyDir)\freetype\include;$(KunaiEngine3rdPartyDir)\vectormath;$(KunaiEngine3rdPartyDir)\tokamak\include;$(KunaiEngine3rdPartyDir)\ezxml;$(KunaiEngine3rdPartyDir)\enet\include;$(KunaiEngine3rdPartyDir)\lzma;$(KunaiEngine3rdPartyDir)\jo_jpeg;$(KunaiEngine3rdPartyDir)\miniz;$(KunaiEngine3rdPartyDir)\angelscript\include;$(KunaiEngine3rdPartyDir)\nvgameworks;$(KunaiEngine3rdPartyDir)\openctm;$(KunaiEngine3rdPartyDir)\nvidia;$(KunaiEngine3rdPartyDir)\assimp\include;$(KunaiEngine3rdPartyDir)\microsoft;$(KunaiEngine3rdPartyDir)\assimp\contrib\openddlparser\include;$(KunaiEngine3rdPartyDir)\assimp\code\BoostWorkaround;$(KunaiEngine3rdPartyDir)\recastnavigation\Recast\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourTileCache\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DetourCrowd\include;$(KunaiEngine3rdPartyDir)\recastnavigation\Detour\include;$(KunaiEngine3rdPartyDir)\recastnavigation\DebugUtils\Include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\include;$(KunaiEngine3rdPartyDir)\xiph\libtheora\include;$(KunaiEngine3rdPartyDir)\xiph\libvorbis\lib;$(KunaiEngine3rdPartyDir)\xiph\libogg\include;$(KunaiEngine3rdPartyDir)\libYAML\include;$(KunaiEngine3rdPartyDir)\boost_1_58_0\;$(KunaiEngine3rdPartyDir)\mysql++\;$(KunaiEngine3rdPartyDir)\libtomcrypt\src\headers;$(KunaiEngine3rdPartyDir)\libtommath;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\FixedPoint;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Enhancements\Controllers;$(KunaiEngine3rdPartyDir)\Box2D\Contributions\Utilities\ConvexDecomposition;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Common;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\Box2D\Collision\Shapes;$(KunaiEngine3rdPartyDir)\Box2D\Box2D\;$(KunaiEngine3rdPartyDir)\tristripper\include;$(KunaiEngineLibraryDir)\glew-1.11.0\include;$(KunaiEngineLibraryDir)\openal-soft-1.16.0-bin\include;$(KunaiEngineLibraryDir)\SDL2_ttf\include;$(KunaiEngineLibraryDir)\SDL2_image\include;$(KunaiEngineLibraryDir)\SDL2\include;$(KunaiEngineLibraryDir)\pthread_uwp\include;$(KunaiEngineLibraryDir)\freetype2\include;$(KunaiEngineLibraryDir)\..\windows\nvapi;$(KunaiEngineSourceDir);$(ProjectDir);$(GeneratedFilesDir);$(IntDir)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AS_MAX_PORTABILITY;_CRT_SECURE_NO_WARNINGS;OPENCTM_STATIC;HAVE_STRUCT_TIMESPEC;FT2_BUILD_LIBRARY;YAML_DECLARE_STATIC;ASSIMP_BUILD_NO_C4D_IMPORTER;LTM_DESC;LTC_SOURCE;USE_LTM;LTC_NO_PROTOTYPES;_UWP;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf\lib\x64;$(KunaiEngineLibraryDir)\SDL2\lib\x64;$(KunaiEngineLibraryDir)\pthread_uwp\lib\x64\Release;$(KunaiEngineLibraryDir)\SDL2_image\lib\x64;$(KunaiEngineLibraryDir)\nvapi\amd64;$(KunaiEngineLibraryDir)\freetype2\lib\x64</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+    <None Include="..\..\3rdparty\assimp\code\BlenderDNA.inl" />
+    <None Include="..\..\3rdparty\assimp\code\SmoothingGroups.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\color4.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\material.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\matrix3x3.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\matrix4x4.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\quaternion.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\vector2.inl" />
+    <None Include="..\..\3rdparty\assimp\include\assimp\vector3.inl" />
+    <None Include="KeTemplateUWP_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\LockScreenLogo.scale-200.png" />
+    <Image Include="Assets\SplashScreen.scale-200.png" />
+    <Image Include="Assets\Square150x150Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Image Include="Assets\StoreLogo.png" />
+    <Image Include="Assets\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_atomic.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_builder.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_bytecode.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_callfunc.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_compiler.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_configgroup.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_context.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_datatype.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_gc.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_generic.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_globalproperty.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_memory.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_module.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_objecttype.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_outputbuffer.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_parser.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_restore.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_scriptcode.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_scriptengine.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_scriptfunction.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_scriptnode.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_scriptobject.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_string.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_string_util.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_thread.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_tokenizer.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_typeinfo.cpp" />
+    <ClCompile Include="..\..\3rdparty\angelscript\source\as_variablescope.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\3DSConverter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\3DSExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\3DSLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ACLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ASELoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ASEParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\AssbinExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\AssbinLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Assimp.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\AssimpCExport.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\AssxmlExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\B3DImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BaseImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BaseProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Bitmap.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BlenderBMesh.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BlenderDNA.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BlenderLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BlenderModifier.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BlenderScene.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BlenderTessellator.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\BVHLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\C4DImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\CalcTangentsProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\COBLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ColladaExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ColladaLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ColladaParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ComputeUVMappingProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ConvertToLHProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\CSMLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\DeboneProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\DefaultIOStream.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\DefaultIOSystem.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\DefaultLogger.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\DXFLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Exporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXAnimation.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXBinaryTokenizer.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXConverter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXDeformer.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXDocument.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXDocumentUtil.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXMaterial.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXMeshGeometry.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXModel.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXNodeAttribute.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXProperties.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXTokenizer.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FBXUtil.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FindDegenerates.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FindInstancesProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FindInvalidDataProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\FixNormalsStep.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\GenFaceNormalsProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\GenVertexNormalsProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\HMPLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCBoolean.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCCurve.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCGeometry.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCMaterial.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCOpenings.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCProfile.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCReaderGen.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IFCUtil.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Importer.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ImporterRegistry.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ImproveCacheLocality.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IRRLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IRRMeshLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\IRRShared.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\JoinVerticesProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\LimitBoneWeightsProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\LWOAnimation.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\LWOBLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\LWOLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\LWOMaterial.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\LWSLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MakeVerboseFormat.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MaterialSystem.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MD2Loader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MD3Loader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MD5Loader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MD5Parser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MDCLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MDLLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MDLMaterialLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\MS3DLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\NDOLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\NFFLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ObjExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ObjFileImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ObjFileMtlImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ObjFileParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OFFLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OgreBinarySerializer.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OgreImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OgreMaterial.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OgreStructs.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OgreXmlSerializer.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OpenGEXExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OpenGEXImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OptimizeGraph.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\OptimizeMeshes.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\PlyExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\PlyLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\PlyParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\PostStepRegistry.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\PretransformVertices.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ProcessHelper.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Q3BSPFileImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Q3BSPFileParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Q3BSPZipArchive.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Q3DLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\RawLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\RemoveComments.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\RemoveRedundantMaterials.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\RemoveVCProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SceneCombiner.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ScenePreprocessor.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SGSpatialSort.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SkeletonMeshBuilder.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SMDLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SortByPTypeProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SpatialSort.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SplitByBoneCountProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\SplitLargeMeshes.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\StandardShapes.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\StepExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\STEPFileEncoding.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\STEPFileReader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\STLExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\STLLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Subdivision.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\TargetAnimation.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\TerragenLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\TextureTransform.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\TriangulateProcess.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\UnrealLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\ValidateDataStructure.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\Version.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\VertexTriangleAdjacency.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\XFileExporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\XFileImporter.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\XFileParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\code\XGLLoader.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\clipper\clipper.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\ConvertUTF\ConvertUTF.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\irrXML\irrXML.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\openddlparser\code\DDLNode.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\openddlparser\code\OpenDDLParser.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\openddlparser\code\Value.cpp" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\common\shapes.cc" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\advancing_front.cc" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\cdt.cc" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\sweep.cc" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\sweep_context.cc" />
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\unzip\ioapi.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\unzip\unzip.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\adler32.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\compress.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\crc32.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\deflate.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\gzclose.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\gzlib.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\gzread.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\gzwrite.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\infback.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\inffast.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\inflate.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\inftrees.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\trees.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\uncompr.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\assimp\contrib\zlib\zutil.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2BroadPhase.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2CollideCircle.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2CollideEdge.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2CollidePolygon.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2Collision.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2Distance.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2DynamicTree.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2TimeOfImpact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2ChainShape.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2EdgeShape.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2BlockAllocator.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Draw.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Math.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Settings.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2StackAllocator.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Timer.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2ContactManager.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2Fixture.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2Island.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2World.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2ChainAndCircleContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2ChainAndPolygonContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2CircleContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2Contact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2EdgeAndCircleContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2EdgeAndPolygonContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonContact.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2DistanceJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2FrictionJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2GearJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2Joint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2MotorJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2MouseJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2PrismaticJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2PulleyJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2RevoluteJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2RopeJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2WeldJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2WheelJoint.cpp" />
+    <ClCompile Include="..\..\3rdparty\Box2D\Box2D\Box2D\Rope\b2Rope.cpp" />
+    <ClCompile Include="..\..\3rdparty\enet\callbacks.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\compress.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\host.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\list.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\packet.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\peer.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\protocol.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\enet\win32.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\ezxml\ezxml.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\jo_jpeg\jo_jpeg.cpp" />
+    <ClCompile Include="..\..\3rdparty\libYAML\src\api.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\dumper.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\emitter.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\loader.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\parser.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\reader.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\scanner.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\libYAML\src\writer.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\lzma\Alloc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\lzma\LzFind.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\lzma\LzmaDec.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\lzma\LzmaEnc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\lzma\LzmaLib.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\microsoft\FASTFILE.CPP" />
+    <ClCompile Include="..\..\3rdparty\nvidia\Framerate.cpp" />
+    <ClCompile Include="..\..\3rdparty\openctm\compressMG1.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\openctm\compressMG2.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\openctm\compressRAW.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\openctm\openctm.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\openctm\stream.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DebugUtils\Source\DebugDraw.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DebugUtils\Source\DetourDebugDraw.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DebugUtils\Source\RecastDebugDraw.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DebugUtils\Source\RecastDump.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourCrowd\Source\DetourCrowd.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourCrowd\Source\DetourLocalBoundary.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourCrowd\Source\DetourObstacleAvoidance.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourCrowd\Source\DetourPathCorridor.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourCrowd\Source\DetourPathQueue.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourCrowd\Source\DetourProximityGrid.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourTileCache\Source\DetourTileCache.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\DetourTileCache\Source\DetourTileCacheBuilder.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Detour\Source\DetourAlloc.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Detour\Source\DetourCommon.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Detour\Source\DetourNavMesh.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Detour\Source\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Detour\Source\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Detour\Source\DetourNode.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\Recast.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastAlloc.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastArea.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastContour.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastFilter.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastLayers.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastMesh.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastMeshDetail.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastRasterization.cpp" />
+    <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastRegion.cpp" />
+    <ClCompile Include="..\..\3rdparty\stb\stbi.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\stb\stb_vorbis.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tokamak\src\boxcylinder.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\collision.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\collisionbody.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\constraint.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\cylinder.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\dcd.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\lines.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\ne_interface.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\perfwin32.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\region.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\restcontact.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\rigidbody.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\rigidbodybase.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\scenery.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\simulator.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\solver.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\sphere.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\stack.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\tricollision.cpp" />
+    <ClCompile Include="..\..\3rdparty\tokamak\src\useopcode.cpp" />
+    <ClCompile Include="..\..\3rdparty\tristripper\src\connectivity_graph.cpp" />
+    <ClCompile Include="..\..\3rdparty\tristripper\src\policy.cpp" />
+    <ClCompile Include="..\..\3rdparty\tristripper\src\tri_stripper.cpp" />
+    <ClCompile Include="..\..\3rdparty\washu\allocator.cpp" />
+    <ClCompile Include="..\..\3rdparty\xiph\libogg\src\bitwise.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libogg\src\framing.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\analyze.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\apiwrapper.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\bitpack.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\cpu.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\decapiwrapper.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\decinfo.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\decode.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\dequant.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\encapiwrapper.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\encfrag.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\encinfo.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\encode.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\enquant.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\fdct.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\fragment.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\huffdec.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\huffenc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\idct.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\info.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\internal.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\mathops.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\mcenc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\quant.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\rate.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\state.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\tokenize.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxencfrag.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxfdct.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxfrag.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxidct.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxstate.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\x86enc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\x86state.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\analysis.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\bitrate.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\block.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\codebook.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\envelope.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\floor0.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\floor1.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\info.c">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)/%(RelativeDir)</ObjectFileName>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\lookup.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\lpc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\lsp.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\mapping0.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\mdct.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\psy.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\registry.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\res0.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\sharedbook.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\smallft.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\synthesis.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\vorbisenc.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\vorbisfile.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\xiph\libvorbis\lib\window.c">
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Ke.cpp" />
+    <ClCompile Include="..\..\source\KeActor.cpp" />
+    <ClCompile Include="..\..\source\KeActorFactory.cpp" />
+    <ClCompile Include="..\..\source\KeAudioDevice.cpp" />
+    <ClCompile Include="..\..\source\KeCriticalSection.cpp" />
+    <ClCompile Include="..\..\source\KeDebug.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11CommandList.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11ConstantBuffer.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11Fence.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11GeometryBuffer.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11GpuProgram.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11RenderDevice.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11RenderTarget.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11SpriteFactory.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11State.cpp" />
+    <ClCompile Include="..\..\source\KeDirect3D11\KeDirect3D11Texture.cpp" />
+    <ClCompile Include="..\..\source\KeEffect.cpp" />
+    <ClCompile Include="..\..\source\KeFont.cpp" />
+    <ClCompile Include="..\..\source\KeFrustum.cpp" />
+    <ClCompile Include="..\..\source\KeGamepad.cpp" />
+    <ClCompile Include="..\..\source\KeGpuUtil.cpp" />
+    <ClCompile Include="..\..\source\KeMain.cpp" />
+    <ClCompile Include="..\..\source\KeMemoryPool.cpp" />
+    <ClCompile Include="..\..\source\KeMesh.cpp" />
+    <ClCompile Include="..\..\source\KeMutex.cpp" />
+    <ClCompile Include="..\..\source\KePhysics.cpp" />
+    <ClCompile Include="..\..\source\KeProcess.cpp" />
+    <ClCompile Include="..\..\source\KeProcessManager.cpp" />
+    <ClCompile Include="..\..\source\KeRenderDevice.cpp" />
+    <ClCompile Include="..\..\source\KeResourceArchive.cpp" />
+    <ClCompile Include="..\..\source\KeSemaphore.cpp" />
+    <ClCompile Include="..\..\source\KeSystem.cpp" />
+    <ClCompile Include="..\..\source\KeThread.cpp" />
+    <ClCompile Include="..\..\source\KeTimer.cpp" />
+    <ClCompile Include="..\..\source\KeToolKit.cpp" />
+    <ClCompile Include="..\..\source\KeUWPUtil.cpp" />
+    <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2AudioDevice.cpp" />
+    <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2AudioEffect.cpp" />
+    <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2SoundBuffer.cpp" />
+    <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2SoundStream.cpp" />
+    <ClCompile Include="UWPMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\3rdparty\angelscript\include\angelscript.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_array.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_atomic.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_builder.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_bytecode.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_callfunc.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_compiler.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_config.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_configgroup.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_context.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_criticalsection.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_datatype.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_debug.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_gc.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_generic.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_map.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_memory.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_module.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_namespace.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_objecttype.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_outputbuffer.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_parser.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_property.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_restore.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_scriptcode.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_scriptengine.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_scriptfunction.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_scriptnode.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_scriptobject.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_string.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_string_util.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_symboltable.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_texts.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_thread.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_tokendef.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_tokenizer.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_typeinfo.h" />
+    <ClInclude Include="..\..\3rdparty\angelscript\source\as_variablescope.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\3DSExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\3DSHelper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\3DSLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ACLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ASELoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ASEParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\AssbinExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\AssbinLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\assbin_chunks.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\AssxmlExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\B3DImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BaseImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BaseProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Bitmap.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderBMesh.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderDNA.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderIntermediate.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderModifier.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderScene.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderSceneGen.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlenderTessellator.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BlobIOSystem.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\foreach.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\format.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\lexical_cast.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\make_shared.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\math\common_factor_rt.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\noncopyable.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\pointer_cast.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\scoped_array.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\scoped_ptr.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\shared_array.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\shared_ptr.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\static_assert.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\timer.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BoostWorkaround\boost\tuple\tuple.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\BVHLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ByteSwapper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\C4DImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\CalcTangentsProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\CInterfaceIOWrapper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\COBLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\COBScene.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ColladaExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ColladaHelper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ColladaLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ColladaParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ComputeUVMappingProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ConvertToLHProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\CSMLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\DeboneProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\DefaultIOStream.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\DefaultIOSystem.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\DefaultProgressHandler.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Defines.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\DXFHelper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\DXFLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Exceptional.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\fast_atof.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXCompileConfig.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXConverter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXDocument.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXDocumentUtil.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXImportSettings.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXProperties.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXTokenizer.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FBXUtil.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FileLogStream.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FileSystemFilter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FindDegenerates.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FindInstancesProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FindInvalidDataProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\FixNormalsStep.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\GenericProperty.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\GenFaceNormalsProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\GenVertexNormalsProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\HalfLifeFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Hash.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\HMPFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\HMPLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IFCLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IFCReaderGen.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IFCUtil.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IFF.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Importer.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ImproveCacheLocality.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IRRLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IRRMeshLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\IRRShared.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\irrXMLWrapper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\JoinVerticesProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LimitBoneWeightsProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LineSplitter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LogAux.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LWOAnimation.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LWOFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LWOLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\LWSLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Macros.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MakeVerboseFormat.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MaterialSystem.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD2FileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD2Loader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD2NormalTable.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD3FileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD3Loader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD4FileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD5Loader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MD5Parser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MDCFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MDCLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MDCNormalTable.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MDLDefaultColorMap.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MDLFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MDLLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MemoryIOWrapper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\MS3DLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\NDOLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\NFFLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ObjExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ObjFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ObjFileImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ObjFileMtlImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ObjFileParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ObjTools.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OFFLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OgreBinarySerializer.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OgreImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OgreParsingUtils.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OgreStructs.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OgreXmlSerializer.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OpenGEXExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OpenGEXImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OpenGEXStructs.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OptimizeGraph.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\OptimizeMeshes.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ParsingUtils.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\PlyExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\PlyLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\PlyParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\PolyTools.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\PretransformVertices.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ProcessHelper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Profiler.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Q3BSPFileData.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Q3BSPFileImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Q3BSPFileParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Q3BSPZipArchive.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Q3DLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\qnan.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\RawLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\RemoveComments.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\RemoveRedundantMaterials.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\RemoveVCProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SceneCombiner.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ScenePreprocessor.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ScenePrivate.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SGSpatialSort.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SkeletonMeshBuilder.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SMDLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SmoothingGroups.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SortByPTypeProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SpatialSort.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SplitByBoneCountProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\SplitLargeMeshes.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\StandardShapes.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\StdOStreamLogStream.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\StepExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\STEPFile.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\STEPFileEncoding.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\STEPFileReader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\STLExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\STLLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\StreamReader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\StreamWriter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\StringComparison.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Subdivision.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\TargetAnimation.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\TerragenLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\TextureTransform.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\TinyFormatter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\TriangulateProcess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\UnrealLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\ValidateDataStructure.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Vertex.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\VertexTriangleAdjacency.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\Win32DebugLogStream.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\XFileExporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\XFileHelper.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\XFileImporter.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\XFileParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\XGLLoader.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\code\XMLTools.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\clipper\clipper.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\ConvertUTF\ConvertUTF.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\irrXML\CXMLReaderImpl.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\irrXML\heapsort.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\irrXML\irrArray.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\irrXML\irrString.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\irrXML\irrTypes.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\irrXML\irrXML.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\openddlparser\include\openddlparser\DDLNode.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\openddlparser\include\openddlparser\OpenDDLCommon.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\openddlparser\include\openddlparser\OpenDDLParser.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\openddlparser\include\openddlparser\OpenDDLParserUtils.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\openddlparser\include\openddlparser\Value.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\common\shapes.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\common\utils.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\poly2tri.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\advancing_front.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\cdt.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\sweep.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\poly2tri\poly2tri\sweep\sweep_context.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\unzip\crypt.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\unzip\ioapi.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\unzip\unzip.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\crc32.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\deflate.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\gzguts.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\inffast.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\inffixed.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\inflate.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\inftrees.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\trees.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\zconf.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\zlib.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\contrib\zlib\zutil.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\ai_assert.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\anim.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\camera.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\cexport.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\cfileio.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\cimport.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\color4.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\config.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\defs.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\Exporter.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\Importer.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\importerdesc.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\IOStream.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\light.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\Logger.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\LogStream.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\material.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\matrix3x3.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\matrix4x4.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\mesh.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\metadata.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\postprocess.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\quaternion.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\scene.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\texture.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\types.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\vector2.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\vector3.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\assimp\version.h" />
+    <ClInclude Include="..\..\3rdparty\assimp\include\revision.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Box2D.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2BroadPhase.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2Collision.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2Distance.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2DynamicTree.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\b2TimeOfImpact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2ChainShape.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2EdgeShape.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Collision\Shapes\b2Shape.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2BlockAllocator.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Draw.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2GrowableStack.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Math.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Settings.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2StackAllocator.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Common\b2Timer.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2Body.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2ContactManager.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2Fixture.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2Island.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2TimeStep.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2World.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2ChainAndCircleContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2ChainAndPolygonContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2CircleContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2Contact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2EdgeAndCircleContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2EdgeAndPolygonContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonAndCircleContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Contacts\b2PolygonContact.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2DistanceJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2FrictionJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2GearJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2Joint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2MotorJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2MouseJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2PrismaticJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2PulleyJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2RevoluteJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2RopeJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2WeldJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Dynamics\Joints\b2WheelJoint.h" />
+    <ClInclude Include="..\..\3rdparty\Box2D\Box2D\Box2D\Rope\b2Rope.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\callbacks.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\enet.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\list.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\protocol.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\time.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\types.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\utility.h" />
+    <ClInclude Include="..\..\3rdparty\enet\include\enet\win32.h" />
+    <ClInclude Include="..\..\3rdparty\ezxml\ezxml.h" />
+    <ClInclude Include="..\..\3rdparty\jo_jpeg\jo_jpeg.h" />
+    <ClInclude Include="..\..\3rdparty\libYAML\include\yaml.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\Alloc.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\LzFind.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\LzHash.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\LzmaDec.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\LzmaEnc.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\LzmaLib.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\NameMangle.h" />
+    <ClInclude Include="..\..\3rdparty\lzma\Types.h" />
+    <ClInclude Include="..\..\3rdparty\microsoft\fastfile.hpp" />
+    <ClInclude Include="..\..\3rdparty\microsoft\FFENT.H" />
+    <ClInclude Include="..\..\3rdparty\microsoft\InstructionSet.h" />
+    <ClInclude Include="..\..\3rdparty\nvgameworks\NvFoundation.h" />
+    <ClInclude Include="..\..\3rdparty\nvgameworks\NvFoundationMath.h" />
+    <ClInclude Include="..\..\3rdparty\nvgameworks\NV\NvMath.h" />
+    <ClInclude Include="..\..\3rdparty\nvgameworks\NV\NvMatrix.h" />
+    <ClInclude Include="..\..\3rdparty\nvgameworks\NV\NvQuaternion.h" />
+    <ClInclude Include="..\..\3rdparty\nvgameworks\NV\NvVector.h" />
+    <ClInclude Include="..\..\3rdparty\nvidia\Framerate.h" />
+    <ClInclude Include="..\..\3rdparty\nvidia\nvdebug.h" />
+    <ClInclude Include="..\..\3rdparty\nvidia\NVFileSearch.h" />
+    <ClInclude Include="..\..\3rdparty\nvidia\nvinc.h" />
+    <ClInclude Include="..\..\3rdparty\nvidia\singleton.h" />
+    <ClInclude Include="..\..\3rdparty\openctm\internal.h" />
+    <ClInclude Include="..\..\3rdparty\openctm\openctm.h" />
+    <ClInclude Include="..\..\3rdparty\openctm\openctmpp.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DebugUtils\Include\DebugDraw.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DebugUtils\Include\DetourDebugDraw.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DebugUtils\Include\RecastDebugDraw.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DebugUtils\Include\RecastDump.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourCrowd\Include\DetourCrowd.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourCrowd\Include\DetourLocalBoundary.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourCrowd\Include\DetourObstacleAvoidance.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourCrowd\Include\DetourPathCorridor.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourCrowd\Include\DetourPathQueue.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourCrowd\Include\DetourProximityGrid.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourTileCache\Include\DetourTileCache.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\DetourTileCache\Include\DetourTileCacheBuilder.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourAlloc.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourAssert.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourCommon.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourMath.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourNavMesh.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourNavMeshBuilder.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourNavMeshQuery.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourNode.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Detour\Include\DetourStatus.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Recast\Include\Recast.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Recast\Include\RecastAlloc.h" />
+    <ClInclude Include="..\..\3rdparty\recastnavigation\Recast\Include\RecastAssert.h" />
+    <ClInclude Include="..\..\3rdparty\stb\stb.h" />
+    <ClInclude Include="..\..\3rdparty\stb\stbi.h" />
+    <ClInclude Include="..\..\3rdparty\stb\stb_truetype.h" />
+    <ClInclude Include="..\..\3rdparty\stb\stb_vorbis.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_debug.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_m3_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_m4_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_misc_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_q_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_t3_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_v2_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_v3_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_math_v4_inline.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_smath.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\math\ne_type.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\include\tokamak.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\collision.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\collision2.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\constraint.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\containers.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\dcd.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\message.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\perfwin32.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\rigidbody.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\scenery.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\simulator.h" />
+    <ClInclude Include="..\..\3rdparty\tokamak\src\stack.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\detail\cache_simulator.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\detail\connectivity_graph.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\detail\graph_array.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\detail\heap_array.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\detail\policy.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\detail\types.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\public_types.h" />
+    <ClInclude Include="..\..\3rdparty\tristripper\include\tri_stripper.h" />
+    <ClInclude Include="..\..\3rdparty\washu\allocator.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libogg\include\ogg\ogg.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libogg\include\ogg\os_types.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\include\theora\codec.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\include\theora\theora.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\include\theora\theoradec.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\include\theora\theoraenc.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\apiwrapper.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\bitpack.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\cpu.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\dct.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\decint.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\dequant.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\encint.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\enquant.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\huffdec.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\huffenc.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\huffman.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\internal.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\mathops.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\modedec.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\ocintrin.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\quant.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxfrag.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\mmxloop.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\x86enc.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libtheora\lib\x86_vc\x86int.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\include\vorbis\codec.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\include\vorbis\vorbisenc.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\include\vorbis\vorbisfile.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\backends.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\bitrate.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\codebook.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\codec_internal.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\envelope.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\highlevel.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\lookup.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\lookup_data.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\lpc.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\lsp.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\masking.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\mdct.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\misc.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\os.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\psy.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\registry.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\scales.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\smallft.h" />
+    <ClInclude Include="..\..\3rdparty\xiph\libvorbis\lib\window.h" />
+    <ClInclude Include="..\..\source\Ke.h" />
+    <ClInclude Include="..\..\source\KeActor.h" />
+    <ClInclude Include="..\..\source\KeAudioDevice.h" />
+    <ClInclude Include="..\..\source\KeCriticalSection.h" />
+    <ClInclude Include="..\..\source\KeDebug.h" />
+    <ClInclude Include="..\..\source\KeDirect3D11\KeDirect3D11RenderDevice.h" />
+    <ClInclude Include="..\..\source\KeEffect.h" />
+    <ClInclude Include="..\..\source\KeFont.h" />
+    <ClInclude Include="..\..\source\KeFrustum.h" />
+    <ClInclude Include="..\..\source\KeGamepad.h" />
+    <ClInclude Include="..\..\source\KeGamepadCallbacks.h" />
+    <ClInclude Include="..\..\source\KeGpuUtil.h" />
+    <ClInclude Include="..\..\source\KeMemoryPool.h" />
+    <ClInclude Include="..\..\source\KeMesh.h" />
+    <ClInclude Include="..\..\source\KeMutex.h" />
+    <ClInclude Include="..\..\source\KePhysics.h" />
+    <ClInclude Include="..\..\source\KePlatform.h" />
+    <ClInclude Include="..\..\source\KeProcess.h" />
+    <ClInclude Include="..\..\source\KeRenderDevice.h" />
+    <ClInclude Include="..\..\source\KeResourceArchive.h" />
+    <ClInclude Include="..\..\source\KeSemaphore.h" />
+    <ClInclude Include="..\..\source\KeSystem.h" />
+    <ClInclude Include="..\..\source\KeThread.h" />
+    <ClInclude Include="..\..\source\KeTimer.h" />
+    <ClInclude Include="..\..\source\KeToolkit.h" />
+    <ClInclude Include="..\..\source\KeUnknown.h" />
+    <ClInclude Include="..\..\source\KeUWPUtil.h" />
+    <ClInclude Include="..\..\source\KeXAudio2\KeXAudio2AudioDevice.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
