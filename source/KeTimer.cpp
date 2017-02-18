@@ -18,6 +18,8 @@
 #endif
 
 
+#ifndef _WIN32
+
 /*
  * Timer handle
  */
@@ -60,3 +62,5 @@ bool KeInitializeTimer( const char* timer_name, uint32_t flags, KeTimer* timer )
     
     return true;
 }
+
+#endif

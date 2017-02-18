@@ -654,7 +654,7 @@ neStackHeader * neStackInfo::CheckAcceptNewHeader(neStackHeader * newHeader)
 
 	neStackHeader * anotherHeader = NULL;
 
-	neRigidBody_ * foundBody;
+	neRigidBody_ * foundBody = NULL;
 
 	s32 i;
 

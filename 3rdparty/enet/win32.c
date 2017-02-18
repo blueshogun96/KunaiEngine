@@ -4,6 +4,14 @@
 */
 #ifdef _WIN32
 
+#ifdef _UWP
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+#define timeBeginPeriod(x)
+#define timeEndPeriod(x)
+#define timeGetTime GetTickCount64
+#endif
+
 #define ENET_BUILDING_LIB 1
 #include "enet/enet.h"
 #include <windows.h>

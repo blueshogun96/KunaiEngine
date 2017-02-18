@@ -12,10 +12,18 @@
 #endif
 
 
+#ifdef _UWP
+#if defined(_M_X64) || defined(__amd64__)
+#define NVAPI_DLL L"nvapi64.dll"
+#else
+#define NVAPI_DLL L"nvapi.dll"
+#endif
+#else
 #if defined(_M_X64) || defined(__amd64__)
 #define NVAPI_DLL "nvapi64.dll"
 #else
 #define NVAPI_DLL "nvapi.dll"
+#endif
 #endif
 
 
@@ -67,8 +75,11 @@ struct IKeGpuMonitorNV : public IKeGpuMonitor
     _KEMETHOD(bool) Detect()
     {
 #ifdef _WIN32
+#ifndef _UWP
         HMODULE hmod = LoadLibraryA( NVAPI_DLL );
-        
+#else
+		HMODULE hmod = LoadPackagedLibrary( NVAPI_DLL, 0 );
+#endif
         if( hmod == NULL )
         {
             DISPDBG( KE_ERROR, "Couldn't find " << NVAPI_DLL );
@@ -83,6 +94,8 @@ struct IKeGpuMonitorNV : public IKeGpuMonitor
         _NvAPI_EnumPhysicalGPUs = (NvAPI_EnumPhysicalGPUs_t) (*_NvAPI_QueryInterface)(0xE5AC921F);
         _NvAPI_GPU_GetUsages = (NvAPI_GPU_GetUsages_t) (*_NvAPI_QueryInterface)(0x189A1FDF);
         
+		FreeLibrary( hmod );
+
         if( _NvAPI_Initialize == NULL || _NvAPI_EnumPhysicalGPUs == NULL ||
            _NvAPI_QueryInterface == NULL || _NvAPI_GPU_GetUsages == NULL )
         {
@@ -161,12 +174,11 @@ struct IKeGpuMonitorNV : public IKeGpuMonitor
         NvAPI_ShortString string;
         
         // ---- Retrive the handle for the GPU ----
-        
-        NvU32 gpuCount = 0;
-        NvAPI_Status status = NvAPI_EnumPhysicalGPUs( nvGPUHandles, &gpuCount );
-        if( status != NVAPI_OK ) // !TODO: cache the table for drivers >= 105.00
+        NvU32 GpuCount;
+        NvAPI_Status nvstatus = NvAPI_EnumPhysicalGPUs( nvGPUHandles, &GpuCount );
+        if( nvstatus != NVAPI_OK ) // !TODO: cache the table for drivers >= 105.00
         {
-            NvAPI_GetErrorMessage( status, string );
+            NvAPI_GetErrorMessage( nvstatus, string );
             DISPDBG( KE_ERROR, "NvAPI_EnumPhysicalGPUs(): " << string );
         }
         
@@ -177,10 +189,10 @@ struct IKeGpuMonitorNV : public IKeGpuMonitor
         // Retrive the temperature
         ZeroMemory( &temperature, sizeof( NV_GPU_THERMAL_SETTINGS ) );
         temperature.version = NV_GPU_THERMAL_SETTINGS_VER;
-        status = NvAPI_GPU_GetThermalSettings( nvGPUHandles[0], NVAPI_THERMAL_TARGET_ALL, &temperature );
-        if( status != NVAPI_OK )
+        nvstatus = NvAPI_GPU_GetThermalSettings( nvGPUHandles[0], NVAPI_THERMAL_TARGET_ALL, &temperature );
+        if( nvstatus != NVAPI_OK )
         {
-            NvAPI_GetErrorMessage( status, string );
+            NvAPI_GetErrorMessage( nvstatus, string );
             DISPDBG( KE_ERROR, "\n\tNvAPI_GPU_GetThermalSettings(): " << string );
         }
         
@@ -278,8 +290,11 @@ struct IKeGpuMonitorIntel : public IKeGpuMonitor
            EnumDisplay or whatever for Windows */
         
         /* Load the gdi32.dll directly, and get a function pointer to the necessary function. */
-        
+#ifdef _UWP
+		hGdi = ::LoadPackagedLibrary( L"gdi32.dll", 0 );
+#else
         hGdi = ::LoadLibrary( TEXT( "gdi32.dll" ) );
+#endif
         if( !hGdi )
         {
             DISPDBG( KE_ERROR, "Unable to open gdi32.dll!" );
@@ -324,7 +339,8 @@ struct IKeGpuMonitorIntel : public IKeGpuMonitor
      */
     KEMETHOD GetStatus( KeGpuStatus* status )
     {
-#ifdef _WIN32
+		/* TODO: Get adapter LUID and description without DirectX */
+#if 0 //#ifdef _WIN32
         UINT64 SharedBytesUsed = 0, DedicatedBytesUsed = 0, CommittedBytesUsed = 0;
         D3DKMT_QUERYSTATISTICS QueryStatistics;
         ULONG i;
@@ -393,6 +409,7 @@ struct IKeGpuMonitorIntel : public IKeGpuMonitor
 #ifdef _WIN32   // Windows only
     UINT PVT_GetNodeCount()
     {
+#if 0 /* TODO: Get adapter LUID and description without DirectX */
         D3DKMT_QUERYSTATISTICS QueryStatistics;
         memset( &QueryStatistics, 0, sizeof( D3DKMT_QUERYSTATISTICS ) );
         QueryStatistics.Type = D3DKMT_QUERYSTATISTICS_ADAPTER;
@@ -403,6 +420,9 @@ struct IKeGpuMonitorIntel : public IKeGpuMonitor
             return 0;
         
         return QueryStatistics.QueryResult.AdapterInformation.NodeCount;
+#else
+		return 0;
+#endif
     }
 #endif
 };

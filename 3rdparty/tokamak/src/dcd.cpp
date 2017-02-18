@@ -1079,7 +1079,7 @@ bool TestDCD(neCollisionResult & result, TConvex & convexA, neT3 & transA, TConv
 
 	BigCLength = BigC.Length();
 
-	neV3 * aVertArray, * bVertArray;
+	neV3 * aVertArray = NULL, * bVertArray = NULL;
 
 	if (convexA.type == TConvex::BOX)
 	{

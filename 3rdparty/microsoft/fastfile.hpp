@@ -27,6 +27,10 @@
 #define FALSE   0
 #endif
 
+#ifdef _UWP
+#define HFILE_ERROR -1
+#endif
+
 typedef LPVOID	HFASTFILE;
 
 /*

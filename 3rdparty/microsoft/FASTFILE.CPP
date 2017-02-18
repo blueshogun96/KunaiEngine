@@ -78,8 +78,18 @@ BOOL CFastFile::Init( LPSTR fname, int max_handles )
      * create a memory mapped file for the master file
      */
 #ifdef _WIN32
+#ifdef _UWP
+	const size_t clen = strlen(fname)+1;
+	wchar_t* wc = new wchar_t[clen];
+	mbstowcs( wc, fname, clen );
+
+	hFile = CreateFile2( wc, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING, NULL );
+
+	delete [] wc;
+#else
     hFile = CreateFileA( fname, GENERIC_READ, FILE_SHARE_READ, NULL,
             OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, 0 );
+#endif
 
     if( hFile == NULL || hFile == (HANDLE)HFILE_ERROR )
 	{

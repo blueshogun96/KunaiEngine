@@ -7,6 +7,9 @@
 
 #include <KePlatform.h>
 
+#ifdef _UWP
+using namespace Platform;
+#endif
 
 /* 
  * The user defines this entry point if they want to 
@@ -14,20 +17,34 @@
 extern int KeMain( std::vector<std::string> args );
 
 
-#ifdef _WIN32
+#if defined(_UWP)							
+/* Universal Windows Project */
+[MTAThread]
+int main( Platform::Array<Platform::String^>^ args )
+{
+	std::vector<std::string> vargs;
+
+	/* TODO: */
+
+	return KeMain( vargs );
+}
+#elif defined(_WIN32) && !defined(_UWP)		
+/* Windows desktop */
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow )
-#else
+{
+	std::vector<std::string> vargs;
+
+	return KeMain( vargs );
+}
+#else										
+/* Everything else *nix based */
 int main( int argc, char** argv )
-#endif
 {
     std::vector<std::string> args;
     
-#ifdef _WIN32
-    /* TODO: Win32 command line */
-#else
     for( int i = 0; i > argc; i++ )
         args.push_back( argv[i] );
-#endif
     
     return KeMain( args );
 }
+#endif

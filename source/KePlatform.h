@@ -8,6 +8,7 @@
 
 #include <windows.h>
 #include <mmsystem.h>
+#include <mmreg.h>
 #include <aclapi.h>
 #endif
 
@@ -63,6 +64,11 @@
  #endif
 #endif
 
+/* Windows phone or Surface */
+#if ( WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP )
+#define __MOBILE_OS__
+#endif
+
 #ifdef _WIN32
 #include "KeWin32Util.h"
 #endif
@@ -93,7 +99,7 @@
 #define DWORD unsigned long
 #endif
 
-#ifndef _WIN32
+#if !defined( _WIN32 )
 typedef struct _RECT
 {
     long left;
@@ -103,9 +109,10 @@ typedef struct _RECT
 }RECT;
 
 #define ZeroMemory(a,b) memset( a, 0, b )
+#endif
 
+#ifndef _INC_MMREG	// mmreg.h
 /* Ripped this from PC headers */
-#ifndef _WIN32
 typedef struct {
     uint16_t  wFormatTag;
     uint16_t  nChannels;
@@ -123,11 +130,11 @@ typedef struct {
     uint16_t  wBitsPerSample;
     uint16_t  cbSize;
 } WAVEFORMATEX;
+#endif
 
+#ifndef mmioFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
 ((uint32_t)(uint8_t)(ch0) | ((uint32_t)(uint8_t)(ch1) << 8) |   \
 ((uint32_t)(uint8_t)(ch2) << 16) | ((uint32_t)(uint8_t)(ch3) << 24 ))
 #define mmioFOURCC MAKEFOURCC
-#endif
-
 #endif

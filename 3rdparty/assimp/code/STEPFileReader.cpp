@@ -127,6 +127,7 @@ STEP::DB* STEP::ReadFileHeader(boost::shared_ptr<IOStream> stream)
                     DefaultLogger::get()->warn(AddLineNumber("multiple schemas currently not supported",line));
                 }
                 const EXPRESS::STRING* string;
+				string=dynamic_cast<const EXPRESS::STRING*>( (*list)[0].get() );
                 if (!list->GetSize() || !(string=dynamic_cast<const EXPRESS::STRING*>( (*list)[0].get() ))) {
                     throw STEP::SyntaxError("expected FILE_SCHEMA to contain a single string literal",line);
                 }

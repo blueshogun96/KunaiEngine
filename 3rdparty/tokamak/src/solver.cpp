@@ -692,7 +692,7 @@ f32 neCollisionResult::SolveRelativeLinear(neFixedTimeStepSimulator * sim)
 {
 	f32 velA = 0.0f, velB = 0.0f;
 
-	neRigidBody_ * ba, * bb;
+	neRigidBody_ * ba = NULL, * bb = NULL;
 
 	if (bodyA && (ba = bodyA->AsRigidBody()))
 	{

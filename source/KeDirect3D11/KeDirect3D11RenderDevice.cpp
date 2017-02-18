@@ -13,6 +13,33 @@
 #include "KeDirect3D11RenderDevice.h"
 #include "KeDebug.h"
 
+#ifdef _UWP
+#include <wrl.h>
+#include <wrl/client.h>
+#include <d3d11_2.h>
+#include <d2d1_2.h>
+#include <d2d1effects_1.h>
+#include <dwrite_2.h>
+#include <wincodec.h>
+#include <DirectXColors.h>
+#include <DirectXMath.h>
+#include <memory>
+#include <agile.h>
+#include <concrt.h>
+
+/* Common namespaces for UWP */
+using namespace Windows::ApplicationModel;
+using namespace Windows::ApplicationModel::Core;
+using namespace Windows::ApplicationModel::Activation;
+using namespace Windows::UI::Core;
+using namespace Windows::UI::Popups;
+using namespace Windows::System;
+using namespace Windows::Foundation;
+using namespace Windows::Graphics::Display;
+using namespace Microsoft::WRL;
+using namespace Platform;
+#endif
+
 /*
  * DirectDraw stuff
  */
@@ -190,6 +217,8 @@ std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 {
 	switch( feature )
 	{
+	case D3D_FEATURE_LEVEL_12_1: return "12.1";
+	case D3D_FEATURE_LEVEL_12_0: return "12.0";
 	case D3D_FEATURE_LEVEL_11_1: return "11.1";
 	case D3D_FEATURE_LEVEL_11_0: return "11.0";
 	case D3D_FEATURE_LEVEL_10_1: return "10.1";
@@ -202,25 +231,173 @@ std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 	return "";
 }
 
-/*
-* Name: ke_initialize_default_shaders
-* Desc: Initializes the default shaders to be used when there is
-*       no user defined program used.
-*/
-bool ke_d3d11_initialize_default_shaders()
+#ifdef _UWP
+bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 {
+	/* 
+	 * Initialize Direct3D11 
+	 */
 
-	return true;
+	uint32_t flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+	D3D_FEATURE_LEVEL feature_levels[] = 
+	{
+		D3D_FEATURE_LEVEL_12_1,
+		D3D_FEATURE_LEVEL_12_0,
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1
+	};
+
+	int feature_level_count = ARRAYSIZE( feature_levels );
+
+#ifdef _DEBUG
+	flags = D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	HRESULT hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
+		D3D11_SDK_VERSION, &d3ddevice, nullptr, &d3ddevice_context );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
+
+	/* 
+	 * Initialize swapchain 
+	 */
+
+	hr = d3ddevice->QueryInterface( &dxgi_device );
+	D3D_DISPDBG_RB( KE_ERROR, "Error querying DXGI device!", hr );
+
+	hr = d3ddevice->QueryInterface( &dxgi_adapter );
+	D3D_DISPDBG_RB( KE_ERROR, "Error querying DXGI adapter!", hr );
+
+	hr = dxgi_adapter->GetParent( __uuidof( IDXGIFactory2 ), (void**) &dxgi_factory );
+	D3D_DISPDBG_RB( KE_ERROR, "Error getting DXGI factory!", hr );
+
+	//DXGI_SCALING scaling = DisplayMetrics::SupportHighResolutions ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
+	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
+	swapchain_desc.BufferCount = device_desc->buffer_count;
+    swapchain_desc.Width = device_desc->width;
+    swapchain_desc.Height = device_desc->height;
+    swapchain_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	swapchain_desc.Stereo = false;		/* TODO: Make this configurable */
+    swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapchain_desc.SampleDesc.Count = 1;
+    swapchain_desc.SampleDesc.Quality = 0;
+	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	swapchain_desc.Flags = 0;
+	swapchain_desc.Scaling = DXGI_SCALING_NONE;
+	swapchain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+
+	hr = dxgi_factory->CreateSwapChainForCoreWindow( d3ddevice, reinterpret_cast<IUnknown*>(CoreWindow::GetForCurrentThread()),
+		&swapchain_desc, nullptr, &dxgi_swap_chain );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating DXGI swapchain!", hr );
+
+	/* This must be set to one in order to pass Windows Store certification */
+	hr = dxgi_device->SetMaximumFrameLatency(1);
+	D3D_DISPDBG_RB( KE_ERROR, "Error setting maximum frame latency!", hr );
+
+	/*
+	 * Setup render target and viewport
+	 */
+
+	CD3D11Texture2D backbuffer;
+	hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**) &backbuffer );
+	D3D_DISPDBG_RB( KE_ERROR, "Error getting backbuffer!", hr );
+
+	hr = d3ddevice->CreateRenderTargetView( backbuffer, nullptr, &d3d_render_target_view );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
+
+	D3D11_VIEWPORT vp;
+    vp.Width = (FLOAT) device_desc->width;
+    vp.Height = (FLOAT) device_desc->height;
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = 0;
+    vp.TopLeftY = 0;
+    d3ddevice_context->RSSetViewports( 1, &vp );
+
+	return S_OK;
 }
-
-/*
-* Name: ke_uninitialize_default_shaders
-* Desc:
-*/
-void ke_d3d11_uninitialize_default_shaders()
+#else
+bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 {
-	
+	/* Initialize Direct3D11 */
+	uint32_t flags = 0;
+	D3D_FEATURE_LEVEL feature_levels[] = 
+	{
+		D3D_FEATURE_LEVEL_12_1,
+		D3D_FEATURE_LEVEL_12_0,
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1
+	};
+
+	int feature_level_count = ARRAYSIZE( feature_levels );
+
+#ifdef _DEBUG
+	flags = D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
+	swapchain_desc.BufferCount = renderdevice_desc->buffer_count;
+    swapchain_desc.BufferDesc.Width = renderdevice_desc->width;
+    swapchain_desc.BufferDesc.Height = renderdevice_desc->height;
+    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    swapchain_desc.BufferDesc.RefreshRate.Numerator = renderdevice_desc->refresh_rate;
+    swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
+    swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapchain_desc.OutputWindow = GetActiveWindow();
+    swapchain_desc.SampleDesc.Count = 1;
+    swapchain_desc.SampleDesc.Quality = 0;
+    swapchain_desc.Windowed = !renderdevice_desc->fullscreen;
+
+	hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
+		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
+	if( FAILED( hr ) )
+		D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
+
+	/* Create our render target view */
+	ID3D11Texture2D* back_buffer = NULL;
+    hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
+    if( FAILED( hr ) )
+        D3D_DISPDBG_RB( KE_ERROR, "Error getting back buffer!", hr );
+
+    hr = d3ddevice->CreateRenderTargetView( back_buffer, NULL, &d3d_render_target_view );
+    //back_buffer = 0;
+	back_buffer->Release();
+    if( FAILED( hr ) )
+        D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
+
+    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view, NULL );
+
+    /* Setup the viewport */
+    D3D11_VIEWPORT vp;
+    vp.Width = (FLOAT) renderdevice_desc->width;
+    vp.Height = (FLOAT) renderdevice_desc->height;
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = 0;
+    vp.TopLeftY = 0;
+    d3ddevice_context->RSSetViewports( 1, &vp );
+
+	/* Get DXGI output */
+	if( FAILED( hr = dxgi_swap_chain->GetContainingOutput( &dxgi_output ) ) )
+	{
+		DISPDBG( KE_WARNING, "IDXGISwapChain::GetContainingOutput returned (0x" + hr + ")" );
+		dxgi_output = nullptr;
+	}
+
+	return S_OK;
 }
+#endif
+
 
 /*
 * Name: IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice
@@ -260,11 +437,13 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 		device_desc->device_type == KE_RENDERDEVICE_OGLES3 || device_desc->device_type == KE_RENDERDEVICE_OGL4 )
 		return;
 
+#ifndef _UWP
 #if defined(USE_DDRAW_VMEM) || defined(USE_DDRAW_VBLANK)
 	/* Create a DirectDraw object if desired */
 	HRESULT hr = DirectDrawCreateEx( NULL, (void**) &dd, IID_IDirectDraw7, NULL );
 	if( FAILED( hr ) )
 		D3D_DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!", hr );
+#endif
 #endif
 
 	/* Initialize SDL video */
@@ -277,73 +456,13 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 	if( !window )
 		 DISPDBG_R( KE_ERROR, "Error creating SDL window!" );
 
-	/* Initialize Direct3D11 */
-	uint32_t flags = 0;
-	D3D_FEATURE_LEVEL feature_levels[] = 
-	{
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0,
-		D3D_FEATURE_LEVEL_9_3,
-		D3D_FEATURE_LEVEL_9_2,
-		D3D_FEATURE_LEVEL_9_1
-	};
-
-	int feature_level_count = ARRAYSIZE( feature_levels );
-
-#ifdef _DEBUG
-	flags = D3D11_CREATE_DEVICE_DEBUG;
+	/* Initialize Direct3D11 for the appropriate platform */
+	bool ret = 
+#ifdef _UWP
+		PVT_InitializeDirect3DUWP();
+#else
+		PVT_InitializeDirect3DWin32();
 #endif
-
-	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
-	swapchain_desc.BufferCount = renderdevice_desc->buffer_count;
-    swapchain_desc.BufferDesc.Width = renderdevice_desc->width;
-    swapchain_desc.BufferDesc.Height = renderdevice_desc->height;
-    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    swapchain_desc.BufferDesc.RefreshRate.Numerator = renderdevice_desc->refresh_rate;
-    swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
-    swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapchain_desc.OutputWindow = GetActiveWindow();
-    swapchain_desc.SampleDesc.Count = 1;
-    swapchain_desc.SampleDesc.Quality = 0;
-    swapchain_desc.Windowed = !renderdevice_desc->fullscreen;
-
-	hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
-		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
-	if( FAILED( hr ) )
-		D3D_DISPDBG_R( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
-
-	/* Create our render target view */
-	ID3D11Texture2D* back_buffer = NULL;
-    hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
-    if( FAILED( hr ) )
-        D3D_DISPDBG_R( KE_ERROR, "Error getting back buffer!", hr );
-
-    hr = d3ddevice->CreateRenderTargetView( back_buffer, NULL, &d3d_render_target_view );
-    //back_buffer = 0;
-	back_buffer->Release();
-    if( FAILED( hr ) )
-        D3D_DISPDBG_R( KE_ERROR, "Error creating render target view!", hr );
-
-    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view, NULL );
-
-    /* Setup the viewport */
-    D3D11_VIEWPORT vp;
-    vp.Width = (FLOAT) renderdevice_desc->width;
-    vp.Height = (FLOAT) renderdevice_desc->height;
-    vp.MinDepth = 0.0f;
-    vp.MaxDepth = 1.0f;
-    vp.TopLeftX = 0;
-    vp.TopLeftY = 0;
-    d3ddevice_context->RSSetViewports( 1, &vp );
-
-	/* Get DXGI output */
-	if( FAILED( hr = dxgi_swap_chain->GetContainingOutput( &dxgi_output ) ) )
-	{
-		DISPDBG( KE_WARNING, "IDXGISwapChain::GetContainingOutput returned (0x" + hr );
-		dxgi_output = nullptr;
-	}
 
 	/* Set vertex attributes to their defaults */
 	current_vertexattribute[0].index = 0;
@@ -373,10 +492,7 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 {
 	delete device_desc;
 
-	/* Kill the default vertex and fragment program */
-	ke_d3d11_uninitialize_default_shaders();
-
-	/* Uninitialize and close Direct3D and SDL */
+	/* Uninitialize and close Direct3D and SDL video */
 	
 	dxgi_output = 0;
 	d3ddevice_context->ClearState();
@@ -389,7 +505,7 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 	SDL_QuitSubSystem( SDL_INIT_VIDEO );
 
 	/* Uninitialize DirectDraw */
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_UWP)
 	dd = 0;
 #endif
 }
@@ -672,10 +788,10 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 	D3D11_INPUT_ELEMENT_DESC* layout = NULL;
 	int layout_size = 0;
 	DXGI_FORMAT fmt;
-	DWORD shader_flags = D3D10_SHADER_ENABLE_STRICTNESS;
+	DWORD shader_flags = D3DCOMPILE_ENABLE_STRICTNESS;
 
 #ifdef _DEBUG
-	shader_flags |= D3D10_SHADER_DEBUG;
+	shader_flags |= D3DCOMPILE_DEBUG;
 #endif
 
 	/* Allocate new GPU program */
@@ -720,7 +836,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		ID3D10Blob* blob_shader = NULL;
 		ID3D10Blob* blob_error = NULL;
 
-		HRESULT hr = D3DCompile( vertex_shader, lstrlenA( vertex_shader ) + 1, "vs_main", NULL, NULL, "vs_main", 
+		HRESULT hr = D3DCompile( vertex_shader, strlen( vertex_shader ) + 1, "vs_main", NULL, NULL, "vs_main", 
                      "vs_4_0", shader_flags, 0, &blob_shader, &blob_error );
 		if( FAILED( hr ) )
 		{
@@ -755,7 +871,7 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		}
 
 		/* Create pixel shader */
-		hr = D3DCompile( fragment_shader, lstrlenA( fragment_shader ) + 1, "ps_main", NULL, NULL, "ps_main", 
+		hr = D3DCompile( fragment_shader, strlen( fragment_shader ) + 1, "ps_main", NULL, NULL, "ps_main", 
                      "ps_4_0", shader_flags, 0, &blob_shader, &blob_error );
 		if( FAILED( hr ) )
 		{
@@ -2063,7 +2179,7 @@ void IKeDirect3D11RenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
 */
 void IKeDirect3D11RenderDevice::BlockUntilVerticalBlank()
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_UWP)
  #ifdef USE_DDRAW_VBLANK
 	dd->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
 	return;
@@ -2300,10 +2416,14 @@ bool IKeDirect3D11RenderDevice::IsFence( IKeFence* fence )
  */
 void IKeDirect3D11RenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory )
 {
-#ifdef _WIN32
- #ifdef USE_DDRAW_VMEM
+#ifdef _UWP
+	DISPDBG( KE_ERROR, "Not yet implemented for UWP!" );
+#else
+ #ifdef _WIN32
+  #ifdef USE_DDRAW_VMEM
 	DDSCAPS2 caps;
 	dd->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
+  #endif
  #endif
 #endif
 }

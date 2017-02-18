@@ -31,7 +31,10 @@
  */
 #define _ComPtr(_interface)	_com_ptr_t<_com_IIID<_interface, __uuidof(_interface)>>
 
+#ifndef _UWP	/* For Desktop Windows only */
 typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>							CDirectDraw7;
+#endif
+
 typedef _com_ptr_t<_com_IIID<ID3D11Device, &IID_ID3D11Device>>							CD3D11Device;
 typedef _com_ptr_t<_com_IIID<ID3D11Device1, &IID_ID3D11Device1>>						CD3D11Device1;
 typedef _com_ptr_t<_com_IIID<ID3D11Device2, &IID_ID3D11Device2>>						CD3D11Device2;
@@ -42,6 +45,14 @@ typedef _com_ptr_t<_com_IIID<IDXGISwapChain, &IID_IDXGISwapChain>>						CDXGISwa
 typedef _com_ptr_t<_com_IIID<IDXGISwapChain1, &IID_IDXGISwapChain1>>					CDXGISwapChain1;
 typedef _com_ptr_t<_com_IIID<IDXGIOutput, &IID_IDXGIOutput>>							CDXGIOutput;
 typedef _com_ptr_t<_com_IIID<IDXGIOutput1, &IID_IDXGIOutput1>>							CDXGIOutput1;
+typedef _com_ptr_t<_com_IIID<IDXGIDevice, &IID_IDXGIDevice>>							CDXGIDevice;
+typedef _com_ptr_t<_com_IIID<IDXGIDevice1, &IID_IDXGIDevice1>>							CDXGIDevice1;
+typedef _com_ptr_t<_com_IIID<IDXGIDevice2, &IID_IDXGIDevice2>>							CDXGIDevice2;
+typedef _com_ptr_t<_com_IIID<IDXGIDevice3, &IID_IDXGIDevice3>>							CDXGIDevice3;
+typedef _com_ptr_t<_com_IIID<IDXGIAdapter, &IID_IDXGIAdapter>>							CDXGIAdapter;
+typedef _com_ptr_t<_com_IIID<IDXGIFactory, &IID_IDXGIFactory>>							CDXGIFactory;
+typedef _com_ptr_t<_com_IIID<IDXGIFactory1, &IID_IDXGIFactory1>>						CDXGIFactory1;
+typedef _com_ptr_t<_com_IIID<IDXGIFactory2, &IID_IDXGIFactory2>>						CDXGIFactory2;
 typedef _com_ptr_t<_com_IIID<ID3D11RenderTargetView, &IID_ID3D11RenderTargetView>>		CD3D11RenderTargetView;
 typedef _com_ptr_t<_com_IIID<ID3D11DepthStencilView, &IID_ID3D11DepthStencilView>>		CD3D11DepthStencilView;
 typedef _com_ptr_t<_com_IIID<ID3D11Buffer, &IID_ID3D11Buffer>>							CD3D11Buffer;
@@ -322,16 +333,16 @@ public:
 	virtual void BlockUntilIdle();
 	virtual void Kick();
 	virtual bool CreateFence( IKeFence** fence, uint32_t flags );
-#if 0
-	virtual bool InsertFence( IKeFence** fence );
-	virtual bool TestFence( IKeFence* fence );
-	virtual void BlockOnFence( IKeFence* fence );
-	virtual void DeleteFence( IKeFence* fence );
-	virtual bool IsFence( IKeFence* fence );
-#endif
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory );
+
+protected:
+#ifdef _UWP
+	bool PVT_InitializeDirect3DUWP();
+#else
+	bool PVT_InitializeDirect3DWin32();
+#endif
 
 protected:
 	SDL_Window*						window;
@@ -339,13 +350,27 @@ protected:
 	D3D_FEATURE_LEVEL				feature_level;
 	CD3D11Device					d3ddevice;
 	CD3D11DeviceContext				d3ddevice_context;
+#ifdef _UWP
+	CDXGISwapChain1					dxgi_swap_chain;
+#else
 	CDXGISwapChain					dxgi_swap_chain; 
+#endif
 	CDXGIOutput						dxgi_output;
 	CD3D11RenderTargetView			d3d_render_target_view;
 	CD3D11DepthStencilView			d3d_depth_stencil_view;
+#ifdef _UWP
+	DXGI_SWAP_CHAIN_DESC1			swapchain_desc;
+#else
 	DXGI_SWAP_CHAIN_DESC			swapchain_desc;
+#endif
 	int								swap_interval;
+#ifndef _UWP
 	CDirectDraw7					dd;
+#else
+	CDXGIDevice2					dxgi_device;
+	CDXGIAdapter					dxgi_adapter;
+	CDXGIFactory2					dxgi_factory;
+#endif
 	uint32_t						im_cache_size;
     IKeGeometryBuffer*				im_gb;
 };
