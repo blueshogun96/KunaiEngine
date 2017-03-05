@@ -533,11 +533,16 @@ bool IKeOpenGLRenderDevice::PVT_InititalizeDriverHooks()
 
 void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankDDraw()
 {
+#ifdef _WIN32
 	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+#else
+    DISPDBG( KE_ERROR, "This function should never be called outside of Windows!" );
+#endif
 }
 
 void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankD3DKMT()
 {
+#ifdef _WIN32
 	D3DKMT_OPENADAPTERFROMHDC oa;
 
 	/* For now, we only care about the active window */
@@ -554,6 +559,9 @@ void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankD3DKMT()
 
 		pfnD3DKMTWaitForVerticalBlankEvent( &we );
 	}
+#else
+    DISPDBG( KE_ERROR, "This function should never be called outside of Windows!" );
+#endif
 }
 
 void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankDefault()
