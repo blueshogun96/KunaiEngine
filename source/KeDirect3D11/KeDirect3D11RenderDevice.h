@@ -43,6 +43,8 @@ typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext1, &IID_ID3D11DeviceContext1>>		
 typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext2, &IID_ID3D11DeviceContext2>>			CD3D11DeviceContext2;
 typedef _com_ptr_t<_com_IIID<IDXGISwapChain, &IID_IDXGISwapChain>>						CDXGISwapChain;
 typedef _com_ptr_t<_com_IIID<IDXGISwapChain1, &IID_IDXGISwapChain1>>					CDXGISwapChain1;
+typedef _com_ptr_t<_com_IIID<IDXGISwapChain2, &IID_IDXGISwapChain2>>					CDXGISwapChain2;
+typedef _com_ptr_t<_com_IIID<IDXGISwapChainMedia, &IID_IDXGISwapChainMedia>>			CDXGISwapChainMedia;
 typedef _com_ptr_t<_com_IIID<IDXGIOutput, &IID_IDXGIOutput>>							CDXGIOutput;
 typedef _com_ptr_t<_com_IIID<IDXGIOutput1, &IID_IDXGIOutput1>>							CDXGIOutput1;
 typedef _com_ptr_t<_com_IIID<IDXGIDevice, &IID_IDXGIDevice>>							CDXGIDevice;

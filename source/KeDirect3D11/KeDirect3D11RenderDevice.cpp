@@ -217,8 +217,10 @@ std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 {
 	switch( feature )
 	{
+#ifdef _UWP	/* TODO: Win32 */
 	case D3D_FEATURE_LEVEL_12_1: return "12.1";
 	case D3D_FEATURE_LEVEL_12_0: return "12.0";
+#endif
 	case D3D_FEATURE_LEVEL_11_1: return "11.1";
 	case D3D_FEATURE_LEVEL_11_0: return "11.0";
 	case D3D_FEATURE_LEVEL_10_1: return "10.1";
@@ -328,8 +330,10 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	uint32_t flags = 0;
 	D3D_FEATURE_LEVEL feature_levels[] = 
 	{
+#ifdef _UWP /* TODO: Win32 */
 		D3D_FEATURE_LEVEL_12_1,
 		D3D_FEATURE_LEVEL_12_0,
+#endif
 		D3D_FEATURE_LEVEL_11_1,
 		D3D_FEATURE_LEVEL_11_0,
 		D3D_FEATURE_LEVEL_10_1,
@@ -346,19 +350,19 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 #endif
 
 	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
-	swapchain_desc.BufferCount = renderdevice_desc->buffer_count;
-    swapchain_desc.BufferDesc.Width = renderdevice_desc->width;
-    swapchain_desc.BufferDesc.Height = renderdevice_desc->height;
+	swapchain_desc.BufferCount = device_desc->buffer_count;
+    swapchain_desc.BufferDesc.Width = device_desc->width;
+    swapchain_desc.BufferDesc.Height = device_desc->height;
     swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    swapchain_desc.BufferDesc.RefreshRate.Numerator = renderdevice_desc->refresh_rate;
+    swapchain_desc.BufferDesc.RefreshRate.Numerator = device_desc->refresh_rate;
     swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchain_desc.OutputWindow = GetActiveWindow();
     swapchain_desc.SampleDesc.Count = 1;
     swapchain_desc.SampleDesc.Quality = 0;
-    swapchain_desc.Windowed = !renderdevice_desc->fullscreen;
+    swapchain_desc.Windowed = !device_desc->fullscreen;
 
-	hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
+	HRESULT hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
 		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
 	if( FAILED( hr ) )
 		D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
@@ -379,8 +383,8 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 
     /* Setup the viewport */
     D3D11_VIEWPORT vp;
-    vp.Width = (FLOAT) renderdevice_desc->width;
-    vp.Height = (FLOAT) renderdevice_desc->height;
+    vp.Width = (FLOAT) device_desc->width;
+    vp.Height = (FLOAT) device_desc->height;
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0;
@@ -390,7 +394,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	/* Get DXGI output */
 	if( FAILED( hr = dxgi_swap_chain->GetContainingOutput( &dxgi_output ) ) )
 	{
-		DISPDBG( KE_WARNING, "IDXGISwapChain::GetContainingOutput returned (0x" + hr + ")" );
+		DISPDBG( KE_WARNING, "IDXGISwapChain::GetContainingOutput returned (0x" << hr << ")" );
 		dxgi_output = nullptr;
 	}
 
@@ -2173,27 +2177,23 @@ void IKeDirect3D11RenderDevice::GetProjectionMatrix( nv::matrix4f* projection )
 /*
 * Name: IKeDirect3D11RenderDevice::block_until_vertical_blank
 * Desc: Stalls the current thread for an interval equivalent to one
-*       vertical blank. This function does not sync to the actual vertical blank
-*       as I have not found a way to do this on any platform besides Windows.
-*       This is also thread safe.
+*       vertical blank.
+* TODO: Check for thread safety
 */
 void IKeDirect3D11RenderDevice::BlockUntilVerticalBlank()
 {
-#if defined(_WIN32) && !defined(_UWP)
- #ifdef USE_DDRAW_VBLANK
-	dd->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
-	return;
- #endif
-#endif
+	HRESULT hr = dxgi_output->WaitForVBlank();
 
-	SDL_DisplayMode display_mode;
+	D3D_DISPDBG( KE_WARNING, "Error blocking current thread until vertical blank!", hr );
 
-	/* Get the current display mode */
-	/* TODO: Get display mode based on windowed or fullscreen mode. */
-	SDL_GetWindowDisplayMode(window, &display_mode);
-
-	/* Stall this thread for 1000/refresh_rate milliseconds */
-	SDL_Delay( 1000 / display_mode.refresh_rate );
+	/* Direct3D 11.2 and later allows you to get the Vertical Blank interrupt handle directly */
+	/* Must remember to set the DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT flag first and acquire a
+	   COM pointer to a IDXGISwapChain2 interface */
+	/*HANDLE hVBlank = dxgi_swap_chain->GetFrameLatencyWaitableObject();
+	if( hVBlank )
+	{
+		WaitForSingleObjectEx( hVBlank, INFINITE, FALSE );
+	}*/
 }
 
 

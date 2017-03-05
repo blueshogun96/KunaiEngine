@@ -24,7 +24,12 @@ int main( Platform::Array<Platform::String^>^ args )
 {
 	std::vector<std::string> vargs;
 
-	/* TODO: */
+	vargs.reserve( args->Length );
+	for( unsigned int i = 0; i < args->Length; i++ )
+	{
+		std::wstring wstr( args[i]->Data() );
+		vargs.push_back( std::string( wstr.begin(), wstr.end() ) );
+	}
 
 	return KeMain( vargs );
 }
@@ -33,6 +38,19 @@ int main( Platform::Array<Platform::String^>^ args )
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow )
 {
 	std::vector<std::string> vargs;
+	int argcnt = 0;
+	LPWSTR* cmdargs = CommandLineToArgvW( GetCommandLineW(), &argcnt );
+
+	if( cmdargs != NULL )
+	{
+		vargs.reserve( argcnt );
+
+		for( int i = 0; i < argcnt; i++ )
+		{
+			std::wstring wstr( cmdargs[i] );
+			vargs.push_back( std::string( wstr.begin(), wstr.end() ) );
+		}
+	}
 
 	return KeMain( vargs );
 }

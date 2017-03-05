@@ -16,7 +16,7 @@
 #endif
 
 /*
- * DirectDraw stuff
+ * DirectDraw and D3DKMT stuff
  */
 #ifdef _WIN32
 #define USE_DDRAW_VMEM			/* Not guaranteed to be accurate on modern hardware */

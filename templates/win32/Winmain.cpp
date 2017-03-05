@@ -1,8 +1,6 @@
 #include <Ke.h>
 #include <KeSystem.h>
 
-#include <vector>
-
 
 
 int KeMain( std::vector<std::string> args )
