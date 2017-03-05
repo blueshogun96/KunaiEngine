@@ -65,8 +65,10 @@
 #endif
 
 /* Windows phone or Surface */
+#ifdef _WIN32
 #if ( WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP )
 #define __MOBILE_OS__
+#endif
 #endif
 
 #ifdef _WIN32
