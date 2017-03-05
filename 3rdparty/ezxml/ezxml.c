@@ -24,6 +24,8 @@
 
 #ifdef _WIN32
 #define EZXML_NOMMAP
+#else
+#define _strdup strdup
 #endif
 
 #include <stdlib.h>
