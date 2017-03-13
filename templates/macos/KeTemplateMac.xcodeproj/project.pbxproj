@@ -464,6 +464,8 @@
 		CDDD37371E6D7F2C00E0DCD6 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDD37361E6D7F2C00E0DCD6 /* MetalKit.framework */; };
 		CDDD37391E6D7F7700E0DCD6 /* libLeap.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = CDDD37381E6D7F7700E0DCD6 /* libLeap.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CDDD373A1E6D7FBA00E0DCD6 /* libLeap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDD37381E6D7F7700E0DCD6 /* libLeap.dylib */; };
+		CDDD373D1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CDDD373B1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.cpp */; };
+		CDDD37401E6E297300E0DCD6 /* KeDemoApplication.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CDDD373E1E6E297300E0DCD6 /* KeDemoApplication.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1482,6 +1484,10 @@
 		CDDD37341E6D7F2000E0DCD6 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		CDDD37361E6D7F2C00E0DCD6 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		CDDD37381E6D7F7700E0DCD6 /* libLeap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLeap.dylib; path = "../../libraries/osx/LeapSDK/lib/libc++/libLeap.dylib"; sourceTree = "<group>"; };
+		CDDD373B1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KeBaseApplicationTemplate.cpp; path = ../../src/KeBaseApplicationTemplate.cpp; sourceTree = "<group>"; };
+		CDDD373C1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = KeBaseApplicationTemplate.hpp; path = ../../src/KeBaseApplicationTemplate.hpp; sourceTree = "<group>"; };
+		CDDD373E1E6E297300E0DCD6 /* KeDemoApplication.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeDemoApplication.cpp; sourceTree = "<group>"; };
+		CDDD373F1E6E297300E0DCD6 /* KeDemoApplication.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = KeDemoApplication.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1560,6 +1566,10 @@
 			isa = PBXGroup;
 			children = (
 				CDC6ACD41E6C2616003655B0 /* Main.cpp */,
+				CDDD373B1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.cpp */,
+				CDDD373C1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.hpp */,
+				CDDD373E1E6E297300E0DCD6 /* KeDemoApplication.cpp */,
+				CDDD373F1E6E297300E0DCD6 /* KeDemoApplication.hpp */,
 			);
 			name = Game;
 			sourceTree = "<group>";
@@ -3109,6 +3119,7 @@
 				CDC6ADB21E6C95C3003655B0 /* as_objecttype.cpp in Sources */,
 				CDC6AFEB1E6C9729003655B0 /* PlyLoader.cpp in Sources */,
 				CDC6ADDA1E6C9661003655B0 /* OpenDDLParser.cpp in Sources */,
+				CDDD373D1E6E281A00E0DCD6 /* KeBaseApplicationTemplate.cpp in Sources */,
 				CDC6B1F21E6C9A53003655B0 /* Recast.cpp in Sources */,
 				CDC6AFB81E6C9729003655B0 /* GenVertexNormalsProcess.cpp in Sources */,
 				CDC6AD211E6C268B003655B0 /* KePhysics.cpp in Sources */,
@@ -3349,6 +3360,7 @@
 				CDC6B1FB1E6C9A53003655B0 /* RecastRegion.cpp in Sources */,
 				CDC6AFF51E6C9729003655B0 /* RemoveComments.cpp in Sources */,
 				CDC6ADB71E6C95C3003655B0 /* as_scriptengine.cpp in Sources */,
+				CDDD37401E6E297300E0DCD6 /* KeDemoApplication.cpp in Sources */,
 				CDC6B2BB1E6C9B58003655B0 /* mmxidct.c in Sources */,
 				CDC6AFEC1E6C9729003655B0 /* PlyParser.cpp in Sources */,
 				CDC6AFBD1E6C9729003655B0 /* IFCLoader.cpp in Sources */,

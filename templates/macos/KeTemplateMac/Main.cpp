@@ -6,11 +6,13 @@
 //  Copyright © 2017 Shogun3D. All rights reserved.
 //
 
-#include <Ke.h>
-#include <KeSystem.h>
+#include "KeDemoApplication.hpp"
 
 
 int KeMain( std::vector<std::string> args )
 {
+    std::unique_ptr<CKeDemoApplication> App( new CKeDemoApplication );
+    App->Run();
+    
     return 0;
 }
