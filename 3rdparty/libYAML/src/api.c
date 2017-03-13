@@ -1,6 +1,10 @@
 
 #include "yaml_private.h"
 
+#ifndef _WIN32
+#define _strdup strdup
+#endif
+
 /*
  * Get the library version.
  */
