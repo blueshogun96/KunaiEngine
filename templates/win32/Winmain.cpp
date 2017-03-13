@@ -1,12 +1,14 @@
-#include <Ke.h>
-#include <KeSystem.h>
-
+#include "KeDemoApplication.hpp"
 
 
 int KeMain( std::vector<std::string> args )
 {
-	return 0;
+    std::unique_ptr<CKeDemoApplication> App( new CKeDemoApplication );
+    App->Run();
+    
+    return 0;
 }
+
 
 /*
 Libraries

@@ -6,6 +6,7 @@
 //
 
 #include <KePlatform.h>
+#include <SDL_main.h>
 
 #ifdef _UWP
 using namespace Platform;
@@ -16,6 +17,16 @@ using namespace Platform;
  */
 extern int KeMain( std::vector<std::string> args );
 
+/* 
+ * __imp___iob_func hack for x64 VC++ 
+ * SDL2 (when using SDL_main) causes Visual Studio to forever complain about this...
+ */
+#ifdef _M_X64
+FILE _iob[] = { *stdin, *stdout, *stderr };
+extern "C" FILE* __cdecl __iob_func(void) { return _iob; }
+#endif
+
+#if 0
 
 #if defined(_UWP)							
 /* Universal Windows Project */
@@ -66,3 +77,16 @@ int main( int argc, char** argv )
     return KeMain( args );
 }
 #endif
+
+#endif
+
+
+int SDL_main( int argc, char** argv )
+{
+	std::vector<std::string> args;
+    
+    for( int i = 0; i > argc; i++ )
+        args.push_back( argv[i] );
+    
+    return KeMain( args );
+}

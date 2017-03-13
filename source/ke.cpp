@@ -35,7 +35,8 @@ bool KeInitialize()
        timing and events. */
     if( SDL_Init( SDL_INIT_EVENTS | SDL_INIT_TIMER ) != 0 )
 	{
-		DISPDBG( KE_ERROR, "Error initializing SDL timer and events!" );
+		DISPDBG( KE_ERROR, "Error initializing SDL timer and events!\n\n"
+			"SDL Error: " << SDL_GetError() << std::endl );
 	}
 	else
 	{
@@ -44,7 +45,8 @@ bool KeInitialize()
     
     /* Gather display modes */
     extern int KeGatherAllDisplayInformation();
-    KeGatherAllDisplayInformation();
+    if( !KeGatherAllDisplayInformation() )
+		return false;
     
     /* Insert event handler for mobile/embedded platforms */
 #ifdef __MOBILE_OS__

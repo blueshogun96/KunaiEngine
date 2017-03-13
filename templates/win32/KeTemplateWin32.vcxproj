@@ -109,7 +109,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>winmm.lib;pthreadVC2x64.lib;ws2_32.lib;ddraw.lib;dxguid.lib;d3d9.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;OpenGL32.lib;OpenAL32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;glew32.lib;nvapi64.lib;freetype255.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;pthreadVC2x64.lib;ws2_32.lib;ddraw.lib;dxguid.lib;d3d9.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;OpenGL32.lib;OpenAL32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;glew32.lib;nvapi64.lib;freetype255.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf-2.0.12\lib\x64;$(KunaiEngineLibraryDir)\SDL2-2.0.4\lib\x64;$(KunaiEngineLibraryDir)\glew-2.0.0\lib\Release\x64;$(KunaiEngineLibraryDir)\openal-soft-1.17.2-bin\libs\Win64;$(KunaiEngineLibraryDir)\pthreads-w32-2.91\lib\x64;$(KunaiEngineLibraryDir)\SDL2_image-2.0.1\lib\x64;$(KunaiEngineLibraryDir)\nvapi\amd64;$(KunaiEngineLibraryDir)\freetype2\lib\x64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -150,7 +150,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>winmm.lib;pthreadVC2x64.lib;ws2_32.lib;ddraw.lib;dxguid.lib;d3d9.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;OpenGL32.lib;OpenAL32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;glew32.lib;nvapi64.lib;freetype255.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;pthreadVC2x64.lib;ws2_32.lib;ddraw.lib;dxguid.lib;d3d9.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;OpenGL32.lib;OpenAL32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;glew32.lib;nvapi64.lib;freetype255.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf-2.0.12\lib\x64;$(KunaiEngineLibraryDir)\SDL2-2.0.4\lib\x64;$(KunaiEngineLibraryDir)\glew-2.0.0\lib\Release\x64;$(KunaiEngineLibraryDir)\openal-soft-1.17.2-bin\libs\Win64;$(KunaiEngineLibraryDir)\pthreads-w32-2.91\lib\x64;$(KunaiEngineLibraryDir)\SDL2_image-2.0.1\lib\x64;$(KunaiEngineLibraryDir)\nvapi\amd64;$(KunaiEngineLibraryDir)\freetype2\lib\x64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -615,6 +615,8 @@
     <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2AudioEffect.cpp" />
     <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2SoundBuffer.cpp" />
     <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2SoundStream.cpp" />
+    <ClCompile Include="..\src\KeBaseApplicationTemplate.cpp" />
+    <ClCompile Include="KeDemoApplication.cpp" />
     <ClCompile Include="Winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1115,6 +1117,8 @@
     <ClInclude Include="..\..\source\KeUnknown.h" />
     <ClInclude Include="..\..\source\KeWin32Util.h" />
     <ClInclude Include="..\..\source\KeXAudio2\KeXAudio2AudioDevice.h" />
+    <ClInclude Include="..\src\KeBaseApplicationTemplate.hpp" />
+    <ClInclude Include="KeDemoApplication.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\3rdparty\assimp\code\BlenderDNA.inl" />

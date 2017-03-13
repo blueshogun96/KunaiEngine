@@ -258,12 +258,27 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	int feature_level_count = ARRAYSIZE( feature_levels );
 
 #ifdef _DEBUG
-	flags = D3D11_CREATE_DEVICE_DEBUG;
+	flags |= D3D11_CREATE_DEVICE_DEBUG;  // Comment this out when D3D11CreateDevice fails with 0x887A002D (DXGI_ERROR_SDK_COMPONENT_MISSING)
 #endif
 
 	HRESULT hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
-		D3D11_SDK_VERSION, &d3ddevice, nullptr, &d3ddevice_context );
+		D3D11_SDK_VERSION, &d3ddevice, &feature_level, &d3ddevice_context );
+	
+#ifdef _DEBUG
+	/* If we are requesting a debug device, and we fail to get it, try again without the debug flag. */
+	if( hr == DXGI_ERROR_SDK_COMPONENT_MISSING )
+	{
+		DISPDBG( KE_WARNING, "Attempting to re-create the Direct3D device without debugging capabilities..." );
+
+		flags &= ~D3D11_CREATE_DEVICE_DEBUG;
+
+		hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
+			D3D11_SDK_VERSION, &d3ddevice, &feature_level, &d3ddevice_context );
+		D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
+	}
+#else
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
+#endif
 
 	/* 
 	 * Initialize swapchain 
@@ -272,7 +287,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	hr = d3ddevice->QueryInterface( &dxgi_device );
 	D3D_DISPDBG_RB( KE_ERROR, "Error querying DXGI device!", hr );
 
-	hr = d3ddevice->QueryInterface( &dxgi_adapter );
+	hr = dxgi_device->GetAdapter( &dxgi_adapter );
 	D3D_DISPDBG_RB( KE_ERROR, "Error querying DXGI adapter!", hr );
 
 	hr = dxgi_adapter->GetParent( __uuidof( IDXGIFactory2 ), (void**) &dxgi_factory );

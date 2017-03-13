@@ -47,6 +47,7 @@ void (*pfnKeAppWillEnterBackground)( void* ) = NULL;
 void (*pfnKeAppDidEnterBackground)( void* ) = NULL;
 void (*pfnKeAppWillEnterForeground)( void* ) = NULL;
 void (*pfnKeAppDidEnterForeground)( void* ) = NULL;
+void (*pfnKeWindowResize)( void*, int, int ) = NULL;
 void* pKeContext = NULL;
 
 
@@ -138,6 +139,15 @@ void KeProcessEvents()
 			case SDL_JOYDEVICEREMOVED:
 				KeOnJoystickRemoved( event.jdevice.which );
 				break;
+
+			case SDL_WINDOWEVENT:
+				switch( event.window.event )
+				{
+					case SDL_WINDOWEVENT_RESIZED:
+					case SDL_WINDOWEVENT_SIZE_CHANGED:
+						KeOnWindowResize( KeGetContextPointer(), event.window.data1, event.window.data2 );
+						break;
+				}
         }
     }
     
@@ -336,6 +346,15 @@ void KeSetAppDidEnterForegroundCallback( void (*callback)(void*) )
 }
 
 /*
+ * Name: KeSetWindowResizeCallback
+ * Desc: 
+ */
+void KeSetWindowResizeCallback( void (*callback)(void*, int, int ) )
+{
+	pfnKeWindowResize = callback;
+}
+
+/*
  * Name: KeOnInitialize
  * Desc: Called when the app is being initialized.
  */
@@ -383,6 +402,16 @@ void KeOnGamepad( void* context, void* input_context )
 {
     if( pfnKeGamepad )
         pfnKeGamepad( context, input_context );
+}
+
+/*
+ * Name: KeOnWindowResize
+ * Desc:
+ */
+void KeOnWindowResize( void* context, int width, int height )
+{
+    if( pfnKeWindowResize )
+        pfnKeWindowResize( context, width, height );
 }
 
 /*
@@ -577,7 +606,11 @@ int KeGatherAllDisplayInformation()
     /* Initialize the video subsystem for a minute */
     int res = SDL_InitSubSystem( SDL_INIT_VIDEO );
     if( res == -1 )
+	{
+		DISPDBG( KE_ERROR, "Error initializing video subsystem!\n\n"
+			"SDL Error: " << SDL_GetError() << std::endl );
         return No;
+	}
     
     /* Get the number of displays available for this platform */
     display_count = SDL_GetNumVideoDisplays();

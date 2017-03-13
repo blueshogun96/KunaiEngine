@@ -78,6 +78,7 @@ void KeSetAppWillEnterBackgroundCallback( void (*callback)(void*) );
 void KeSetAppDidEnterBackgroundCallback( void (*callback)(void*) );
 void KeSetAppWillEnterForegroundCallback( void (*callback)(void*) );
 void KeSetAppDidEnterForegroundCallback( void (*callback)(void*) );
+void KeSetWindowResizeCallback( void (*callback)(void*, int, int) );
 
 void KeSetContextPointer( void* context_pointer );
 void* KeGetContextPointer();
@@ -86,6 +87,7 @@ void KeOnUnintialize( void* context );
 void KeOnKeyboard( void* context, void* input_context );
 void KeOnMouse( void* context, void* input_context );
 void KeOnGamepad( void* context, void* input_context );
+void KeOnWindowResize( void* context, int width, int height );
 
 void KeResetKeys();
 void KeResetMouse();

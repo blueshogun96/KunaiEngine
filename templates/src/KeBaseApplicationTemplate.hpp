@@ -25,6 +25,16 @@ public:
     
 public:
     virtual void Run() PURE;
+
+	virtual void OnResize( int width, int height )
+	{
+		nv::matrix4f projection;
+
+		nv::perspective( projection, 45.0f, float( width/height ), 0.1f, 1000.0f );
+
+		m_pRenderDevice->SetProjectionMatrix( &projection );
+		m_pRenderDevice->SetViewport( 0, 0, width, height );
+	}
     
 protected:
     IKeRenderDevice*    m_pRenderDevice;

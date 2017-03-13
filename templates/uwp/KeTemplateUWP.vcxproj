@@ -834,6 +834,7 @@
     <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastMeshDetail.cpp" />
     <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastRasterization.cpp" />
     <ClCompile Include="..\..\3rdparty\recastnavigation\Recast\Source\RecastRegion.cpp" />
+    <ClCompile Include="..\..\3rdparty\SDL2\SDL_winrt_main_NonXAML.cpp" />
     <ClCompile Include="..\..\3rdparty\stb\stbi.c">
       <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsWinRT>
       <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsWinRT>
@@ -1376,6 +1377,8 @@
     <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2AudioEffect.cpp" />
     <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2SoundBuffer.cpp" />
     <ClCompile Include="..\..\source\KeXAudio2\KeXAudio2SoundStream.cpp" />
+    <ClCompile Include="..\src\KeBaseApplicationTemplate.cpp" />
+    <ClCompile Include="KeDemoApplication.cpp" />
     <ClCompile Include="UWPMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1901,6 +1904,8 @@
     <ClInclude Include="..\..\source\KeUnknown.h" />
     <ClInclude Include="..\..\source\KeUWPUtil.h" />
     <ClInclude Include="..\..\source\KeXAudio2\KeXAudio2AudioDevice.h" />
+    <ClInclude Include="..\src\KeBaseApplicationTemplate.hpp" />
+    <ClInclude Include="KeDemoApplication.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

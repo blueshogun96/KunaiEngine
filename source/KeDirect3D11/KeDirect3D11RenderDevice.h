@@ -369,7 +369,7 @@ protected:
 #ifndef _UWP
 	CDirectDraw7					dd;
 #else
-	CDXGIDevice2					dxgi_device;
+	CDXGIDevice3					dxgi_device;
 	CDXGIAdapter					dxgi_adapter;
 	CDXGIFactory2					dxgi_factory;
 #endif
