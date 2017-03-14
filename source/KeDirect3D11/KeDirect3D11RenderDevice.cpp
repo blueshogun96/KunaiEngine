@@ -274,11 +274,9 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 
 		hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
 			D3D11_SDK_VERSION, &d3ddevice, &feature_level, &d3ddevice_context );
-		D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
 	}
-#else
-	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
 #endif
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
 
 	/* 
 	 * Initialize swapchain 
@@ -379,22 +377,31 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 
 	HRESULT hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
 		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
-	if( FAILED( hr ) )
-		D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
+
+#ifdef _DEBUG
+	/* If we are requesting a debug device, and we fail to get it, try again without the debug flag. */
+	if( hr == DXGI_ERROR_SDK_COMPONENT_MISSING )
+	{
+		DISPDBG( KE_WARNING, "Attempting to re-create the Direct3D device without debugging capabilities..." );
+
+		flags &= ~D3D11_CREATE_DEVICE_DEBUG;
+
+		hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
+			D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );	
+	}
+#endif
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
 
 	/* Create our render target view */
 	ID3D11Texture2D* back_buffer = NULL;
     hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
-    if( FAILED( hr ) )
-        D3D_DISPDBG_RB( KE_ERROR, "Error getting back buffer!", hr );
+    D3D_DISPDBG_RB( KE_ERROR, "Error getting back buffer!", hr );
 
     hr = d3ddevice->CreateRenderTargetView( back_buffer, NULL, &d3d_render_target_view );
-    //back_buffer = 0;
 	back_buffer->Release();
-    if( FAILED( hr ) )
-        D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
+    D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
 
-    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view, NULL );
+    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), NULL );
 
     /* Setup the viewport */
     D3D11_VIEWPORT vp;
