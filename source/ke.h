@@ -32,4 +32,20 @@ void KeDestroyAudioDevice( IKeAudioDevice* device );
 IKeAudioDevice* KeGetAudioDevice( void );
 
 
+/*
+ * Namespaced API for those that want it
+ */
+namespace Ke
+{
+    bool (*Initialize)() = KeInitialize;
+    bool (*InitializeEx)( std::string, IKeRenderDevice**, IKeAudioDevice** ) = KeInitializeEx;
+    void (*Uninitialize)() = KeUninitialize;
+    bool (*CreateWindowAndDevice)( KeRenderDeviceDesc*, IKeRenderDevice** ) = KeCreateWindowAndDevice;
+    void (*DestroyWindowAndDevice)( IKeRenderDevice* ) = KeDestroyWindowAndDevice;
+    IKeRenderDevice* (*GetRenderDevice)() = KeGetRenderDevice;
+    bool (*CreateAudioDevice)( KeAudioDeviceDesc*, IKeAudioDevice** ) = KeCreateAudioDevice;
+    void (*DestroyAudioDevice)( IKeAudioDevice* device ) = KeDestroyAudioDevice;
+    IKeAudioDevice* (*GetAudioDevice)() = KeGetAudioDevice;
+}
+
 #endif /* defined(__ke__) */

@@ -64,4 +64,23 @@ int KeProjectVertex( nv::vec3f obj, nv::matrix4f modelview, nv::matrix4f project
 
 int KeUnProjectVertex( nv::matrix4f& modelview, nv::matrix4f& projection, int* viewport, nv::vec3f* win_coord, nv::vec3f* obj );
 
+
+/*
+ * Namespaced API
+ */
+namespace Ke
+{
+    namespace Frustum
+    {
+        void    (*Calculate)( nv::matrix4f, nv::matrix4f ) = KeCalculateFrustum;
+        bool    (*PointVisible)( nv::vec3f ) = KePointInFrustum;
+        float   (*SphereVisible)( nv::vec3f, float ) = KeSphereInFrustum;
+        bool    (*CubeVisible)( nv::vec3f, float ) = KeCubeInFrustum;
+        int     (*SphereVisibleEx)( nv::vec3f, float ) = KeSphereInFrustum2;
+        int     (*CubeVisibleEx)( nv::vec3f, float ) = KeCubeInFrustum2;
+        bool    (*PolygonVisible)( int , nv::vec3f* ) = KePolygonInFrustum;
+        int     (*ProjectVertex)( nv::vec3f, nv::matrix4f, nv::matrix4f, int*, nv::vec3f* ) = KeProjectVertex;
+        int     (*UnprojectVertex)( nv::matrix4f&, nv::matrix4f&, int*, nv::vec3f*, nv::vec3f* ) = KeUnProjectVertex;
+    }
+}
 #endif /* defined(__frustum__) */

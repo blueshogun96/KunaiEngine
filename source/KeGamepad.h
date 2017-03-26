@@ -98,3 +98,24 @@ bool KeGetJoystickState( int device_id, KeJoystickState* Joystick );
  * Desc: Returns the number of joysticks connected
  */
 int KeGetJoystickCount();
+
+
+/*
+ * Namespaced API
+ */
+namespace Ke
+{
+    namespace Gamepad
+    {
+        bool (*Initialize)() = KeInitializeGamepads;
+        void (*Uninitialize)() = KeUninitializeGamepads;
+        bool (*GetState)( int, KeGamepadState* ) = KeGetGamepadState;
+        int  (*GetCount)() = KeGetGamepadCount;
+    }
+    
+    namespace Joystick
+    {
+        bool (*GetState)( int, KeJoystickState* ) = KeGetJoystickState;
+        int  (*GetCount)() = KeGetJoystickCount;
+    }
+}

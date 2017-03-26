@@ -330,3 +330,22 @@ void KeCloseCompiledFontString( KeCompiledFontString* compiled_string );
  * Desc: Draws the string to the screen using it's own 2D coordinates.
  */
 void KeDrawCompiledFontString( KeCompiledFontString* compiled_string, int x, int y );
+
+
+/*
+ * Namespaced API
+ */
+namespace Ke
+{
+    namespace FontLibrary
+    {
+        bool (*Init)() = KeInitFontLibrary;
+        void (*Uninit)() = KeUninitFontLibrary;
+        bool (*OpenFont)( const char*, int, KeFont** ) = KeOpenFont;
+        bool (*OpenFontFromMemory)( void*, uint32_t, int, KeFont** ) = KeOpenFontFromMemory;
+        void (*CloseFont)( KeFont* ) = KeCloseFont;
+        bool (*CreateCompiledFontString)( const char*, uint32_t, IKeGpuProgram*, KeFont*, KeCompiledFontString** ) = KeCreateCompiledFontString;
+        void (*CloseCompiledFontString) = KeCloseCompiledFontString;
+        void (*DrawCompiledFontString) = KeDrawCompiledFontString;
+    }
+}

@@ -387,17 +387,17 @@ int KeUnProjectVertex( nv::matrix4f& modelview, nv::matrix4f& projection, int* v
     m = nv::inverse(A);
     
     //Transformation of normalized coordinates between -1 and 1
-    in.x = ( win_coord->x - (float)viewport[0] ) / (float)viewport[2] * 2.0 - 1.0;
-    in.y = ( win_coord->y - (float)viewport[1] ) / (float)viewport[3] * 2.0 - 1.0;
-    in.z = 2.0 * win_coord->z - 1.0;
-    in.w = 1.0;
+    in.x = ( win_coord->x - (float)viewport[0] ) / (float)viewport[2] * 2.0f - 1.0f;
+    in.y = ( win_coord->y - (float)viewport[1] ) / (float)viewport[3] * 2.0f - 1.0f;
+    in.z = 2.0f * win_coord->z - 1.0f;
+    in.w = 1.0f;
     
     //Objects coordinates
     out = m * in;
-    if( out.w == 0.0 )
+    if( out.w == 0.0f )
         return 0;
     
-    out.w = 1.0 / out.w;
+    out.w = 1.0f / out.w;
     obj->x = out.x * out.w;
     obj->y = out.y * out.w;
     obj->z = out.z * out.w;

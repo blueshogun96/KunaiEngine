@@ -140,6 +140,21 @@ protected:
 };
 
 
+/*
+ * Audio device creation function
+ */
 IKeAudioDevice* KeCreateAudioDevice( KeAudioDeviceDesc* audiodevice_desc );
+
+
+/*
+ * Namespaced API
+ */
+namespace Ke
+{
+    namespace Audio
+    {
+        IKeAudioDevice* (*CreateDevice)( KeAudioDeviceDesc* ) = KeCreateAudioDevice;
+    }
+}
 
 #endif /* defined(__ke_audiodevice__) */

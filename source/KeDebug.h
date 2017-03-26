@@ -30,3 +30,16 @@ void KeCallStackPop();
 #define _pushfn
 #define _popfn
 #endif
+
+
+/*
+ * Namespaced API
+ */
+namespace Ke
+{
+    namespace CallStaack
+    {
+        void (*Push)( std::string ) = KeCallStackPush;
+        void (*Pop)() = KeCallStackPop;
+    }
+}
