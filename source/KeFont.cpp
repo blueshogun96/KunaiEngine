@@ -105,7 +105,19 @@ bool KeOpenFontFromMemory( void* fontbuffer, uint32_t length, int size, KeFont**
 	return true;
 }
 
-
+/*
+ * Name: KeSetFontOutline
+ * Desc: Sets the width of the font outline in pixels (use 0 to set to normal)
+ */
+bool KeSetFontOutline( int outline, KeFont** font )
+{
+    if( !font )
+        return false;
+    
+    TTF_SetFontOutline( (*font)->font, outline );
+    
+    return true;
+}
 
 /*
  * Name: KeCloseFont
@@ -122,12 +134,48 @@ void KeCloseFont( KeFont* font )
 	}
 }
 
+/*
+ * Name: KeCreateBakedFontTexture
+ * Desc: Creates a texture with the desired text using the supplied font
+ */
+bool KeCreateBakedFontTexture( const char* string, uint32_t colour, int outline, KeFont* font, IKeTexture** texture )
+{
+    bool ret = false;
+    
+    /* Sanity chechs */
+    if( !string && !font )
+        return false;
+    
+    SDL_Colour sdl_colour =
+    {
+        static_cast<Uint8>((colour>>16)&0xFF),
+        static_cast<Uint8>((colour>> 8)&0xFF),
+        static_cast<Uint8>((colour    )&0xFF),
+        static_cast<Uint8>((colour>>24)&0xFF),
+    };
+    
+    /* Set the outline level */
+    TTF_SetFontOutline( font->font, outline );
+    
+    /* Generate pixel data */
+    SDL_Surface* surface = TTF_RenderText_Blended( font->font, string, sdl_colour );
+    if( !surface )
+        DISPDBG( KE_ERROR, "Error creating SDL surface from TTF!\nError: " << TTF_GetError() << std::endl );
+    
+    /* Generate a new texture from the pixel data */
+    ret = KeGetRenderDevice()->CreateTexture2D( KE_TEXTURE_2D, surface->w, surface->h, 1, KE_TEXTUREFORMAT_RGBA, KE_UNSIGNED_BYTE, texture, surface->pixels );
+    
+    /* Free the surface */
+    SDL_FreeSurface( surface );
+    
+    return ret;
+}
 
 /*
  * Name: KeCreateCompiledFontString
  * Desc: Creates a texture with the desired string using the supplied font and program
  */
-bool KeCreateCompiledFontString( const char* string, uint32_t colour, IKeGpuProgram* program, KeFont* font, KeCompiledFontString** compiled_string )
+bool KeCreateCompiledFontString( const char* string, uint32_t colour, int outline, IKeGpuProgram* program, KeFont* font, KeCompiledFontString** compiled_string )
 {
 	/* Sanity chechs */
 	if( !string && !font )

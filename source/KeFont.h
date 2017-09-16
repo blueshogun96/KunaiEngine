@@ -303,12 +303,24 @@ bool KeOpenFont( const char* fontfile, int size, KeFont** font );
  */
 bool KeOpenFontFromMemory( void* fontbuffer, uint32_t length, int size, KeFont** font );
 
+/*
+ * Name: KeSetFontOutline
+ * Desc: Sets the width of the font outline in pixels (use 0 to set to normal)
+ */
+bool KeSetFontOutline( int outline, KeFont** font );
 
 /*
  * Name: KeCloseFont
  * Desc: Closes this font handle
  */
 void KeCloseFont( KeFont* font );
+
+
+/*
+ * Name: KeCreateBakedFontTexture
+ * Desc: Creates a texture with the desired text using the supplied font
+ */
+bool KeCreateBakedFontTexture( const char* string, uint32_t colour, int outline, KeFont* font, IKeTexture** texture );
 
 
 /*
@@ -339,13 +351,14 @@ namespace Ke
 {
     namespace FontLibrary
     {
-        bool (*Init)() = KeInitFontLibrary;
-        void (*Uninit)() = KeUninitFontLibrary;
-        bool (*OpenFont)( const char*, int, KeFont** ) = KeOpenFont;
-        bool (*OpenFontFromMemory)( void*, uint32_t, int, KeFont** ) = KeOpenFontFromMemory;
-        void (*CloseFont)( KeFont* ) = KeCloseFont;
-        bool (*CreateCompiledFontString)( const char*, uint32_t, IKeGpuProgram*, KeFont*, KeCompiledFontString** ) = KeCreateCompiledFontString;
-        void (*CloseCompiledFontString) = KeCloseCompiledFontString;
-        void (*DrawCompiledFontString) = KeDrawCompiledFontString;
+        static bool (*Init)() = KeInitFontLibrary;
+        static void (*Uninit)() = KeUninitFontLibrary;
+        static bool (*OpenFont)( const char*, int, KeFont** ) = KeOpenFont;
+        static bool (*OpenFontFromMemory)( void*, uint32_t, int, KeFont** ) = KeOpenFontFromMemory;
+        static void (*CloseFont)( KeFont* ) = KeCloseFont;
+        static bool (*CreateBakedFontTexture)( const char*, uint32_t, int, KeFont* font, IKeTexture** ) = KeCreateBakedFontTexture;
+        static  bool (*CreateCompiledFontString)( const char*, uint32_t, IKeGpuProgram*, KeFont*, KeCompiledFontString** ) = KeCreateCompiledFontString;
+        static void (*CloseCompiledFontString)( KeCompiledFontString* ) = KeCloseCompiledFontString;
+        static void (*DrawCompiledFontString)( KeCompiledFontString*, int, int ) = KeDrawCompiledFontString;
     }
 }

@@ -6,7 +6,11 @@
 //
 
 #include <KePlatform.h>
+#ifdef __APPLE__
+#include <SDL2/SDL_main.h>
+#else
 #include <SDL_main.h>
+#endif
 
 #ifdef _UWP
 using namespace Platform;
@@ -80,8 +84,11 @@ int main( int argc, char** argv )
 
 #endif
 
-
+#ifdef __APPLE__
+int main( int argc, char** argv )
+#else
 int SDL_main( int argc, char** argv )
+#endif
 {
 	std::vector<std::string> args;
     

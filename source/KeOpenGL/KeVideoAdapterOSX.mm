@@ -9,6 +9,9 @@
 #include "KeDebug.h"
 #include "KeVideoAdapterOSX.h"
 
+#include <IOKit/graphics/IOGraphicsLib.h>
+#include <IOKit/iokitmig.h>
+
 
 /*
  * NOTES: This code is based off of Apple's official documentation, in particular can be found at the link below.
@@ -174,4 +177,39 @@ bool KeMultithreadedEngineEnabledOSX( int* enabled )
     CGL_DISPDBG( KE_WARNING, "Error querying OpenGL multithreading engine state!" );
     
     return error != kCGLNoError ? true : false;
+}
+
+void KeInitializeVerticalBlankInterrupt( int display_number )
+{
+    /* TODO: This stuff is so poorly documented, it's ridiculous.  Find out how this
+       IOFrameBuffer stuff works and how the actual fudge you initialize it! */
+#if 0
+    /* Supporting only the main display for now */
+    if( display_number != 0 )
+        return;
+    
+    kern_return_t err;
+    
+    /* Start off by getting our display ID */
+    io_service_t display_service_port = CGDisplayIOServicePort( kCGDirectMainDisplay );
+    //io_service_t root = IODisplayForFramebuffer( display_service_port, kNilOptions );
+    
+    /* This only works when ARC is disabled, and I'm too lazy to deal with that now... */
+    //IORegistryEntryCreateCFProperties( root, (CFMutableDictionaryRef*) &io_registry_dict, kCFAllocatorDefault, kNilOptions );
+    
+    /* So instead of the above, let's use the most basic C API */
+    CGDirectDisplayID display_id = CGMainDisplayID();
+    task_port_t task_port = mach_task_self();
+    io_connect_t display_connection = 0;
+    
+    /* Open the framebuffer */
+    err = IOFramebufferOpen( display_service_port, task_port, kIOFBSharedConnectType, &display_connection );
+    if( err != KERN_SUCCESS )
+        return;
+    
+    semaphore_t semaphore;
+    err = io_connect_get_notification_semaphore( mach_host_self(), kIOFBVBLInterruptType, &semaphore );
+    //IOConnectMapMemory
+#endif
+    
 }

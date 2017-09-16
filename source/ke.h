@@ -37,15 +37,15 @@ IKeAudioDevice* KeGetAudioDevice( void );
  */
 namespace Ke
 {
-    bool (*Initialize)() = KeInitialize;
-    bool (*InitializeEx)( std::string, IKeRenderDevice**, IKeAudioDevice** ) = KeInitializeEx;
-    void (*Uninitialize)() = KeUninitialize;
-    bool (*CreateWindowAndDevice)( KeRenderDeviceDesc*, IKeRenderDevice** ) = KeCreateWindowAndDevice;
-    void (*DestroyWindowAndDevice)( IKeRenderDevice* ) = KeDestroyWindowAndDevice;
-    IKeRenderDevice* (*GetRenderDevice)() = KeGetRenderDevice;
-    bool (*CreateAudioDevice)( KeAudioDeviceDesc*, IKeAudioDevice** ) = KeCreateAudioDevice;
-    void (*DestroyAudioDevice)( IKeAudioDevice* device ) = KeDestroyAudioDevice;
-    IKeAudioDevice* (*GetAudioDevice)() = KeGetAudioDevice;
+    static bool (*Initialize)() = KeInitialize;
+    static bool (*InitializeEx)( std::string, IKeRenderDevice**, IKeAudioDevice** ) = KeInitializeEx;
+    static void (*Uninitialize)() = KeUninitialize;
+    static bool (*CreateWindowAndDevice)( KeRenderDeviceDesc*, IKeRenderDevice** ) = KeCreateWindowAndDevice;
+    static void (*DestroyWindowAndDevice)( IKeRenderDevice* ) = KeDestroyWindowAndDevice;
+    static IKeRenderDevice* (*GetRenderDevice)() = KeGetRenderDevice;
+    static bool (*CreateAudioDevice)( KeAudioDeviceDesc*, IKeAudioDevice** ) = KeCreateAudioDevice;
+    static void (*DestroyAudioDevice)( IKeAudioDevice* device ) = KeDestroyAudioDevice;
+    static IKeAudioDevice* (*GetAudioDevice)() = KeGetAudioDevice;
 }
 
 #endif /* defined(__ke__) */

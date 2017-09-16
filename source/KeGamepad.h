@@ -107,15 +107,15 @@ namespace Ke
 {
     namespace Gamepad
     {
-        bool (*Initialize)() = KeInitializeGamepads;
-        void (*Uninitialize)() = KeUninitializeGamepads;
-        bool (*GetState)( int, KeGamepadState* ) = KeGetGamepadState;
-        int  (*GetCount)() = KeGetGamepadCount;
+        static bool (*Initialize)() = KeInitializeGamepads;
+        static void (*Uninitialize)() = KeUninitializeGamepads;
+        static bool (*GetState)( int, KeGamepadState* ) = KeGetGamepadState;
+        static int  (*GetCount)() = KeGetGamepadCount;
     }
     
     namespace Joystick
     {
-        bool (*GetState)( int, KeJoystickState* ) = KeGetJoystickState;
-        int  (*GetCount)() = KeGetJoystickCount;
+        static bool (*GetState)( int, KeJoystickState* ) = KeGetJoystickState;
+        static int  (*GetCount)() = KeGetJoystickCount;
     }
 }

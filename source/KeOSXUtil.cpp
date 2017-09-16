@@ -391,3 +391,4 @@ bool KeGetVideoCardInfoList( std::vector<KeVideoCardInfo> video_card_info_list )
     
     return true;
 }
+

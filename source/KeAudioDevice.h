@@ -153,7 +153,7 @@ namespace Ke
 {
     namespace Audio
     {
-        IKeAudioDevice* (*CreateDevice)( KeAudioDeviceDesc* ) = KeCreateAudioDevice;
+        static IKeAudioDevice* (*CreateDevice)( KeAudioDeviceDesc* ) = KeCreateAudioDevice;
     }
 }
 

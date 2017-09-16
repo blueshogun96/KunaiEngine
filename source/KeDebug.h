@@ -39,7 +39,7 @@ namespace Ke
 {
     namespace CallStaack
     {
-        void (*Push)( std::string ) = KeCallStackPush;
-        void (*Pop)() = KeCallStackPop;
+        static void (*Push)( std::string ) = KeCallStackPush;
+        static void (*Pop)() = KeCallStackPop;
     }
 }

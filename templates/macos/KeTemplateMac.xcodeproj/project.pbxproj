@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CD1D59B91F3BF68C00B6E5AA /* Remotery.c in Sources */ = {isa = PBXBuildFile; fileRef = CD1D59B61F3BF68C00B6E5AA /* Remotery.c */; };
+		CD1D59BA1F3BF68C00B6E5AA /* RemoteryMetal.mm in Sources */ = {isa = PBXBuildFile; fileRef = CD1D59B81F3BF68C00B6E5AA /* RemoteryMetal.mm */; };
 		CDC6ACC71E6C251E003655B0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CDC6ACC61E6C251E003655B0 /* Assets.xcassets */; };
 		CDC6ACD51E6C2616003655B0 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CDC6ACD41E6C2616003655B0 /* Main.cpp */; };
 		CDC6AD101E6C268B003655B0 /* Ke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CDC6ACDA1E6C268B003655B0 /* Ke.cpp */; };
@@ -495,6 +497,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		CD1D59B61F3BF68C00B6E5AA /* Remotery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Remotery.c; path = ../../../3rdparty/Remotery/lib/Remotery.c; sourceTree = "<group>"; };
+		CD1D59B71F3BF68C00B6E5AA /* Remotery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Remotery.h; path = ../../../3rdparty/Remotery/lib/Remotery.h; sourceTree = "<group>"; };
+		CD1D59B81F3BF68C00B6E5AA /* RemoteryMetal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RemoteryMetal.mm; path = ../../../3rdparty/Remotery/lib/RemoteryMetal.mm; sourceTree = "<group>"; };
 		CDC6ACC11E6C251E003655B0 /* KeTemplateMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeTemplateMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC6ACC61E6C251E003655B0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CDC6ACCB1E6C251F003655B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1514,6 +1519,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CD1D59B51F3BF66000B6E5AA /* Remotery */ = {
+			isa = PBXGroup;
+			children = (
+				CD1D59B61F3BF68C00B6E5AA /* Remotery.c */,
+				CD1D59B71F3BF68C00B6E5AA /* Remotery.h */,
+				CD1D59B81F3BF68C00B6E5AA /* RemoteryMetal.mm */,
+			);
+			name = Remotery;
+			sourceTree = "<group>";
+		};
 		CDC6ACB81E6C251C003655B0 = {
 			isa = PBXGroup;
 			children = (
@@ -1663,6 +1678,7 @@
 				CDC6AD561E6C29F5003655B0 /* nvidia */,
 				CDC6AD551E6C29F2003655B0 /* openctm */,
 				CDC6AD541E6C29EF003655B0 /* recastnavigation */,
+				CD1D59B51F3BF66000B6E5AA /* Remotery */,
 				CDC6AD531E6C29EC003655B0 /* sqlite */,
 				CDC6AD521E6C29EA003655B0 /* stb */,
 				CDC6AD511E6C29E7003655B0 /* tokamak */,
@@ -3103,6 +3119,7 @@
 				CDC6B2A51E6C9B3B003655B0 /* mathops.c in Sources */,
 				CDC6AE191E6C96D0003655B0 /* gzlib.c in Sources */,
 				CDC6B29F1E6C9B3B003655B0 /* fragment.c in Sources */,
+				CD1D59B91F3BF68C00B6E5AA /* Remotery.c in Sources */,
 				CDC6AD4C1E6C26B6003655B0 /* KeVideoAdapterOSX.mm in Sources */,
 				CDC6B29D1E6C9B3B003655B0 /* enquant.c in Sources */,
 				CDC6ADA91E6C95C3003655B0 /* as_compiler.cpp in Sources */,
@@ -3356,6 +3373,7 @@
 				CDC6B00D1E6C9729003655B0 /* UnrealLoader.cpp in Sources */,
 				CDC6ADE51E6C9686003655B0 /* shapes.cc in Sources */,
 				CDC6ADB81E6C95C3003655B0 /* as_scriptfunction.cpp in Sources */,
+				CD1D59BA1F3BF68C00B6E5AA /* RemoteryMetal.mm in Sources */,
 				CDC6B05D1E6C97F5003655B0 /* b2TimeOfImpact.cpp in Sources */,
 				CDC6B1FB1E6C9A53003655B0 /* RecastRegion.cpp in Sources */,
 				CDC6AFF51E6C9729003655B0 /* RemoveComments.cpp in Sources */,
@@ -3583,6 +3601,9 @@
 					"AS_MAX_PORTABILITY=1",
 					"_DEBUG=1",
 					ASSIMP_BUILD_NO_C4D_IMPORTER,
+					YYPARSE_PARAM,
+					"RMT_USE_OPENGL=1",
+					"RMT_USE_METAL=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					../../3rdparty/jo_jpeg,
@@ -3615,6 +3636,10 @@
 					../../3rdparty/tristripper/include,
 					../../3rdparty/xiph/libvorbis/lib,
 					../../libraries/osx/LeapSDK/include,
+					../../3rdparty/cmusphinx/include/android,
+					../../3rdparty/cmusphinx/include,
+					../../3rdparty/cmusphinx/include/sphinxbase,
+					../../3rdparty/cmusphinx/include/pocketsphinx,
 				);
 				INFOPLIST_FILE = KeTemplateMac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -3636,6 +3661,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"AS_MAX_PORTABILITY=1",
 					ASSIMP_BUILD_NO_C4D_IMPORTER,
+					YYPARSE_PARAM,
+					"RMT_USE_OPENGL=1",
+					"RMT_USE_METAL=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					../../3rdparty/jo_jpeg,
@@ -3668,6 +3696,10 @@
 					../../3rdparty/tristripper/include,
 					../../3rdparty/xiph/libvorbis/lib,
 					../../libraries/osx/LeapSDK/include,
+					../../3rdparty/cmusphinx/include/android,
+					../../3rdparty/cmusphinx/include,
+					../../3rdparty/cmusphinx/include/sphinxbase,
+					../../3rdparty/cmusphinx/include/pocketsphinx,
 				);
 				INFOPLIST_FILE = KeTemplateMac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
