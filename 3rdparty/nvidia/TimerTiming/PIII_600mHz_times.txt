@@ -1,0 +1,100 @@
+
+
+i: 0   passes[i]: 100
+i: 1   passes[i]: 500
+i: 2   passes[i]: 1000
+i: 3   passes[i]: 10000
+
+Counter freq = 1193180  0 
+method 0:
+  QueryPerfCntr..()  100 times
+  tot:   0 522
+  avg:   5.220000
+  avg time:			4.37486e-006 sec
+method 0:
+  QueryPerfCntr..()  500 times
+  tot:   0 2627
+  avg:   5.254000
+  avg time:			4.40336e-006 sec
+method 0:
+  QueryPerfCntr..()  1000 times
+  tot:   0 5204
+  avg:   5.204000
+  avg time:			4.36145e-006 sec
+method 0:
+  QueryPerfCntr..()  10000 times
+  tot:   0 260781
+  avg:   26.078100
+  avg time:			2.1856e-005 sec
+
+
+
+method 1:
+  GetTickCount()  100 times
+  tot:   0 54
+  avg:   0.540000
+  avg time:			4.52572e-007 sec
+method 1:
+  GetTickCount()  500 times
+  tot:   0 247
+  avg:   0.494000
+  avg time:			4.1402e-007 sec
+method 1:
+  GetTickCount()  1000 times
+  tot:   0 488
+  avg:   0.488000
+  avg time:			4.08991e-007 sec
+method 1:
+  GetTickCount()  10000 times
+  tot:   0 4828
+  avg:   0.482800
+  avg time:			4.04633e-007 sec
+
+
+
+method 2:
+  TimeGetTime()  100 times
+  tot:   0 670
+  avg:   6.700000
+  avg time:			5.61525e-006 sec
+method 2:
+  TimeGetTime()  500 times
+  tot:   0 174909
+  avg:   349.818000
+  avg time:			0.000293181 sec
+method 2:
+  TimeGetTime()  1000 times
+  tot:   0 24401
+  avg:   24.401000
+  avg time:			2.04504e-005 sec
+method 2:
+  TimeGetTime()  10000 times
+  tot:   0 330399
+  avg:   33.039900
+  avg time:			2.76906e-005 sec
+
+
+
+method 3:
+  Pentium internal high-freq cntr()  100 times
+  tot:   0 12
+  avg:   0.120000
+  avg time:			1.00572e-007 sec
+method 3:
+  Pentium internal high-freq cntr()  500 times
+  tot:   0 40
+  avg:   0.080000
+  avg time:			6.70477e-008 sec
+method 3:
+  Pentium internal high-freq cntr()  1000 times
+  tot:   0 140
+  avg:   0.140000
+  avg time:			1.17334e-007 sec
+method 3:
+  Pentium internal high-freq cntr()  10000 times
+  tot:   0 883
+  avg:   0.088300
+  avg time:			7.40039e-008 sec
+
+
+

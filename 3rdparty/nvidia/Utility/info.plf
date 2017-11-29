@@ -1,0 +1,11 @@
+
+$ship = 1;
+
+$name = "Utility";
+$type = "tool";
+
+@dependencies = (
+		  "/Common/src/Utility"
+);
+
+1;
