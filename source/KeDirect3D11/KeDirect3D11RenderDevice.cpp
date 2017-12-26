@@ -399,6 +399,13 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 
     d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), NULL );
 
+	/* Create our depth stencil view */
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvdesc = {};
+	dsvdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	/* TODO: Do not hardcode this... */
+	dsvdesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvdesc.Texture2D.MipSlice = 0;
+	//hr = d3ddevice->CreateDepthStencilView( )
+
     /* Setup the viewport */
     D3D11_VIEWPORT vp;
     vp.Width = (FLOAT) device_desc->width;
@@ -1953,7 +1960,7 @@ void IKeDirect3D11RenderDevice::DrawVertices( uint32_t primtype, uint32_t stride
 	IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>(current_gpu_program);
 
 	uint32_t offset = 0;		/* TODO: Allow user to specify this */
-	d3ddevice_context->IASetVertexBuffers( 0, 1, &gb->vb, &stride, &offset );
+	d3ddevice_context->IASetVertexBuffers( 0, 1, &gb->vb.GetInterfacePtr(), &stride, &offset );
 	d3ddevice_context->IASetPrimitiveTopology( primitive_types[primtype] );
 	d3ddevice_context->Draw( count, first );
 }

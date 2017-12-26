@@ -15,7 +15,6 @@ CKeDemoApplication::CKeDemoApplication()
 	std::string dxvs = 
 		"float4 vs_main( float4 Pos : POSITION ) : SV_POSITION\n"
 		"{\n"
-		"    Pos.w = 1.0f;\n"
 		"    return Pos;\n"
 		"}";
 	std::string dxps = 
