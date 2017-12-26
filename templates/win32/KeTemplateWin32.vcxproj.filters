@@ -3154,6 +3154,12 @@
     <ClInclude Include="..\..\3rdparty\nvidia\Utility\ulVector1.h">
       <Filter>Source Files\Engine\3rdParty\nvidia</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\3rdparty\nvidia\NV_Common.h">
+      <Filter>Source Files\Engine\3rdParty\nvidia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\nvidia\NV_Error.h">
+      <Filter>Source Files\Engine\3rdParty\nvidia</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\3rdparty\assimp\code\BlenderDNA.inl">

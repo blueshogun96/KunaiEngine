@@ -120,6 +120,8 @@ void CKeDemoApplication::Run()
         
         float green[4] = { 0.0f, 0.5f, 0.0f, 1.0 };
         m_pRenderDevice->SetClearColourFV( green );
+		m_pRenderDevice->SetClearDepth( 1.0f );
+		m_pRenderDevice->SetClearStencil(0);
         m_pRenderDevice->Clear( KE_COLOUR_BUFFER | KE_DEPTH_BUFFER /*| KE_STENCIL_BUFFER*/ );
 		m_pRenderDevice->DrawVertices( KE_TRIANGLES, sizeof(nv::vec3f), 0, 3 );
         m_pRenderDevice->Swap();

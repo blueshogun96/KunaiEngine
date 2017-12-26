@@ -646,7 +646,7 @@ void IKeDirect3D11RenderDevice::Clear( uint32_t buffers )
 	if( buffers & KE_DEPTH_BUFFER )		flags |= 0x1;
 	if( buffers & KE_STENCIL_BUFFER )	flags |= 0x2;
 
-	if( flags )
+	if( flags && d3d_depth_stencil_view != nullptr )
 		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, (D3D11_CLEAR_FLAG) flags, clear_depth, clear_stencil );
 }
 
