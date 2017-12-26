@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <KunaiEngineDir>C:\Shogun3D\KunaiEngine</KunaiEngineDir>
+    <KunaiEngineSourceDir>C:\Shogun3D\KunaiEngine\source</KunaiEngineSourceDir>
+    <KunaiEngine3rdPartyDir>C:\Shogun3D\KunaiEngine\3rdparty</KunaiEngine3rdPartyDir>
+    <KunaiEngineLibraryDir>C:\Shogun3D\KunaiEngine\libraries\windows</KunaiEngineLibraryDir>
+    <KunaiEngineLibraryUWPDir>C:\Shogun3D\KunaiEngine\libraries\uwp</KunaiEngineLibraryUWPDir>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="KunaiEngineDir">
+      <Value>$(KunaiEngineDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="KunaiEngineSourceDir">
+      <Value>$(KunaiEngineSourceDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="KunaiEngine3rdPartyDir">
+      <Value>$(KunaiEngine3rdPartyDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="KunaiEngineLibraryDir">
+      <Value>$(KunaiEngineLibraryDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="KunaiEngineLibraryUWPDir">
+      <Value>$(KunaiEngineLibraryUWPDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
