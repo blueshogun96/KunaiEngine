@@ -24,9 +24,13 @@ Comments:
 
 
 void ulComputeYDDerivative(float *Y, int len, float *YD);
+void ulComputeYDDerivative(real64 *Y, int len, real64 *YD);
 void ulTriDiagonal(float *D, int len);
+void ulTriDiagonal(real64 *D, int len);
 int ulComputeYDDerivativeIrregular(float *X, float *Y, float *YD, int len);
+int ulComputeYDDerivativeIrregular(real64 *X, real64 *Y, real64 *YD, int len);
 int ulTriDiagonalIrregular(float *A, float *B, float *C, float *D, int len);
+int ulTriDiagonalIrregular(real64 *A, real64 *B, real64 *C, real64 *D, int len);
 
 
 void ulCubicSpline(real64 * Y1, int len1, real64 *Y2, int len2)

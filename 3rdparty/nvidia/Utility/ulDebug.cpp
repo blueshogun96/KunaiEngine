@@ -24,7 +24,7 @@ void dprintf( LPSTR fmt, ... )
   va_start( va, fmt );
   vsprintf( buff, fmt, va );
   va_end( va ); 
-  OutputDebugString(buff);
+  OutputDebugStringA(buff);
 
 #endif
 }

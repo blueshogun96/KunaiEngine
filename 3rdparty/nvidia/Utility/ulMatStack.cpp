@@ -14,6 +14,7 @@ Comments:
 ******************************************************************************/
 #include <ul.h>
 
+#if 0 /* TODO: Since the header is clearly missing (like alot of stuff) I'll have to define the class myself.  May or may not be worth it though... */
 
 MatrixStack::MatrixStack()
 {
@@ -69,3 +70,4 @@ Mat4 &MatrixStack::GetMatrix ()
 
 
 
+#endif

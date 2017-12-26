@@ -17,7 +17,7 @@ Comments:
 
 
 //The Plane class 
-
+#if 0 /* TODO: The class definition was missing */
 Int Plane::FindPlanePos(
                    real x0, real y0, real z0,
                    real x1, real y1, real z1,
@@ -213,3 +213,4 @@ Plane::Plane()
 }
 
 
+#endif

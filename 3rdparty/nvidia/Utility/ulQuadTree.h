@@ -2,7 +2,7 @@
 #define _QUADTREE_H_
 
 #include <list>
-#include "BSphere.h"
+//#include "BSphere.h"
 
 
 // ID =  ( Parent << 2 ) | { LL,LR,UL,UR }

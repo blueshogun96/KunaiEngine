@@ -30,11 +30,11 @@ Comments:
 //======================================================================
 char * ulGetFileName(HWND hWnd, char *fileMask)
 {
-	OPENFILENAME theFileInfo;
+	OPENFILENAMEA theFileInfo;
 	static char fileName[256];
 	//char filterStrs[256];
 
-	theFileInfo.lStructSize = sizeof(OPENFILENAME);
+	theFileInfo.lStructSize = sizeof(OPENFILENAMEA);
 	theFileInfo.hwndOwner = hWnd;
 	theFileInfo.hInstance = NULL;
 	theFileInfo.lpstrFilter = fileMask;
@@ -47,13 +47,45 @@ char * ulGetFileName(HWND hWnd, char *fileMask)
 	theFileInfo.Flags = OFN_LONGNAMES;
 	theFileInfo.lpstrDefExt = NULL;
 
-	if (GetOpenFileName(&theFileInfo))
+	if (GetOpenFileNameA(&theFileInfo))
 		return fileName;
 	else
 		return NULL;
 }
 
 
+
+//======================================================================
+// Function:	GetFileName
+// Description:	get a file name from a standard open dialog box
+// Parameters:	hWnd = window that owns the dialog
+//				fileMask = "3D Studio Files", "*.3ds", NULL, NULL
+// Returns:		char * = full path/filename or NULL
+//======================================================================
+wchar_t * ulGetFileNameW(HWND hWnd, wchar_t *fileMask)
+{
+	OPENFILENAMEW theFileInfo;
+	static wchar_t fileName[256];
+	//char filterStrs[256];
+
+	theFileInfo.lStructSize = sizeof(OPENFILENAMEW);
+	theFileInfo.hwndOwner = hWnd;
+	theFileInfo.hInstance = NULL;
+	theFileInfo.lpstrFilter = fileMask;
+	theFileInfo.lpstrCustomFilter = NULL;
+	theFileInfo.lpstrFile = fileName;
+	theFileInfo.nMaxFile = 255;
+	theFileInfo.lpstrFileTitle = NULL;
+	theFileInfo.lpstrInitialDir = NULL;
+	theFileInfo.lpstrTitle = NULL;
+	theFileInfo.Flags = OFN_LONGNAMES;
+	theFileInfo.lpstrDefExt = NULL;
+
+	if (GetOpenFileNameW(&theFileInfo))
+		return fileName;
+	else
+		return NULL;
+}
 
 
 

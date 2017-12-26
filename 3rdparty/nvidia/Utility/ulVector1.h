@@ -168,7 +168,7 @@ INLINE void ulVector1::Allocate(const int &elements)
         char buff[1000];
         sprintf(buff, "Out of Memory [%d bytes]! Exitting", n);
 
-        MessageBox(0, buff, "Error", MB_OK);
+        MessageBoxA(0, buff, "Error", MB_OK);
         exit(1);
     }
         
@@ -229,7 +229,7 @@ INLINE real & ulVector1::operator[](int i) const
     {
         char buff[1000];
         sprintf(buff, "ulVector1 %d %d",i, n);
-        MessageBox(0, buff, 0, MB_OK);
+        MessageBoxA(0, buff, 0, MB_OK);
         exit(1);
 
     }
@@ -247,6 +247,7 @@ INLINE real & ulVector1::operator () (const int &i) const
 
 INLINE void ulVector1::print (char *title)
 {
+#if 0
     int i, j;
 
     if (title)
@@ -260,7 +261,7 @@ INLINE void ulVector1::print (char *title)
     dprintf ("\n");
 
     fflush (stdout);
-
+#endif
 }
 
 

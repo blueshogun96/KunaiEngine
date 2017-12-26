@@ -327,7 +327,7 @@ bool KeCreateBakedFontTexture( const char* string, uint32_t colour, int outline,
  * Name: KeCreateCompiledFontString
  * Desc: Creates a texture with the desired string using the supplied font and program
  */
-bool KeCreateCompiledFontString( const char* string, uint32_t colour, IKeGpuProgram* program, KeFont* font, KeCompiledFontString** compiled_string );
+bool KeCreateCompiledFontString( const char* string, uint32_t colour, int outline, IKeGpuProgram* program, KeFont* font, KeCompiledFontString** compiled_string );
 
 
 /*
@@ -357,7 +357,7 @@ namespace Ke
         static bool (*OpenFontFromMemory)( void*, uint32_t, int, KeFont** ) = KeOpenFontFromMemory;
         static void (*CloseFont)( KeFont* ) = KeCloseFont;
         static bool (*CreateBakedFontTexture)( const char*, uint32_t, int, KeFont* font, IKeTexture** ) = KeCreateBakedFontTexture;
-        static  bool (*CreateCompiledFontString)( const char*, uint32_t, IKeGpuProgram*, KeFont*, KeCompiledFontString** ) = KeCreateCompiledFontString;
+        static  bool (*CreateCompiledFontString)( const char*, uint32_t, int, IKeGpuProgram*, KeFont*, KeCompiledFontString** ) = KeCreateCompiledFontString;
         static void (*CloseCompiledFontString)( KeCompiledFontString* ) = KeCloseCompiledFontString;
         static void (*DrawCompiledFontString)( KeCompiledFontString*, int, int ) = KeDrawCompiledFontString;
     }

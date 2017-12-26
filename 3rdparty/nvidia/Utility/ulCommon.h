@@ -56,7 +56,11 @@ Things common to all ul classes - like types & things the classes need
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef _WIN32
 #include <iostream.h>
+#else
+#include <iostream>
+#endif
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>

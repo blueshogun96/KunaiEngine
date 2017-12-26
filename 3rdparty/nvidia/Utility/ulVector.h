@@ -411,6 +411,7 @@ INLINE void ulVector::CopyVector(const ulVector & src)
 
 INLINE void ulVector::Print (char *title)
 {
+#if 0
     int i, d;
 
     if (title)
@@ -427,7 +428,7 @@ INLINE void ulVector::Print (char *title)
     dprintf ("\n");
 
     //fflush(stdout);
-
+#endif
 }
 
 

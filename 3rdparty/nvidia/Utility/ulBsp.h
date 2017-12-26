@@ -68,13 +68,13 @@ class BSPPlane
         }
 
     public :
-        typedef enum Classification
+        typedef enum _Classification
         {
             Coplanar = 0,
             Intersection,
             Front,
             Back
-        };
+        }Classification;
 
         BSPPlane( const real& x = 0.0f, const real& y = 0.0f , const real& z = 1.0f , const real& d = 0.0f )
             : mNormal( x, y, z ), mDistance( d )

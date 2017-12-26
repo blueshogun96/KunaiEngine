@@ -567,6 +567,7 @@ INLINE ulMatrix::~ulMatrix ()
 
 INLINE void ulMatrix::Print (char *title, bool bydim)
 {
+#if 0
     int i, j, d;
     if (title)
         dprintf ("%s\n", title);
@@ -606,7 +607,7 @@ INLINE void ulMatrix::Print (char *title, bool bydim)
         dprintf ("\n");
     }
     fflush (stdout);
-
+#endif
 }
 
 

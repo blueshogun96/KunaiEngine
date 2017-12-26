@@ -15,6 +15,7 @@ CKeDemoApplication::CKeDemoApplication()
 	std::string dxvs = 
 		"float4 vs_main( float4 Pos : POSITION ) : SV_POSITION\n"
 		"{\n"
+		"    Pos.w = 1.0f;\n"
 		"    return Pos;\n"
 		"}";
 	std::string dxps = 
@@ -61,7 +62,7 @@ CKeDemoApplication::CKeDemoApplication()
     rddesc.stencil_bpp = 8;
     rddesc.fullscreen = No;
     rddesc.buffer_count = 2;
-    rddesc.device_type = KE_RENDERDEVICE_OGL3;
+    rddesc.device_type = KE_RENDERDEVICE_D3D11;
     
     bool ret = KeCreateWindowAndDevice( &rddesc, &m_pRenderDevice );
     if( !ret )
@@ -80,9 +81,9 @@ CKeDemoApplication::CKeDemoApplication()
 
 	nv::vec3f vd[] = 
 	{
-		nv::vec3f( 0.0f, 0.5f, 0.5f ),
-		nv::vec3f( 0.5f, -0.5f, 0.5f ),
-		nv::vec3f( -0.5f, -0.5f, 0.5f ),
+		nv::vec3f( -1.0f, -1.0f, 0.0f ),
+		nv::vec3f( 1.0f, -1.0f, 0.0f ),
+		nv::vec3f( 0.0f, 1.0f, 0.0f ),
 	};
 
 	if( rddesc.device_type == KE_RENDERDEVICE_D3D11 )
@@ -119,7 +120,7 @@ void CKeDemoApplication::Run()
         
         float green[4] = { 0.0f, 0.5f, 0.0f, 1.0 };
         m_pRenderDevice->SetClearColourFV( green );
-        m_pRenderDevice->Clear( KE_COLOUR_BUFFER /*| KE_DEPTH_BUFFER | KE_STENCIL_BUFFER*/ );
+        m_pRenderDevice->Clear( KE_COLOUR_BUFFER | KE_DEPTH_BUFFER /*| KE_STENCIL_BUFFER*/ );
 		m_pRenderDevice->DrawVertices( KE_TRIANGLES, sizeof(nv::vec3f), 0, 3 );
         m_pRenderDevice->Swap();
     }

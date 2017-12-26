@@ -47,7 +47,7 @@ Poly* Poly::LookUpPoly( const PolyID& anID )
     PolyList::iterator iter = BSPTree::smPolyList.find( aPoly );
     if ( iter != BSPTree::smPolyList.end() )
     {
-        return &(*iter);
+        return (Poly*) &(*iter);
     }
     else
     {
@@ -63,7 +63,7 @@ Poly& Poly::CreatePoly()
     aPoly.mID = anID;
     std::pair< PolyList::iterator, bool > aPair = BSPTree::smPolyList.insert( aPoly );
     assert( aPair.second );
-    return *( aPair.first );
+    return (Poly&) *( aPair.first );
 }
 
 /*static*/
@@ -75,8 +75,8 @@ Poly& Poly::CreatePoly( const BSP::VertexList& aList, const BSPPlane& aBSPPlane 
     std::pair< PolyList::iterator, bool > aPair = BSPTree::smPolyList.insert( aPoly );
     assert( aPair.second );
     (*(aPair.first)).mID = anID;
-    (*(aPair.first)).mVertexList = aList;
+    (*(aPair.first)).mVertexList = (BSP::VertexList) aList;
     (*(aPair.first)).mBSPPlane = aBSPPlane;
-    return *( aPair.first );
+    return (Poly&) *( aPair.first );
 }
 

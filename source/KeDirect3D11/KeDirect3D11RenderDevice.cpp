@@ -217,10 +217,8 @@ std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 {
 	switch( feature )
 	{
-#ifdef _UWP	/* TODO: Win32 */
 	case D3D_FEATURE_LEVEL_12_1: return "12.1";
 	case D3D_FEATURE_LEVEL_12_0: return "12.0";
-#endif
 	case D3D_FEATURE_LEVEL_11_1: return "11.1";
 	case D3D_FEATURE_LEVEL_11_0: return "11.0";
 	case D3D_FEATURE_LEVEL_10_1: return "10.1";
@@ -230,7 +228,7 @@ std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 	case D3D_FEATURE_LEVEL_9_1:  return "9.1";
 	}
 
-	return "";
+	return "???";
 }
 
 #ifdef _UWP
@@ -340,13 +338,11 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 {
 	/* Initialize Direct3D11 */
-	uint32_t flags = 0;
+	uint32_t flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 	D3D_FEATURE_LEVEL feature_levels[] = 
 	{
-#ifdef _UWP /* TODO: Win32 */
 		D3D_FEATURE_LEVEL_12_1,
 		D3D_FEATURE_LEVEL_12_0,
-#endif
 		D3D_FEATURE_LEVEL_11_1,
 		D3D_FEATURE_LEVEL_11_0,
 		D3D_FEATURE_LEVEL_10_1,
@@ -823,7 +819,6 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 	/* Allocate new GPU program */
 	*gpu_program = new IKeDirect3D11GpuProgram;
 	IKeDirect3D11GpuProgram* gp = static_cast<IKeDirect3D11GpuProgram*>( *gpu_program );
-	ZeroMemory( gp, sizeof( IKeDirect3D11GpuProgram ) );
 
 	/* Create Direct3D compatible vertex layout */
 	while( vertex_attributes[layout_size].index != -1 )
