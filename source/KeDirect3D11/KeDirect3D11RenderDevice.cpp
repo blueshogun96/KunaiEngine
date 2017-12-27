@@ -297,7 +297,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
     swapchain_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	swapchain_desc.Stereo = false;		/* TODO: Make this configurable */
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapchain_desc.SampleDesc.Count = 1;
+    swapchain_desc.SampleDesc.Count = 4;
     swapchain_desc.SampleDesc.Quality = 0;
 	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapchain_desc.Flags = 0;
@@ -362,12 +362,12 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	swapchain_desc.BufferCount = device_desc->buffer_count;
     swapchain_desc.BufferDesc.Width = device_desc->width;
     swapchain_desc.BufferDesc.Height = device_desc->height;
-    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swapchain_desc.BufferDesc.RefreshRate.Numerator = device_desc->refresh_rate;
     swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchain_desc.OutputWindow = GetActiveWindow();
-    swapchain_desc.SampleDesc.Count = 1;
+    swapchain_desc.SampleDesc.Count = 4;
     swapchain_desc.SampleDesc.Quality = 0;
     swapchain_desc.Windowed = !device_desc->fullscreen;
 
@@ -397,14 +397,32 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	back_buffer->Release();
     D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
 
-    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), NULL );
-
 	/* Create our depth stencil view */
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvdesc = {};
-	dsvdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	/* TODO: Do not hardcode this... */
-	dsvdesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	dsvdesc.Texture2D.MipSlice = 0;
-	//hr = d3ddevice->CreateDepthStencilView( )
+#if 1
+	D3D11_TEXTURE2D_DESC depthdesc;
+	depthdesc.Width = device_desc->width;
+	depthdesc.Height = device_desc->height;
+	depthdesc.MipLevels = 1;
+	depthdesc.ArraySize = 1;
+	depthdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthdesc.SampleDesc.Count = 4;
+	depthdesc.SampleDesc.Quality = 0;
+	depthdesc.Usage = D3D11_USAGE_DEFAULT;
+	depthdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthdesc.CPUAccessFlags = 0;
+	depthdesc.MiscFlags = 0;
+	hr = d3ddevice->CreateTexture2D( &depthdesc, NULL, &d3d_depth_stencil_buffer );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil buffer!", hr );
+
+	hr = d3ddevice->CreateDepthStencilView( d3d_depth_stencil_buffer, nullptr, &d3d_depth_stencil_view );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil view!", hr );
+
+	/* Set render target and depth stencil */
+    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), d3d_depth_stencil_view );
+#else
+	/* Set render target and depth stencil */
+    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), NULL );
+#endif
 
     /* Setup the viewport */
     D3D11_VIEWPORT vp;
@@ -625,7 +643,8 @@ void IKeDirect3D11RenderDevice::ClearColourBuffer()
 */
 void IKeDirect3D11RenderDevice::ClearDepthBuffer()
 {
-	
+	if( d3d_depth_stencil_view != nullptr )
+		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, D3D11_CLEAR_DEPTH, clear_depth, 0 );
 }
 
 
@@ -635,7 +654,8 @@ void IKeDirect3D11RenderDevice::ClearDepthBuffer()
 */
 void IKeDirect3D11RenderDevice::ClearStencilBuffer()
 {
-	
+	if( d3d_depth_stencil_view != nullptr )	
+		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, D3D11_CLEAR_STENCIL, 0.0f, clear_stencil );
 }
 
 
@@ -645,16 +665,14 @@ void IKeDirect3D11RenderDevice::ClearStencilBuffer()
  */
 void IKeDirect3D11RenderDevice::Clear( uint32_t buffers )
 {
-	if( buffers & KE_COLOUR_BUFFER )
+	if( buffers & KE_COLOUR_BUFFER && d3d_render_target_view != nullptr )
 		d3ddevice_context->ClearRenderTargetView( d3d_render_target_view, clear_colour );
 
-	uint32_t flags = 0;
+	if( buffers & KE_DEPTH_BUFFER && d3d_depth_stencil_view != nullptr )
+		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, D3D11_CLEAR_DEPTH, clear_depth, 0 );
 
-	if( buffers & KE_DEPTH_BUFFER )		flags |= 0x1;
-	if( buffers & KE_STENCIL_BUFFER )	flags |= 0x2;
-
-	if( flags && d3d_depth_stencil_view != nullptr )
-		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, (D3D11_CLEAR_FLAG) flags, clear_depth, clear_stencil );
+	if( buffers & KE_STENCIL_BUFFER && d3d_depth_stencil_view != nullptr )	
+		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, D3D11_CLEAR_STENCIL, 0.0f, clear_stencil );
 }
 
 
@@ -732,6 +750,7 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
  
     *geometry_buffer = new IKeDirect3D11GeometryBuffer;
     IKeDirect3D11GeometryBuffer* gb = static_cast<IKeDirect3D11GeometryBuffer*>( *geometry_buffer );
+	gb->stride = 0;
 
 	/* Create a vertex buffer */
 	D3D11_BUFFER_DESC bd;
@@ -771,6 +790,10 @@ bool IKeDirect3D11RenderDevice::CreateGeometryBuffer( void* vertex_data, uint32_
 		}
 
 		gb->index_type = index_data_type;
+	}
+	else
+	{
+		gb->index_type = 0;
 	}
 
 	return true;
@@ -861,8 +884,8 @@ bool IKeDirect3D11RenderDevice::CreateProgram( const char* vertex_shader, const 
 		
 		/* Initialize vertex shader */
 		/* TODO: Auto detect highest shader version */
-		ID3D10Blob* blob_shader = NULL;
-		ID3D10Blob* blob_error = NULL;
+		CD3D10Blob blob_shader;
+		CD3D10Blob blob_error;
 
 		HRESULT hr = D3DCompile( vertex_shader, strlen( vertex_shader ) + 1, "vs_main", NULL, NULL, "vs_main", 
                      "vs_4_0", shader_flags, 0, &blob_shader, &blob_error );

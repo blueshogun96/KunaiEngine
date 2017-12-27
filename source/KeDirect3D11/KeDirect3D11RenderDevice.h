@@ -77,6 +77,7 @@ typedef _com_ptr_t<_com_IIID<ID3D11SamplerState, &IID_ID3D11SamplerState>>				CD
 typedef _com_ptr_t<_com_IIID<ID3D11Query, &IID_ID3D11Query>>							CD3D11Query;
 typedef _com_ptr_t<_com_IIID<ID3D11CommandList, &IID_ID3D11CommandList>>				CD3D11CommandList;
 typedef _com_ptr_t<_com_IIID<ID3D11ShaderResourceView, &IID_ID3D11ShaderResourceView>>	CD3D11ShaderResourceView;
+typedef _com_ptr_t<_com_IIID<ID3D10Blob, &IID_ID3D10Blob>>								CD3D10Blob;
 
 
 /*
@@ -359,6 +360,7 @@ protected:
 #endif
 	CDXGIOutput						dxgi_output;
 	CD3D11RenderTargetView			d3d_render_target_view;
+	CD3D11Texture2D					d3d_depth_stencil_buffer;
 	CD3D11DepthStencilView			d3d_depth_stencil_view;
 #ifdef _UWP
 	DXGI_SWAP_CHAIN_DESC1			swapchain_desc;
