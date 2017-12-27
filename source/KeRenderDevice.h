@@ -260,6 +260,7 @@ struct KeRenderDeviceDesc
     int width;
     int height;
     int colour_bpp;
+	int alpha_bpp;
     int depth_bpp;
     int stencil_bpp;
     int buffer_count;

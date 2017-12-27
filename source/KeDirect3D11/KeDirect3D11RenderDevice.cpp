@@ -297,7 +297,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
     swapchain_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	swapchain_desc.Stereo = false;		/* TODO: Make this configurable */
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapchain_desc.SampleDesc.Count = 4;
+    swapchain_desc.SampleDesc.Count = 1;
     swapchain_desc.SampleDesc.Quality = 0;
 	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapchain_desc.Flags = 0;
@@ -358,11 +358,52 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	flags = D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
+	DXGI_FORMAT rtfmt, dsfmt;
+
+	/* Interpret RenderTarget format */
+	switch( device_desc->colour_bpp )
+	{
+	case 128: rtfmt = DXGI_FORMAT_R32G32B32A32_UINT; break;
+	case 64: rtfmt = DXGI_FORMAT_R16G16B16A16_UNORM; break;
+	case 32:
+	case 24:
+		//if( device_desc->alpha_bpp == 8 )
+			rtfmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		//else		
+			//rtfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
+		break;
+
+	case 16:
+		switch( device_desc->alpha_bpp )
+		{
+		case 4: rtfmt = DXGI_FORMAT_B4G4R4A4_UNORM; break;
+		case 1: rtfmt = DXGI_FORMAT_B5G5R5A1_UNORM; break;
+		default: rtfmt = DXGI_FORMAT_B5G6R5_UNORM; break;
+		}
+	default:
+		DISPDBG_RB( KE_ERROR, "Invalid render target format!" );
+	}
+
+	/* Interpret DepthStencil format */
+	switch( device_desc->depth_bpp )
+	{
+	case 32:
+		if( device_desc->stencil_bpp == 8 )
+			dsfmt = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+		else
+			dsfmt = DXGI_FORMAT_D32_FLOAT;
+		break;
+	case 24: dsfmt = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
+	case 16: dsfmt = DXGI_FORMAT_D16_UNORM; break;
+	default:
+		DISPDBG_RB( KE_ERROR, "Invalid depth stencil format!" );
+	}
+
 	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
 	swapchain_desc.BufferCount = device_desc->buffer_count;
     swapchain_desc.BufferDesc.Width = device_desc->width;
     swapchain_desc.BufferDesc.Height = device_desc->height;
-    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    swapchain_desc.BufferDesc.Format = rtfmt;
     swapchain_desc.BufferDesc.RefreshRate.Numerator = device_desc->refresh_rate;
     swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -405,7 +446,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	depthdesc.Height = device_desc->height;
 	depthdesc.MipLevels = 1;
 	depthdesc.ArraySize = 1;
-	depthdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthdesc.Format = dsfmt;
 	depthdesc.SampleDesc.Count = 1;
 	depthdesc.SampleDesc.Quality = 0;
 	depthdesc.Usage = D3D11_USAGE_DEFAULT;
@@ -495,7 +536,7 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 		DISPDBG_R( KE_ERROR, "Error initializing SDL video sub system!" );
 
 	/* Initialize the SDL window */
-	window = SDL_CreateWindow( "Kunai Engine 0.1a", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+	window = SDL_CreateWindow( "Kunai Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		device_desc->width, device_desc->height, SDL_WINDOW_SHOWN );
 	if( !window )
 		 DISPDBG_R( KE_ERROR, "Error creating SDL window!" );
