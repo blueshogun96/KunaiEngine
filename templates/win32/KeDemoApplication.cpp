@@ -81,8 +81,8 @@ CKeDemoApplication::CKeDemoApplication()
 
 	nv::vec3f vd[] = 
 	{
-		nv::vec3f( -1.0f, -1.0f, 0.0f ),
 		nv::vec3f( 1.0f, -1.0f, 0.0f ),
+		nv::vec3f( -1.0f, -1.0f, 0.0f ),
 		nv::vec3f( 0.0f, 1.0f, 0.0f ),
 	};
 

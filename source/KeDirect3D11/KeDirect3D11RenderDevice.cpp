@@ -362,14 +362,16 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	swapchain_desc.BufferCount = device_desc->buffer_count;
     swapchain_desc.BufferDesc.Width = device_desc->width;
     swapchain_desc.BufferDesc.Height = device_desc->height;
-    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapchain_desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     swapchain_desc.BufferDesc.RefreshRate.Numerator = device_desc->refresh_rate;
     swapchain_desc.BufferDesc.RefreshRate.Denominator = 1;
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchain_desc.OutputWindow = GetActiveWindow();
-    swapchain_desc.SampleDesc.Count = 4;
+    swapchain_desc.SampleDesc.Count = 1;
     swapchain_desc.SampleDesc.Quality = 0;
     swapchain_desc.Windowed = !device_desc->fullscreen;
+	swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 	HRESULT hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
 		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
@@ -398,14 +400,13 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
     D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
 
 	/* Create our depth stencil view */
-#if 1
 	D3D11_TEXTURE2D_DESC depthdesc;
 	depthdesc.Width = device_desc->width;
 	depthdesc.Height = device_desc->height;
 	depthdesc.MipLevels = 1;
 	depthdesc.ArraySize = 1;
 	depthdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthdesc.SampleDesc.Count = 4;
+	depthdesc.SampleDesc.Count = 1;
 	depthdesc.SampleDesc.Quality = 0;
 	depthdesc.Usage = D3D11_USAGE_DEFAULT;
 	depthdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -419,10 +420,6 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 
 	/* Set render target and depth stencil */
     d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), d3d_depth_stencil_view );
-#else
-	/* Set render target and depth stencil */
-    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), NULL );
-#endif
 
     /* Setup the viewport */
     D3D11_VIEWPORT vp;
