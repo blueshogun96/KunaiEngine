@@ -299,10 +299,10 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchain_desc.SampleDesc.Count = 1;
     swapchain_desc.SampleDesc.Quality = 0;
-	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	//swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapchain_desc.Flags = 0;
-	swapchain_desc.Scaling = DXGI_SCALING_NONE;
-	swapchain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+	//swapchain_desc.Scaling = DXGI_SCALING_NONE;
+	//swapchain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
 	hr = dxgi_factory->CreateSwapChainForCoreWindow( d3ddevice, reinterpret_cast<IUnknown*>(CoreWindow::GetForCurrentThread()),
 		&swapchain_desc, nullptr, &dxgi_swap_chain );
