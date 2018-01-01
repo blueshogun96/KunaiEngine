@@ -231,6 +231,62 @@ std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 	return "???";
 }
 
+DXGI_FORMAT KeDirect3D11GetRenderTargetFormat( int colour_bpp, int alpha_bpp )
+{
+	DXGI_FORMAT rtfmt;
+
+	/* Interpret RenderTarget format */
+	switch( colour_bpp )
+	{
+	case 128: rtfmt = DXGI_FORMAT_R32G32B32A32_UINT; break;
+	case 64: rtfmt = DXGI_FORMAT_R16G16B16A16_UNORM; break;
+	case 32:
+	case 24:
+		//if( device_desc->alpha_bpp == 8 )
+			rtfmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		//else		
+			//rtfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
+		break;
+
+	case 16:
+		switch( alpha_bpp )
+		{
+		case 4: rtfmt = DXGI_FORMAT_B4G4R4A4_UNORM; break;
+		case 1: rtfmt = DXGI_FORMAT_B5G5R5A1_UNORM; break;
+		default: rtfmt = DXGI_FORMAT_B5G6R5_UNORM; break;
+		}
+	default:
+		DISPDBG( KE_WARNING, "Unable to decipher render target format!" );
+		rtfmt = DXGI_FORMAT_UNKNOWN;
+	}
+
+	return rtfmt;
+}
+
+DXGI_FORMAT KeDirect3D11GetDepthStencilFormat( int depth_bpp, int stencil_bpp )
+{
+	DXGI_FORMAT dsfmt;
+	
+	/* Interpret DepthStencil format */
+	switch( depth_bpp )
+	{
+	case 32:
+		if( stencil_bpp == 8 )
+			dsfmt = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+		else
+			dsfmt = DXGI_FORMAT_D32_FLOAT;
+		break;
+	case 24: dsfmt = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
+	case 16: dsfmt = DXGI_FORMAT_D16_UNORM; break;
+	default:
+		DISPDBG( KE_WARNING, "Unable to decipher render target format!" );
+		dsfmt = DXGI_FORMAT_UNKNOWN;
+	}
+
+	return dsfmt;
+}
+
+
 #ifdef _UWP
 bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 {
@@ -289,20 +345,33 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	hr = dxgi_adapter->GetParent( __uuidof( IDXGIFactory2 ), (void**) &dxgi_factory );
 	D3D_DISPDBG_RB( KE_ERROR, "Error getting DXGI factory!", hr );
 
+	DXGI_FORMAT rtfmt, dsfmt;
+
+	rtfmt = KeDirect3D11GetRenderTargetFormat( device_desc->colour_bpp, device_desc->alpha_bpp );
+	dsfmt = KeDirect3D11GetDepthStencilFormat( device_desc->depth_bpp, device_desc->stencil_bpp );
+
+	/* UWP doesn't seem to like it when this is less than 2 */
+	int buffer_count = device_desc->buffer_count;
+	if( buffer_count < 2 )
+	{
+		DISPDBG( KE_WARNING, "Changing buffer count from 1 -> 2" );
+		buffer_count = 2;
+	}
+
 	//DXGI_SCALING scaling = DisplayMetrics::SupportHighResolutions ? DXGI_SCALING_NONE : DXGI_SCALING_STRETCH;
 	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
-	swapchain_desc.BufferCount = device_desc->buffer_count;
+	swapchain_desc.BufferCount = buffer_count;
     swapchain_desc.Width = device_desc->width;
     swapchain_desc.Height = device_desc->height;
-    swapchain_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    swapchain_desc.Format = rtfmt;
 	swapchain_desc.Stereo = false;		/* TODO: Make this configurable */
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchain_desc.SampleDesc.Count = 1;
     swapchain_desc.SampleDesc.Quality = 0;
-	//swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	swapchain_desc.Flags = 0;
-	//swapchain_desc.Scaling = DXGI_SCALING_NONE;
-	//swapchain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+	swapchain_desc.Scaling = DXGI_SCALING_NONE;
+	swapchain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
 	hr = dxgi_factory->CreateSwapChainForCoreWindow( d3ddevice, reinterpret_cast<IUnknown*>(CoreWindow::GetForCurrentThread()),
 		&swapchain_desc, nullptr, &dxgi_swap_chain );
@@ -323,6 +392,28 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	hr = d3ddevice->CreateRenderTargetView( backbuffer, nullptr, &d3d_render_target_view );
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
 
+	/* Create our depth stencil view */
+	D3D11_TEXTURE2D_DESC depthdesc;
+	depthdesc.Width = device_desc->width;
+	depthdesc.Height = device_desc->height;
+	depthdesc.MipLevels = 1;
+	depthdesc.ArraySize = 1;
+	depthdesc.Format = dsfmt;
+	depthdesc.SampleDesc.Count = 1;
+	depthdesc.SampleDesc.Quality = 0;
+	depthdesc.Usage = D3D11_USAGE_DEFAULT;
+	depthdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthdesc.CPUAccessFlags = 0;
+	depthdesc.MiscFlags = 0;
+	hr = d3ddevice->CreateTexture2D( &depthdesc, NULL, &d3d_depth_stencil_buffer );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil buffer!", hr );
+
+	hr = d3ddevice->CreateDepthStencilView( d3d_depth_stencil_buffer, nullptr, &d3d_depth_stencil_view );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil view!", hr );
+
+	/* Set render target and depth stencil */
+    //d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), d3d_depth_stencil_view );
+
 	D3D11_VIEWPORT vp;
     vp.Width = (FLOAT) device_desc->width;
     vp.Height = (FLOAT) device_desc->height;
@@ -331,6 +422,13 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
     vp.TopLeftX = 0;
     vp.TopLeftY = 0;
     d3ddevice_context->RSSetViewports( 1, &vp );
+
+	/* Get DXGI output */
+	if( FAILED( hr = dxgi_swap_chain->GetContainingOutput( &dxgi_output ) ) )
+	{
+		DISPDBG( KE_WARNING, "IDXGISwapChain::GetContainingOutput returned (0x" << hr << ")" );
+		dxgi_output = nullptr;
+	}
 
 	return S_OK;
 }
@@ -360,44 +458,8 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 
 	DXGI_FORMAT rtfmt, dsfmt;
 
-	/* Interpret RenderTarget format */
-	switch( device_desc->colour_bpp )
-	{
-	case 128: rtfmt = DXGI_FORMAT_R32G32B32A32_UINT; break;
-	case 64: rtfmt = DXGI_FORMAT_R16G16B16A16_UNORM; break;
-	case 32:
-	case 24:
-		//if( device_desc->alpha_bpp == 8 )
-			rtfmt = DXGI_FORMAT_B8G8R8A8_UNORM;
-		//else		
-			//rtfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
-		break;
-
-	case 16:
-		switch( device_desc->alpha_bpp )
-		{
-		case 4: rtfmt = DXGI_FORMAT_B4G4R4A4_UNORM; break;
-		case 1: rtfmt = DXGI_FORMAT_B5G5R5A1_UNORM; break;
-		default: rtfmt = DXGI_FORMAT_B5G6R5_UNORM; break;
-		}
-	default:
-		DISPDBG_RB( KE_ERROR, "Invalid render target format!" );
-	}
-
-	/* Interpret DepthStencil format */
-	switch( device_desc->depth_bpp )
-	{
-	case 32:
-		if( device_desc->stencil_bpp == 8 )
-			dsfmt = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-		else
-			dsfmt = DXGI_FORMAT_D32_FLOAT;
-		break;
-	case 24: dsfmt = DXGI_FORMAT_D24_UNORM_S8_UINT; break;
-	case 16: dsfmt = DXGI_FORMAT_D16_UNORM; break;
-	default:
-		DISPDBG_RB( KE_ERROR, "Invalid depth stencil format!" );
-	}
+	rtfmt = KeDirect3D11GetRenderTargetFormat( device_desc->colour_bpp, device_desc->alpha_bpp );
+	dsfmt = KeDirect3D11GetDepthStencilFormat( device_desc->depth_bpp, device_desc->stencil_bpp );
 
 	ZeroMemory( &swapchain_desc, sizeof( swapchain_desc ) );
 	swapchain_desc.BufferCount = device_desc->buffer_count;
