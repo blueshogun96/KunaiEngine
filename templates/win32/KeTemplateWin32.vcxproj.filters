@@ -180,6 +180,12 @@
     <Filter Include="Source Files\Engine\3rdParty\xiph\libtheora\x86_vc">
       <UniqueIdentifier>{f8de4df8-974f-444e-8b84-901a2720d195}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\3rdParty\glfx">
+      <UniqueIdentifier>{dbcb2d8e-3d34-45d9-9be5-65544f3283e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\3rdParty\glfx\generated">
+      <UniqueIdentifier>{5d68c8cc-3fd1-4545-9f27-49db79a73a8e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Winmain.cpp">
@@ -1579,6 +1585,45 @@
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\nvidia\Utility\ulWindows.cpp">
       <Filter>Source Files\Engine\3rdParty\nvidia</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\FileLoader.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\glfx.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\glfxc.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\glfxEffect.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\glfxErrorCheck.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\glfxProgram.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\ShaderCompiler.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\StringFunctions.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\StringToWString.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\generated\glfxLALRParser.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\generated\glfxScanner.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\generated\PreprocessLexer.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\glfx\src\generated\PreprocessParser.cpp">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -3159,6 +3204,51 @@
     </ClInclude>
     <ClInclude Include="..\..\3rdparty\nvidia\NV_Error.h">
       <Filter>Source Files\Engine\3rdParty\nvidia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\BufferedStringStreamBuf.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\FileLoader.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\glfxClasses.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\glfxEffect.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\glfxErrorCheck.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\glfxParser.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\glfxProgram.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\Preprocessor.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\StringFunctions.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\StringToWString.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\VisualStudioDebugOutput.h">
+      <Filter>Source Files\Engine\3rdParty\glfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\generated\glfxLALRParser.hpp">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\generated\glfxScanner.h">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\generated\PreprocessLexer.h">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\glfx\src\generated\PreprocessParser.h">
+      <Filter>Source Files\Engine\3rdParty\glfx\generated</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

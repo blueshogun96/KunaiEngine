@@ -1,0 +1,2475 @@
+Terminals unused in grammar
+
+   FLOAT
+   TIMES_EQUALS
+   OVER_EQUALS
+   PERCENT_EQUALS
+   PLUS_EQUALS
+   MINUS_EQUALS
+   LEFT_SHIFT_EQUALS
+   RIGHT_SHIFT_EQUALS
+   AND_EQUALS
+   XOR_EQUALS
+   OR_EQUALS
+
+
+State 12 conflicts: 1 shift/reduce
+State 16 conflicts: 28 reduce/reduce
+State 32 conflicts: 1 shift/reduce
+State 82 conflicts: 21 shift/reduce
+State 125 conflicts: 18 shift/reduce
+
+
+Grammar
+
+    0 $accept: prog $end
+
+    1 prog: prog prepr
+    2     | /* empty */
+
+    3 prepr: IF if_conditions
+    4      | MACRO_NAME optional_params
+    5      | IFNDEF IDENTIFIER
+    6      | IFDEF IDENTIFIER
+    7      | DEFINE IDENTIFIER optional_param_decls optional_definition
+    8      | ELSE
+    9      | ENDIF
+   10      | EOL
+   11      | NUMBER
+   12      | '('
+   13      | AND
+   14      | ')'
+   15      | symbol
+   16      | ','
+
+   17 symbol: '.'
+   18       | '<'
+   19       | '>'
+   20       | '{'
+   21       | '}'
+   22       | ','
+   23       | ';'
+   24       | '='
+   25       | '/'
+   26       | '*'
+   27       | '+'
+   28       | '-'
+   29       | '['
+   30       | ']'
+   31       | SYMBOL
+
+   32 optional_param_decls: '(' param_decl_list ')'
+   33                     | /* empty */
+
+   34 param_decl_list: param_decl_list ',' expression
+   35                | expression
+
+   36 expression: conditional_exp
+
+   37 conditional_exp: logical_or_exp
+   38                | logical_or_exp '?' expression ':' conditional_exp
+
+   39 logical_or_exp: logical_and_exp
+   40               | logical_or_exp OR logical_and_exp
+
+   41 logical_and_exp: inclusive_or_exp
+   42                | logical_and_exp AND inclusive_or_exp
+
+   43 inclusive_or_exp: exclusive_or_exp
+   44                 | inclusive_or_exp '|' exclusive_or_exp
+
+   45 exclusive_or_exp: and_exp
+   46                 | exclusive_or_exp '^' and_exp
+
+   47 and_exp: equality_exp
+   48        | and_exp '&' equality_exp
+
+   49 equality_exp: relational_exp
+   50             | equality_exp EQ_EQ relational_exp
+   51             | equality_exp NOT_EQ relational_exp
+
+   52 relational_exp: shift_expression
+   53               | relational_exp '<' shift_expression
+   54               | relational_exp '>' shift_expression
+   55               | relational_exp LESS_EQ shift_expression
+   56               | relational_exp GRTR_EQ shift_expression
+
+   57 shift_expression: additive_exp
+   58                 | shift_expression LEFT_SHIFT additive_exp
+   59                 | shift_expression RIGHT_SHIFT additive_exp
+
+   60 additive_exp: mult_exp
+   61             | additive_exp '+' mult_exp
+   62             | additive_exp '-' mult_exp
+
+   63 mult_exp: cast_exp
+   64         | mult_exp '*' cast_exp
+   65         | mult_exp '/' cast_exp
+   66         | mult_exp '%' cast_exp
+
+   67 cast_exp: unary_exp
+
+   68 unary_exp: postfix_exp
+   69          | PLUS_PLUS unary_exp
+   70          | MINUS_MINUS unary_exp
+   71          | unary_operator cast_exp
+
+   72 unary_operator: '&'
+   73               | '*'
+   74               | '+'
+   75               | '-'
+   76               | '~'
+   77               | '!'
+
+   78 postfix_exp: primary_exp
+   79            | postfix_exp '[' expression ']'
+   80            | postfix_exp '(' argument_exp_list ')'
+   81            | postfix_exp '(' ')'
+   82            | postfix_exp '.' IDENTIFIER
+
+   83 primary_exp: IDENTIFIER
+   84            | const
+   85            | '(' expression ')'
+
+   86 const: NUMBER
+
+   87 argument_exp_list: argument_exp_list ',' conditional_exp
+   88                  | conditional_exp
+
+   89 optional_params: '(' argument_exp_list ')'
+   90                | /* empty */
+
+   91 if_conditions: if_conditions OR if_condition
+   92              | if_condition
+
+   93 if_condition: IDENTIFIER if_test
+   94             | optional_boolean_not defined_test
+   95             | NUMBER
+
+   96 defined_test: DEFINED '(' IDENTIFIER ')'
+
+   97 optional_boolean_not: BOOLEAN_NOT
+   98                     | /* empty */
+
+   99 if_test: IS_EQUAL NUMBER
+  100        | /* empty */
+
+  101 optional_definition: WHITESPACE opt_definition
+  102                    | /* empty */
+
+  103 opt_definition: opt_definition definition_element
+  104               | definition_element
+  105               | /* empty */
+
+  106 definition_element: IDENTIFIER
+  107                   | '('
+  108                   | ')'
+  109                   | NUMBER
+  110                   | DOUBLE_HASH IDENTIFIER
+  111                   | symbol
+  112                   | WHITESPACE
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 77
+'%' (37) 66
+'&' (38) 48 72
+'(' (40) 12 32 80 81 85 89 96 107
+')' (41) 14 32 80 81 85 89 96 108
+'*' (42) 26 64 73
+'+' (43) 27 61 74
+',' (44) 16 22 34 87
+'-' (45) 28 62 75
+'.' (46) 17 82
+'/' (47) 25 65
+':' (58) 38
+';' (59) 23
+'<' (60) 18 53
+'=' (61) 24
+'>' (62) 19 54
+'?' (63) 38
+'[' (91) 29 79
+']' (93) 30 79
+'^' (94) 46
+'{' (123) 20
+'|' (124) 44
+'}' (125) 21
+'~' (126) 76
+error (256)
+NUMBER (258) 11 86 95 99 109
+FLOAT (259)
+DEFINE (260) 7
+IF (261) 3
+IFDEF (262) 6
+IFNDEF (263) 5
+ELSE (264) 8
+ENDIF (265) 9
+IDENTIFIER (266) 5 6 7 82 83 93 96 106 110
+IS_EQUAL (267) 99
+BOOLEAN_NOT (268) 97
+DEFINED (269) 96
+AND (270) 13 42
+OR (271) 40 91
+WHITESPACE (272) 101 112
+EOL (273) 10
+MACRO_NAME (274) 4
+TIMES_EQUALS (275)
+OVER_EQUALS (276)
+PERCENT_EQUALS (277)
+PLUS_EQUALS (278)
+MINUS_EQUALS (279)
+LEFT_SHIFT_EQUALS (280)
+RIGHT_SHIFT_EQUALS (281)
+AND_EQUALS (282)
+XOR_EQUALS (283)
+OR_EQUALS (284)
+LESS_EQ (285) 55
+GRTR_EQ (286) 56
+LEFT_SHIFT (287) 58
+RIGHT_SHIFT (288) 59
+PLUS_PLUS (289) 69
+MINUS_MINUS (290) 70
+EQ_EQ (291) 50
+NOT_EQ (292) 51
+SYMBOL (293) 31
+DOUBLE_HASH (294) 110
+
+
+Nonterminals, with rules where they appear
+
+$accept (64)
+    on left: 0
+prog (65)
+    on left: 1 2, on right: 0 1
+prepr (66)
+    on left: 3 4 5 6 7 8 9 10 11 12 13 14 15 16, on right: 1
+symbol (67)
+    on left: 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31, on right:
+    15 111
+optional_param_decls (68)
+    on left: 32 33, on right: 7
+param_decl_list (69)
+    on left: 34 35, on right: 32 34
+expression (70)
+    on left: 36, on right: 34 35 38 79 85
+conditional_exp (71)
+    on left: 37 38, on right: 36 38 87 88
+logical_or_exp (72)
+    on left: 39 40, on right: 37 38 40
+logical_and_exp (73)
+    on left: 41 42, on right: 39 40 42
+inclusive_or_exp (74)
+    on left: 43 44, on right: 41 42 44
+exclusive_or_exp (75)
+    on left: 45 46, on right: 43 44 46
+and_exp (76)
+    on left: 47 48, on right: 45 46 48
+equality_exp (77)
+    on left: 49 50 51, on right: 47 48 50 51
+relational_exp (78)
+    on left: 52 53 54 55 56, on right: 49 50 51 53 54 55 56
+shift_expression (79)
+    on left: 57 58 59, on right: 52 53 54 55 56 58 59
+additive_exp (80)
+    on left: 60 61 62, on right: 57 58 59 61 62
+mult_exp (81)
+    on left: 63 64 65 66, on right: 60 61 62 64 65 66
+cast_exp (82)
+    on left: 67, on right: 63 64 65 66 71
+unary_exp (83)
+    on left: 68 69 70 71, on right: 67 69 70
+unary_operator (84)
+    on left: 72 73 74 75 76 77, on right: 71
+postfix_exp (85)
+    on left: 78 79 80 81 82, on right: 68 79 80 81 82
+primary_exp (86)
+    on left: 83 84 85, on right: 78
+const (87)
+    on left: 86, on right: 84
+argument_exp_list (88)
+    on left: 87 88, on right: 80 87 89
+optional_params (89)
+    on left: 89 90, on right: 4
+if_conditions (90)
+    on left: 91 92, on right: 3 91
+if_condition (91)
+    on left: 93 94 95, on right: 91 92
+defined_test (92)
+    on left: 96, on right: 94
+optional_boolean_not (93)
+    on left: 97 98, on right: 94
+if_test (94)
+    on left: 99 100, on right: 93
+optional_definition (95)
+    on left: 101 102, on right: 7
+opt_definition (96)
+    on left: 103 104 105, on right: 101 103
+definition_element (97)
+    on left: 106 107 108 109 110 111 112, on right: 103 104
+
+
+State 0
+
+    0 $accept: . prog $end
+
+    $default  reduce using rule 2 (prog)
+
+    prog  go to state 1
+
+
+State 1
+
+    0 $accept: prog . $end
+    1 prog: prog . prepr
+
+    $end        shift, and go to state 2
+    NUMBER      shift, and go to state 3
+    DEFINE      shift, and go to state 4
+    IF          shift, and go to state 5
+    IFDEF       shift, and go to state 6
+    IFNDEF      shift, and go to state 7
+    ELSE        shift, and go to state 8
+    ENDIF       shift, and go to state 9
+    AND         shift, and go to state 10
+    EOL         shift, and go to state 11
+    MACRO_NAME  shift, and go to state 12
+    SYMBOL      shift, and go to state 13
+    '('         shift, and go to state 14
+    ')'         shift, and go to state 15
+    ','         shift, and go to state 16
+    '.'         shift, and go to state 17
+    '<'         shift, and go to state 18
+    '>'         shift, and go to state 19
+    '{'         shift, and go to state 20
+    '}'         shift, and go to state 21
+    ';'         shift, and go to state 22
+    '='         shift, and go to state 23
+    '/'         shift, and go to state 24
+    '*'         shift, and go to state 25
+    '+'         shift, and go to state 26
+    '-'         shift, and go to state 27
+    '['         shift, and go to state 28
+    ']'         shift, and go to state 29
+
+    prepr   go to state 30
+    symbol  go to state 31
+
+
+State 2
+
+    0 $accept: prog $end .
+
+    $default  accept
+
+
+State 3
+
+   11 prepr: NUMBER .
+
+    $default  reduce using rule 11 (prepr)
+
+
+State 4
+
+    7 prepr: DEFINE . IDENTIFIER optional_param_decls optional_definition
+
+    IDENTIFIER  shift, and go to state 32
+
+
+State 5
+
+    3 prepr: IF . if_conditions
+
+    NUMBER       shift, and go to state 33
+    IDENTIFIER   shift, and go to state 34
+    BOOLEAN_NOT  shift, and go to state 35
+
+    $default  reduce using rule 98 (optional_boolean_not)
+
+    if_conditions         go to state 36
+    if_condition          go to state 37
+    optional_boolean_not  go to state 38
+
+
+State 6
+
+    6 prepr: IFDEF . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 39
+
+
+State 7
+
+    5 prepr: IFNDEF . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 40
+
+
+State 8
+
+    8 prepr: ELSE .
+
+    $default  reduce using rule 8 (prepr)
+
+
+State 9
+
+    9 prepr: ENDIF .
+
+    $default  reduce using rule 9 (prepr)
+
+
+State 10
+
+   13 prepr: AND .
+
+    $default  reduce using rule 13 (prepr)
+
+
+State 11
+
+   10 prepr: EOL .
+
+    $default  reduce using rule 10 (prepr)
+
+
+State 12
+
+    4 prepr: MACRO_NAME . optional_params
+
+    '('  shift, and go to state 41
+
+    '('       [reduce using rule 90 (optional_params)]
+    $default  reduce using rule 90 (optional_params)
+
+    optional_params  go to state 42
+
+
+State 13
+
+   31 symbol: SYMBOL .
+
+    $default  reduce using rule 31 (symbol)
+
+
+State 14
+
+   12 prepr: '(' .
+
+    $default  reduce using rule 12 (prepr)
+
+
+State 15
+
+   14 prepr: ')' .
+
+    $default  reduce using rule 14 (prepr)
+
+
+State 16
+
+   16 prepr: ',' .
+   22 symbol: ',' .
+
+    $end        reduce using rule 16 (prepr)
+    $end        [reduce using rule 22 (symbol)]
+    NUMBER      reduce using rule 16 (prepr)
+    NUMBER      [reduce using rule 22 (symbol)]
+    DEFINE      reduce using rule 16 (prepr)
+    DEFINE      [reduce using rule 22 (symbol)]
+    IF          reduce using rule 16 (prepr)
+    IF          [reduce using rule 22 (symbol)]
+    IFDEF       reduce using rule 16 (prepr)
+    IFDEF       [reduce using rule 22 (symbol)]
+    IFNDEF      reduce using rule 16 (prepr)
+    IFNDEF      [reduce using rule 22 (symbol)]
+    ELSE        reduce using rule 16 (prepr)
+    ELSE        [reduce using rule 22 (symbol)]
+    ENDIF       reduce using rule 16 (prepr)
+    ENDIF       [reduce using rule 22 (symbol)]
+    AND         reduce using rule 16 (prepr)
+    AND         [reduce using rule 22 (symbol)]
+    EOL         reduce using rule 16 (prepr)
+    EOL         [reduce using rule 22 (symbol)]
+    MACRO_NAME  reduce using rule 16 (prepr)
+    MACRO_NAME  [reduce using rule 22 (symbol)]
+    SYMBOL      reduce using rule 16 (prepr)
+    SYMBOL      [reduce using rule 22 (symbol)]
+    '('         reduce using rule 16 (prepr)
+    '('         [reduce using rule 22 (symbol)]
+    ')'         reduce using rule 16 (prepr)
+    ')'         [reduce using rule 22 (symbol)]
+    ','         reduce using rule 16 (prepr)
+    ','         [reduce using rule 22 (symbol)]
+    '.'         reduce using rule 16 (prepr)
+    '.'         [reduce using rule 22 (symbol)]
+    '<'         reduce using rule 16 (prepr)
+    '<'         [reduce using rule 22 (symbol)]
+    '>'         reduce using rule 16 (prepr)
+    '>'         [reduce using rule 22 (symbol)]
+    '{'         reduce using rule 16 (prepr)
+    '{'         [reduce using rule 22 (symbol)]
+    '}'         reduce using rule 16 (prepr)
+    '}'         [reduce using rule 22 (symbol)]
+    ';'         reduce using rule 16 (prepr)
+    ';'         [reduce using rule 22 (symbol)]
+    '='         reduce using rule 16 (prepr)
+    '='         [reduce using rule 22 (symbol)]
+    '/'         reduce using rule 16 (prepr)
+    '/'         [reduce using rule 22 (symbol)]
+    '*'         reduce using rule 16 (prepr)
+    '*'         [reduce using rule 22 (symbol)]
+    '+'         reduce using rule 16 (prepr)
+    '+'         [reduce using rule 22 (symbol)]
+    '-'         reduce using rule 16 (prepr)
+    '-'         [reduce using rule 22 (symbol)]
+    '['         reduce using rule 16 (prepr)
+    '['         [reduce using rule 22 (symbol)]
+    ']'         reduce using rule 16 (prepr)
+    ']'         [reduce using rule 22 (symbol)]
+    $default    reduce using rule 16 (prepr)
+
+
+State 17
+
+   17 symbol: '.' .
+
+    $default  reduce using rule 17 (symbol)
+
+
+State 18
+
+   18 symbol: '<' .
+
+    $default  reduce using rule 18 (symbol)
+
+
+State 19
+
+   19 symbol: '>' .
+
+    $default  reduce using rule 19 (symbol)
+
+
+State 20
+
+   20 symbol: '{' .
+
+    $default  reduce using rule 20 (symbol)
+
+
+State 21
+
+   21 symbol: '}' .
+
+    $default  reduce using rule 21 (symbol)
+
+
+State 22
+
+   23 symbol: ';' .
+
+    $default  reduce using rule 23 (symbol)
+
+
+State 23
+
+   24 symbol: '=' .
+
+    $default  reduce using rule 24 (symbol)
+
+
+State 24
+
+   25 symbol: '/' .
+
+    $default  reduce using rule 25 (symbol)
+
+
+State 25
+
+   26 symbol: '*' .
+
+    $default  reduce using rule 26 (symbol)
+
+
+State 26
+
+   27 symbol: '+' .
+
+    $default  reduce using rule 27 (symbol)
+
+
+State 27
+
+   28 symbol: '-' .
+
+    $default  reduce using rule 28 (symbol)
+
+
+State 28
+
+   29 symbol: '[' .
+
+    $default  reduce using rule 29 (symbol)
+
+
+State 29
+
+   30 symbol: ']' .
+
+    $default  reduce using rule 30 (symbol)
+
+
+State 30
+
+    1 prog: prog prepr .
+
+    $default  reduce using rule 1 (prog)
+
+
+State 31
+
+   15 prepr: symbol .
+
+    $default  reduce using rule 15 (prepr)
+
+
+State 32
+
+    7 prepr: DEFINE IDENTIFIER . optional_param_decls optional_definition
+
+    '('  shift, and go to state 43
+
+    '('       [reduce using rule 33 (optional_param_decls)]
+    $default  reduce using rule 33 (optional_param_decls)
+
+    optional_param_decls  go to state 44
+
+
+State 33
+
+   95 if_condition: NUMBER .
+
+    $default  reduce using rule 95 (if_condition)
+
+
+State 34
+
+   93 if_condition: IDENTIFIER . if_test
+
+    IS_EQUAL  shift, and go to state 45
+
+    $default  reduce using rule 100 (if_test)
+
+    if_test  go to state 46
+
+
+State 35
+
+   97 optional_boolean_not: BOOLEAN_NOT .
+
+    $default  reduce using rule 97 (optional_boolean_not)
+
+
+State 36
+
+    3 prepr: IF if_conditions .
+   91 if_conditions: if_conditions . OR if_condition
+
+    OR  shift, and go to state 47
+
+    $default  reduce using rule 3 (prepr)
+
+
+State 37
+
+   92 if_conditions: if_condition .
+
+    $default  reduce using rule 92 (if_conditions)
+
+
+State 38
+
+   94 if_condition: optional_boolean_not . defined_test
+
+    DEFINED  shift, and go to state 48
+
+    defined_test  go to state 49
+
+
+State 39
+
+    6 prepr: IFDEF IDENTIFIER .
+
+    $default  reduce using rule 6 (prepr)
+
+
+State 40
+
+    5 prepr: IFNDEF IDENTIFIER .
+
+    $default  reduce using rule 5 (prepr)
+
+
+State 41
+
+   89 optional_params: '(' . argument_exp_list ')'
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    conditional_exp    go to state 61
+    logical_or_exp     go to state 62
+    logical_and_exp    go to state 63
+    inclusive_or_exp   go to state 64
+    exclusive_or_exp   go to state 65
+    and_exp            go to state 66
+    equality_exp       go to state 67
+    relational_exp     go to state 68
+    shift_expression   go to state 69
+    additive_exp       go to state 70
+    mult_exp           go to state 71
+    cast_exp           go to state 72
+    unary_exp          go to state 73
+    unary_operator     go to state 74
+    postfix_exp        go to state 75
+    primary_exp        go to state 76
+    const              go to state 77
+    argument_exp_list  go to state 78
+
+
+State 42
+
+    4 prepr: MACRO_NAME optional_params .
+
+    $default  reduce using rule 4 (prepr)
+
+
+State 43
+
+   32 optional_param_decls: '(' . param_decl_list ')'
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    param_decl_list   go to state 79
+    expression        go to state 80
+    conditional_exp   go to state 81
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 44
+
+    7 prepr: DEFINE IDENTIFIER optional_param_decls . optional_definition
+
+    WHITESPACE  shift, and go to state 82
+
+    $default  reduce using rule 102 (optional_definition)
+
+    optional_definition  go to state 83
+
+
+State 45
+
+   99 if_test: IS_EQUAL . NUMBER
+
+    NUMBER  shift, and go to state 84
+
+
+State 46
+
+   93 if_condition: IDENTIFIER if_test .
+
+    $default  reduce using rule 93 (if_condition)
+
+
+State 47
+
+   91 if_conditions: if_conditions OR . if_condition
+
+    NUMBER       shift, and go to state 33
+    IDENTIFIER   shift, and go to state 34
+    BOOLEAN_NOT  shift, and go to state 35
+
+    $default  reduce using rule 98 (optional_boolean_not)
+
+    if_condition          go to state 85
+    optional_boolean_not  go to state 38
+
+
+State 48
+
+   96 defined_test: DEFINED . '(' IDENTIFIER ')'
+
+    '('  shift, and go to state 86
+
+
+State 49
+
+   94 if_condition: optional_boolean_not defined_test .
+
+    $default  reduce using rule 94 (if_condition)
+
+
+State 50
+
+   86 const: NUMBER .
+
+    $default  reduce using rule 86 (const)
+
+
+State 51
+
+   83 primary_exp: IDENTIFIER .
+
+    $default  reduce using rule 83 (primary_exp)
+
+
+State 52
+
+   69 unary_exp: PLUS_PLUS . unary_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    unary_exp       go to state 87
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 53
+
+   70 unary_exp: MINUS_MINUS . unary_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    unary_exp       go to state 88
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 54
+
+   85 primary_exp: '(' . expression ')'
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    expression        go to state 89
+    conditional_exp   go to state 81
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 55
+
+   73 unary_operator: '*' .
+
+    $default  reduce using rule 73 (unary_operator)
+
+
+State 56
+
+   74 unary_operator: '+' .
+
+    $default  reduce using rule 74 (unary_operator)
+
+
+State 57
+
+   75 unary_operator: '-' .
+
+    $default  reduce using rule 75 (unary_operator)
+
+
+State 58
+
+   72 unary_operator: '&' .
+
+    $default  reduce using rule 72 (unary_operator)
+
+
+State 59
+
+   76 unary_operator: '~' .
+
+    $default  reduce using rule 76 (unary_operator)
+
+
+State 60
+
+   77 unary_operator: '!' .
+
+    $default  reduce using rule 77 (unary_operator)
+
+
+State 61
+
+   88 argument_exp_list: conditional_exp .
+
+    $default  reduce using rule 88 (argument_exp_list)
+
+
+State 62
+
+   37 conditional_exp: logical_or_exp .
+   38                | logical_or_exp . '?' expression ':' conditional_exp
+   40 logical_or_exp: logical_or_exp . OR logical_and_exp
+
+    OR   shift, and go to state 90
+    '?'  shift, and go to state 91
+
+    $default  reduce using rule 37 (conditional_exp)
+
+
+State 63
+
+   39 logical_or_exp: logical_and_exp .
+   42 logical_and_exp: logical_and_exp . AND inclusive_or_exp
+
+    AND  shift, and go to state 92
+
+    $default  reduce using rule 39 (logical_or_exp)
+
+
+State 64
+
+   41 logical_and_exp: inclusive_or_exp .
+   44 inclusive_or_exp: inclusive_or_exp . '|' exclusive_or_exp
+
+    '|'  shift, and go to state 93
+
+    $default  reduce using rule 41 (logical_and_exp)
+
+
+State 65
+
+   43 inclusive_or_exp: exclusive_or_exp .
+   46 exclusive_or_exp: exclusive_or_exp . '^' and_exp
+
+    '^'  shift, and go to state 94
+
+    $default  reduce using rule 43 (inclusive_or_exp)
+
+
+State 66
+
+   45 exclusive_or_exp: and_exp .
+   48 and_exp: and_exp . '&' equality_exp
+
+    '&'  shift, and go to state 95
+
+    $default  reduce using rule 45 (exclusive_or_exp)
+
+
+State 67
+
+   47 and_exp: equality_exp .
+   50 equality_exp: equality_exp . EQ_EQ relational_exp
+   51             | equality_exp . NOT_EQ relational_exp
+
+    EQ_EQ   shift, and go to state 96
+    NOT_EQ  shift, and go to state 97
+
+    $default  reduce using rule 47 (and_exp)
+
+
+State 68
+
+   49 equality_exp: relational_exp .
+   53 relational_exp: relational_exp . '<' shift_expression
+   54               | relational_exp . '>' shift_expression
+   55               | relational_exp . LESS_EQ shift_expression
+   56               | relational_exp . GRTR_EQ shift_expression
+
+    LESS_EQ  shift, and go to state 98
+    GRTR_EQ  shift, and go to state 99
+    '<'      shift, and go to state 100
+    '>'      shift, and go to state 101
+
+    $default  reduce using rule 49 (equality_exp)
+
+
+State 69
+
+   52 relational_exp: shift_expression .
+   58 shift_expression: shift_expression . LEFT_SHIFT additive_exp
+   59                 | shift_expression . RIGHT_SHIFT additive_exp
+
+    LEFT_SHIFT   shift, and go to state 102
+    RIGHT_SHIFT  shift, and go to state 103
+
+    $default  reduce using rule 52 (relational_exp)
+
+
+State 70
+
+   57 shift_expression: additive_exp .
+   61 additive_exp: additive_exp . '+' mult_exp
+   62             | additive_exp . '-' mult_exp
+
+    '+'  shift, and go to state 104
+    '-'  shift, and go to state 105
+
+    $default  reduce using rule 57 (shift_expression)
+
+
+State 71
+
+   60 additive_exp: mult_exp .
+   64 mult_exp: mult_exp . '*' cast_exp
+   65         | mult_exp . '/' cast_exp
+   66         | mult_exp . '%' cast_exp
+
+    '/'  shift, and go to state 106
+    '*'  shift, and go to state 107
+    '%'  shift, and go to state 108
+
+    $default  reduce using rule 60 (additive_exp)
+
+
+State 72
+
+   63 mult_exp: cast_exp .
+
+    $default  reduce using rule 63 (mult_exp)
+
+
+State 73
+
+   67 cast_exp: unary_exp .
+
+    $default  reduce using rule 67 (cast_exp)
+
+
+State 74
+
+   71 unary_exp: unary_operator . cast_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    cast_exp        go to state 109
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 75
+
+   68 unary_exp: postfix_exp .
+   79 postfix_exp: postfix_exp . '[' expression ']'
+   80            | postfix_exp . '(' argument_exp_list ')'
+   81            | postfix_exp . '(' ')'
+   82            | postfix_exp . '.' IDENTIFIER
+
+    '('  shift, and go to state 110
+    '.'  shift, and go to state 111
+    '['  shift, and go to state 112
+
+    $default  reduce using rule 68 (unary_exp)
+
+
+State 76
+
+   78 postfix_exp: primary_exp .
+
+    $default  reduce using rule 78 (postfix_exp)
+
+
+State 77
+
+   84 primary_exp: const .
+
+    $default  reduce using rule 84 (primary_exp)
+
+
+State 78
+
+   87 argument_exp_list: argument_exp_list . ',' conditional_exp
+   89 optional_params: '(' argument_exp_list . ')'
+
+    ')'  shift, and go to state 113
+    ','  shift, and go to state 114
+
+
+State 79
+
+   32 optional_param_decls: '(' param_decl_list . ')'
+   34 param_decl_list: param_decl_list . ',' expression
+
+    ')'  shift, and go to state 115
+    ','  shift, and go to state 116
+
+
+State 80
+
+   35 param_decl_list: expression .
+
+    $default  reduce using rule 35 (param_decl_list)
+
+
+State 81
+
+   36 expression: conditional_exp .
+
+    $default  reduce using rule 36 (expression)
+
+
+State 82
+
+  101 optional_definition: WHITESPACE . opt_definition
+
+    NUMBER       shift, and go to state 117
+    IDENTIFIER   shift, and go to state 118
+    WHITESPACE   shift, and go to state 119
+    SYMBOL       shift, and go to state 13
+    DOUBLE_HASH  shift, and go to state 120
+    '('          shift, and go to state 121
+    ')'          shift, and go to state 122
+    ','          shift, and go to state 123
+    '.'          shift, and go to state 17
+    '<'          shift, and go to state 18
+    '>'          shift, and go to state 19
+    '{'          shift, and go to state 20
+    '}'          shift, and go to state 21
+    ';'          shift, and go to state 22
+    '='          shift, and go to state 23
+    '/'          shift, and go to state 24
+    '*'          shift, and go to state 25
+    '+'          shift, and go to state 26
+    '-'          shift, and go to state 27
+    '['          shift, and go to state 28
+    ']'          shift, and go to state 29
+
+    NUMBER       [reduce using rule 105 (opt_definition)]
+    IDENTIFIER   [reduce using rule 105 (opt_definition)]
+    WHITESPACE   [reduce using rule 105 (opt_definition)]
+    SYMBOL       [reduce using rule 105 (opt_definition)]
+    DOUBLE_HASH  [reduce using rule 105 (opt_definition)]
+    '('          [reduce using rule 105 (opt_definition)]
+    ')'          [reduce using rule 105 (opt_definition)]
+    ','          [reduce using rule 105 (opt_definition)]
+    '.'          [reduce using rule 105 (opt_definition)]
+    '<'          [reduce using rule 105 (opt_definition)]
+    '>'          [reduce using rule 105 (opt_definition)]
+    '{'          [reduce using rule 105 (opt_definition)]
+    '}'          [reduce using rule 105 (opt_definition)]
+    ';'          [reduce using rule 105 (opt_definition)]
+    '='          [reduce using rule 105 (opt_definition)]
+    '/'          [reduce using rule 105 (opt_definition)]
+    '*'          [reduce using rule 105 (opt_definition)]
+    '+'          [reduce using rule 105 (opt_definition)]
+    '-'          [reduce using rule 105 (opt_definition)]
+    '['          [reduce using rule 105 (opt_definition)]
+    ']'          [reduce using rule 105 (opt_definition)]
+    $default     reduce using rule 105 (opt_definition)
+
+    symbol              go to state 124
+    opt_definition      go to state 125
+    definition_element  go to state 126
+
+
+State 83
+
+    7 prepr: DEFINE IDENTIFIER optional_param_decls optional_definition .
+
+    $default  reduce using rule 7 (prepr)
+
+
+State 84
+
+   99 if_test: IS_EQUAL NUMBER .
+
+    $default  reduce using rule 99 (if_test)
+
+
+State 85
+
+   91 if_conditions: if_conditions OR if_condition .
+
+    $default  reduce using rule 91 (if_conditions)
+
+
+State 86
+
+   96 defined_test: DEFINED '(' . IDENTIFIER ')'
+
+    IDENTIFIER  shift, and go to state 127
+
+
+State 87
+
+   69 unary_exp: PLUS_PLUS unary_exp .
+
+    $default  reduce using rule 69 (unary_exp)
+
+
+State 88
+
+   70 unary_exp: MINUS_MINUS unary_exp .
+
+    $default  reduce using rule 70 (unary_exp)
+
+
+State 89
+
+   85 primary_exp: '(' expression . ')'
+
+    ')'  shift, and go to state 128
+
+
+State 90
+
+   40 logical_or_exp: logical_or_exp OR . logical_and_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    logical_and_exp   go to state 129
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 91
+
+   38 conditional_exp: logical_or_exp '?' . expression ':' conditional_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    expression        go to state 130
+    conditional_exp   go to state 81
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 92
+
+   42 logical_and_exp: logical_and_exp AND . inclusive_or_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    inclusive_or_exp  go to state 131
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 93
+
+   44 inclusive_or_exp: inclusive_or_exp '|' . exclusive_or_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    exclusive_or_exp  go to state 132
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 94
+
+   46 exclusive_or_exp: exclusive_or_exp '^' . and_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    and_exp           go to state 133
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 95
+
+   48 and_exp: and_exp '&' . equality_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    equality_exp      go to state 134
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 96
+
+   50 equality_exp: equality_exp EQ_EQ . relational_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    relational_exp    go to state 135
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 97
+
+   51 equality_exp: equality_exp NOT_EQ . relational_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    relational_exp    go to state 136
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 98
+
+   55 relational_exp: relational_exp LESS_EQ . shift_expression
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    shift_expression  go to state 137
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 99
+
+   56 relational_exp: relational_exp GRTR_EQ . shift_expression
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    shift_expression  go to state 138
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 100
+
+   53 relational_exp: relational_exp '<' . shift_expression
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    shift_expression  go to state 139
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 101
+
+   54 relational_exp: relational_exp '>' . shift_expression
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    shift_expression  go to state 140
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 102
+
+   58 shift_expression: shift_expression LEFT_SHIFT . additive_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    additive_exp    go to state 141
+    mult_exp        go to state 71
+    cast_exp        go to state 72
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 103
+
+   59 shift_expression: shift_expression RIGHT_SHIFT . additive_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    additive_exp    go to state 142
+    mult_exp        go to state 71
+    cast_exp        go to state 72
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 104
+
+   61 additive_exp: additive_exp '+' . mult_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    mult_exp        go to state 143
+    cast_exp        go to state 72
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 105
+
+   62 additive_exp: additive_exp '-' . mult_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    mult_exp        go to state 144
+    cast_exp        go to state 72
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 106
+
+   65 mult_exp: mult_exp '/' . cast_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    cast_exp        go to state 145
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 107
+
+   64 mult_exp: mult_exp '*' . cast_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    cast_exp        go to state 146
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 108
+
+   66 mult_exp: mult_exp '%' . cast_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    cast_exp        go to state 147
+    unary_exp       go to state 73
+    unary_operator  go to state 74
+    postfix_exp     go to state 75
+    primary_exp     go to state 76
+    const           go to state 77
+
+
+State 109
+
+   71 unary_exp: unary_operator cast_exp .
+
+    $default  reduce using rule 71 (unary_exp)
+
+
+State 110
+
+   80 postfix_exp: postfix_exp '(' . argument_exp_list ')'
+   81            | postfix_exp '(' . ')'
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    ')'          shift, and go to state 148
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    conditional_exp    go to state 61
+    logical_or_exp     go to state 62
+    logical_and_exp    go to state 63
+    inclusive_or_exp   go to state 64
+    exclusive_or_exp   go to state 65
+    and_exp            go to state 66
+    equality_exp       go to state 67
+    relational_exp     go to state 68
+    shift_expression   go to state 69
+    additive_exp       go to state 70
+    mult_exp           go to state 71
+    cast_exp           go to state 72
+    unary_exp          go to state 73
+    unary_operator     go to state 74
+    postfix_exp        go to state 75
+    primary_exp        go to state 76
+    const              go to state 77
+    argument_exp_list  go to state 149
+
+
+State 111
+
+   82 postfix_exp: postfix_exp '.' . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 150
+
+
+State 112
+
+   79 postfix_exp: postfix_exp '[' . expression ']'
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    expression        go to state 151
+    conditional_exp   go to state 81
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 113
+
+   89 optional_params: '(' argument_exp_list ')' .
+
+    $default  reduce using rule 89 (optional_params)
+
+
+State 114
+
+   87 argument_exp_list: argument_exp_list ',' . conditional_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    conditional_exp   go to state 152
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 115
+
+   32 optional_param_decls: '(' param_decl_list ')' .
+
+    $default  reduce using rule 32 (optional_param_decls)
+
+
+State 116
+
+   34 param_decl_list: param_decl_list ',' . expression
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    expression        go to state 153
+    conditional_exp   go to state 81
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 117
+
+  109 definition_element: NUMBER .
+
+    $default  reduce using rule 109 (definition_element)
+
+
+State 118
+
+  106 definition_element: IDENTIFIER .
+
+    $default  reduce using rule 106 (definition_element)
+
+
+State 119
+
+  112 definition_element: WHITESPACE .
+
+    $default  reduce using rule 112 (definition_element)
+
+
+State 120
+
+  110 definition_element: DOUBLE_HASH . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 154
+
+
+State 121
+
+  107 definition_element: '(' .
+
+    $default  reduce using rule 107 (definition_element)
+
+
+State 122
+
+  108 definition_element: ')' .
+
+    $default  reduce using rule 108 (definition_element)
+
+
+State 123
+
+   22 symbol: ',' .
+
+    $default  reduce using rule 22 (symbol)
+
+
+State 124
+
+  111 definition_element: symbol .
+
+    $default  reduce using rule 111 (definition_element)
+
+
+State 125
+
+  101 optional_definition: WHITESPACE opt_definition .
+  103 opt_definition: opt_definition . definition_element
+
+    NUMBER       shift, and go to state 117
+    IDENTIFIER   shift, and go to state 118
+    WHITESPACE   shift, and go to state 119
+    SYMBOL       shift, and go to state 13
+    DOUBLE_HASH  shift, and go to state 120
+    '('          shift, and go to state 121
+    ')'          shift, and go to state 122
+    ','          shift, and go to state 123
+    '.'          shift, and go to state 17
+    '<'          shift, and go to state 18
+    '>'          shift, and go to state 19
+    '{'          shift, and go to state 20
+    '}'          shift, and go to state 21
+    ';'          shift, and go to state 22
+    '='          shift, and go to state 23
+    '/'          shift, and go to state 24
+    '*'          shift, and go to state 25
+    '+'          shift, and go to state 26
+    '-'          shift, and go to state 27
+    '['          shift, and go to state 28
+    ']'          shift, and go to state 29
+
+    NUMBER    [reduce using rule 101 (optional_definition)]
+    SYMBOL    [reduce using rule 101 (optional_definition)]
+    '('       [reduce using rule 101 (optional_definition)]
+    ')'       [reduce using rule 101 (optional_definition)]
+    ','       [reduce using rule 101 (optional_definition)]
+    '.'       [reduce using rule 101 (optional_definition)]
+    '<'       [reduce using rule 101 (optional_definition)]
+    '>'       [reduce using rule 101 (optional_definition)]
+    '{'       [reduce using rule 101 (optional_definition)]
+    '}'       [reduce using rule 101 (optional_definition)]
+    ';'       [reduce using rule 101 (optional_definition)]
+    '='       [reduce using rule 101 (optional_definition)]
+    '/'       [reduce using rule 101 (optional_definition)]
+    '*'       [reduce using rule 101 (optional_definition)]
+    '+'       [reduce using rule 101 (optional_definition)]
+    '-'       [reduce using rule 101 (optional_definition)]
+    '['       [reduce using rule 101 (optional_definition)]
+    ']'       [reduce using rule 101 (optional_definition)]
+    $default  reduce using rule 101 (optional_definition)
+
+    symbol              go to state 124
+    definition_element  go to state 155
+
+
+State 126
+
+  104 opt_definition: definition_element .
+
+    $default  reduce using rule 104 (opt_definition)
+
+
+State 127
+
+   96 defined_test: DEFINED '(' IDENTIFIER . ')'
+
+    ')'  shift, and go to state 156
+
+
+State 128
+
+   85 primary_exp: '(' expression ')' .
+
+    $default  reduce using rule 85 (primary_exp)
+
+
+State 129
+
+   40 logical_or_exp: logical_or_exp OR logical_and_exp .
+   42 logical_and_exp: logical_and_exp . AND inclusive_or_exp
+
+    AND  shift, and go to state 92
+
+    $default  reduce using rule 40 (logical_or_exp)
+
+
+State 130
+
+   38 conditional_exp: logical_or_exp '?' expression . ':' conditional_exp
+
+    ':'  shift, and go to state 157
+
+
+State 131
+
+   42 logical_and_exp: logical_and_exp AND inclusive_or_exp .
+   44 inclusive_or_exp: inclusive_or_exp . '|' exclusive_or_exp
+
+    '|'  shift, and go to state 93
+
+    $default  reduce using rule 42 (logical_and_exp)
+
+
+State 132
+
+   44 inclusive_or_exp: inclusive_or_exp '|' exclusive_or_exp .
+   46 exclusive_or_exp: exclusive_or_exp . '^' and_exp
+
+    '^'  shift, and go to state 94
+
+    $default  reduce using rule 44 (inclusive_or_exp)
+
+
+State 133
+
+   46 exclusive_or_exp: exclusive_or_exp '^' and_exp .
+   48 and_exp: and_exp . '&' equality_exp
+
+    '&'  shift, and go to state 95
+
+    $default  reduce using rule 46 (exclusive_or_exp)
+
+
+State 134
+
+   48 and_exp: and_exp '&' equality_exp .
+   50 equality_exp: equality_exp . EQ_EQ relational_exp
+   51             | equality_exp . NOT_EQ relational_exp
+
+    EQ_EQ   shift, and go to state 96
+    NOT_EQ  shift, and go to state 97
+
+    $default  reduce using rule 48 (and_exp)
+
+
+State 135
+
+   50 equality_exp: equality_exp EQ_EQ relational_exp .
+   53 relational_exp: relational_exp . '<' shift_expression
+   54               | relational_exp . '>' shift_expression
+   55               | relational_exp . LESS_EQ shift_expression
+   56               | relational_exp . GRTR_EQ shift_expression
+
+    LESS_EQ  shift, and go to state 98
+    GRTR_EQ  shift, and go to state 99
+    '<'      shift, and go to state 100
+    '>'      shift, and go to state 101
+
+    $default  reduce using rule 50 (equality_exp)
+
+
+State 136
+
+   51 equality_exp: equality_exp NOT_EQ relational_exp .
+   53 relational_exp: relational_exp . '<' shift_expression
+   54               | relational_exp . '>' shift_expression
+   55               | relational_exp . LESS_EQ shift_expression
+   56               | relational_exp . GRTR_EQ shift_expression
+
+    LESS_EQ  shift, and go to state 98
+    GRTR_EQ  shift, and go to state 99
+    '<'      shift, and go to state 100
+    '>'      shift, and go to state 101
+
+    $default  reduce using rule 51 (equality_exp)
+
+
+State 137
+
+   55 relational_exp: relational_exp LESS_EQ shift_expression .
+   58 shift_expression: shift_expression . LEFT_SHIFT additive_exp
+   59                 | shift_expression . RIGHT_SHIFT additive_exp
+
+    LEFT_SHIFT   shift, and go to state 102
+    RIGHT_SHIFT  shift, and go to state 103
+
+    $default  reduce using rule 55 (relational_exp)
+
+
+State 138
+
+   56 relational_exp: relational_exp GRTR_EQ shift_expression .
+   58 shift_expression: shift_expression . LEFT_SHIFT additive_exp
+   59                 | shift_expression . RIGHT_SHIFT additive_exp
+
+    LEFT_SHIFT   shift, and go to state 102
+    RIGHT_SHIFT  shift, and go to state 103
+
+    $default  reduce using rule 56 (relational_exp)
+
+
+State 139
+
+   53 relational_exp: relational_exp '<' shift_expression .
+   58 shift_expression: shift_expression . LEFT_SHIFT additive_exp
+   59                 | shift_expression . RIGHT_SHIFT additive_exp
+
+    LEFT_SHIFT   shift, and go to state 102
+    RIGHT_SHIFT  shift, and go to state 103
+
+    $default  reduce using rule 53 (relational_exp)
+
+
+State 140
+
+   54 relational_exp: relational_exp '>' shift_expression .
+   58 shift_expression: shift_expression . LEFT_SHIFT additive_exp
+   59                 | shift_expression . RIGHT_SHIFT additive_exp
+
+    LEFT_SHIFT   shift, and go to state 102
+    RIGHT_SHIFT  shift, and go to state 103
+
+    $default  reduce using rule 54 (relational_exp)
+
+
+State 141
+
+   58 shift_expression: shift_expression LEFT_SHIFT additive_exp .
+   61 additive_exp: additive_exp . '+' mult_exp
+   62             | additive_exp . '-' mult_exp
+
+    '+'  shift, and go to state 104
+    '-'  shift, and go to state 105
+
+    $default  reduce using rule 58 (shift_expression)
+
+
+State 142
+
+   59 shift_expression: shift_expression RIGHT_SHIFT additive_exp .
+   61 additive_exp: additive_exp . '+' mult_exp
+   62             | additive_exp . '-' mult_exp
+
+    '+'  shift, and go to state 104
+    '-'  shift, and go to state 105
+
+    $default  reduce using rule 59 (shift_expression)
+
+
+State 143
+
+   61 additive_exp: additive_exp '+' mult_exp .
+   64 mult_exp: mult_exp . '*' cast_exp
+   65         | mult_exp . '/' cast_exp
+   66         | mult_exp . '%' cast_exp
+
+    '/'  shift, and go to state 106
+    '*'  shift, and go to state 107
+    '%'  shift, and go to state 108
+
+    $default  reduce using rule 61 (additive_exp)
+
+
+State 144
+
+   62 additive_exp: additive_exp '-' mult_exp .
+   64 mult_exp: mult_exp . '*' cast_exp
+   65         | mult_exp . '/' cast_exp
+   66         | mult_exp . '%' cast_exp
+
+    '/'  shift, and go to state 106
+    '*'  shift, and go to state 107
+    '%'  shift, and go to state 108
+
+    $default  reduce using rule 62 (additive_exp)
+
+
+State 145
+
+   65 mult_exp: mult_exp '/' cast_exp .
+
+    $default  reduce using rule 65 (mult_exp)
+
+
+State 146
+
+   64 mult_exp: mult_exp '*' cast_exp .
+
+    $default  reduce using rule 64 (mult_exp)
+
+
+State 147
+
+   66 mult_exp: mult_exp '%' cast_exp .
+
+    $default  reduce using rule 66 (mult_exp)
+
+
+State 148
+
+   81 postfix_exp: postfix_exp '(' ')' .
+
+    $default  reduce using rule 81 (postfix_exp)
+
+
+State 149
+
+   80 postfix_exp: postfix_exp '(' argument_exp_list . ')'
+   87 argument_exp_list: argument_exp_list . ',' conditional_exp
+
+    ')'  shift, and go to state 158
+    ','  shift, and go to state 114
+
+
+State 150
+
+   82 postfix_exp: postfix_exp '.' IDENTIFIER .
+
+    $default  reduce using rule 82 (postfix_exp)
+
+
+State 151
+
+   79 postfix_exp: postfix_exp '[' expression . ']'
+
+    ']'  shift, and go to state 159
+
+
+State 152
+
+   87 argument_exp_list: argument_exp_list ',' conditional_exp .
+
+    $default  reduce using rule 87 (argument_exp_list)
+
+
+State 153
+
+   34 param_decl_list: param_decl_list ',' expression .
+
+    $default  reduce using rule 34 (param_decl_list)
+
+
+State 154
+
+  110 definition_element: DOUBLE_HASH IDENTIFIER .
+
+    $default  reduce using rule 110 (definition_element)
+
+
+State 155
+
+  103 opt_definition: opt_definition definition_element .
+
+    $default  reduce using rule 103 (opt_definition)
+
+
+State 156
+
+   96 defined_test: DEFINED '(' IDENTIFIER ')' .
+
+    $default  reduce using rule 96 (defined_test)
+
+
+State 157
+
+   38 conditional_exp: logical_or_exp '?' expression ':' . conditional_exp
+
+    NUMBER       shift, and go to state 50
+    IDENTIFIER   shift, and go to state 51
+    PLUS_PLUS    shift, and go to state 52
+    MINUS_MINUS  shift, and go to state 53
+    '('          shift, and go to state 54
+    '*'          shift, and go to state 55
+    '+'          shift, and go to state 56
+    '-'          shift, and go to state 57
+    '&'          shift, and go to state 58
+    '~'          shift, and go to state 59
+    '!'          shift, and go to state 60
+
+    conditional_exp   go to state 160
+    logical_or_exp    go to state 62
+    logical_and_exp   go to state 63
+    inclusive_or_exp  go to state 64
+    exclusive_or_exp  go to state 65
+    and_exp           go to state 66
+    equality_exp      go to state 67
+    relational_exp    go to state 68
+    shift_expression  go to state 69
+    additive_exp      go to state 70
+    mult_exp          go to state 71
+    cast_exp          go to state 72
+    unary_exp         go to state 73
+    unary_operator    go to state 74
+    postfix_exp       go to state 75
+    primary_exp       go to state 76
+    const             go to state 77
+
+
+State 158
+
+   80 postfix_exp: postfix_exp '(' argument_exp_list ')' .
+
+    $default  reduce using rule 80 (postfix_exp)
+
+
+State 159
+
+   79 postfix_exp: postfix_exp '[' expression ']' .
+
+    $default  reduce using rule 79 (postfix_exp)
+
+
+State 160
+
+   38 conditional_exp: logical_or_exp '?' expression ':' conditional_exp .
+
+    $default  reduce using rule 38 (conditional_exp)
