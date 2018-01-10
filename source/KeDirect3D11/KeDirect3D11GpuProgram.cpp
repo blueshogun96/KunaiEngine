@@ -10,6 +10,18 @@
 #include "KeDirect3D11RenderDevice.h"
 
 
+
+/*
+ * Debugging macros
+ */
+#define DISPDBG_R( a, b ) { DISPDBG( a, b ); return; }
+#define DISPDBG_RB( a, b ) { DISPDBG( a, b ); return false; }
+#define D3D_DISPDBG( a, b, c ) if(FAILED(c)) { DISPDBG( a, b << "\nError code: (" << c << ")" ); }
+#define D3D_DISPDBG_R( a, b, c ) if(FAILED(c)) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return; }
+#define D3D_DISPDBG_RB( a, b, c ) if(FAILED(c)) { DISPDBG( a, b << "\nError code: (" << c << ")" ); return false; }
+
+
+
 /*
  * Name: IKeDirect3D11GpuProgram::Destroy
  * Desc: Handles destruction of this interface instance.

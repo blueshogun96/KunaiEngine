@@ -231,6 +231,9 @@ struct IKeDirect3D11Fence : public IKeFence
 struct IKeDirect3D11RenderStateBuffer : public IKeRenderStateBuffer
 {
     virtual void Destroy();
+	bool PVT_CreateWithDefaults( CD3D11Device device );
+	bool PVT_CreateWithDefaults( CD3D11Device1 device );
+	bool PVT_CreateWithDefaults( CD3D11Device2 device );
 
 	CD3D11BlendState			bs;
 	CD3D11RasterizerState		rs;
@@ -382,6 +385,7 @@ protected:
 #endif
 	uint32_t						im_cache_size;
     IKeGeometryBuffer*				im_gb;
+	IKeDirect3D11RenderStateBuffer*	rsb_default;
 };
 
 #endif /* defined(__ke_d3d11_renderdevice__) */

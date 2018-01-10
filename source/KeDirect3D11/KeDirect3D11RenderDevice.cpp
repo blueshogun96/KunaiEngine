@@ -566,7 +566,7 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice()
 * Name: IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice
 * Desc: Appropriate constructor used for initialization of Direct3D and a window via SDL.
 */
-IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : swap_interval(0), im_gb(NULL), im_cache_size(4096)
+IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : swap_interval(0), im_gb(NULL), im_cache_size(4096), rsb_default(nullptr)
 {
 	/* Until we are finished initializing, mark this flag as false */
 	initialized = false;
@@ -611,6 +611,15 @@ IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice( KeRenderDeviceDesc* render
 		PVT_InitializeDirect3DWin32();
 #endif
 
+	/* Initialize default render state buffer, and set it as the current one */
+	if( rsb_default ) rsb_default->Destroy();
+	
+	rsb_default = new IKeDirect3D11RenderStateBuffer();
+	if( rsb_default->PVT_CreateWithDefaults( d3ddevice ) )
+	{
+		SetRenderStateBuffer( rsb_default );
+	}
+
 	/* Set vertex attributes to their defaults */
 	current_vertexattribute[0].index = 0;
 	current_vertexattribute[0].size = 3;
@@ -641,6 +650,8 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 
 	/* Uninitialize and close Direct3D and SDL video */
 	
+	if( rsb_default ) rsb_default->Destroy();
+
 	dxgi_output = 0;
 	d3ddevice_context->ClearState();
 	d3d_render_target_view = 0;
