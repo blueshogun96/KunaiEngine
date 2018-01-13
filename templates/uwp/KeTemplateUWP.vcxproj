@@ -127,7 +127,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(KunaiEngineLibraryUWPDir)\SDL2_ttf\lib\x86\Debug;$(KunaiEngineLibraryUWPDir)\SDL2\lib\x86;$(KunaiEngineLibraryUWPDir)\pthread_uwp\lib\x86\Debug;$(KunaiEngineLibraryUWPDir)\SDL2_image\lib\x86\Debug;$(KunaiEngineLibraryUWPDir)\nvapi\x86;$(KunaiEngineLibraryUWPDir)\freetype2\lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winmm.lib;pthreads-UWP-S.lib;ws2_32.lib;dxguid.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;pthreads-UWP-S.lib;ws2_32.lib;dxguid.lib;dxgi.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,7 +140,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(KunaiEngineLibraryDir)\SDL2_ttf\lib\x86;$(KunaiEngineLibraryDir)\SDL2\lib\x86;$(KunaiEngineLibraryDir)\pthread_uwp\lib\x86\Release;$(KunaiEngineLibraryDir)\SDL2_image\lib\x86;$(KunaiEngineLibraryDir)\nvapi\x86;$(KunaiEngineLibraryDir)\freetype2\lib\x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winmm.lib;pthreads-UWP-S.lib;ws2_32.lib;dxguid.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;pthreads-UWP-S.lib;ws2_32.lib;dxguid.lib;dxgi.lib;d3d11.lib;d3dcompiler.lib;xaudio2.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

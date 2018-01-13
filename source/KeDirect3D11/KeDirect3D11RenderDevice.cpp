@@ -411,33 +411,46 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
     swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchain_desc.SampleDesc.Count = 1;
     swapchain_desc.SampleDesc.Quality = 0;
-	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapchain_desc.Flags = 0;
-	swapchain_desc.Scaling = DXGI_SCALING_NONE;
+	swapchain_desc.Scaling = DXGI_SCALING_ASPECT_RATIO_STRETCH;
 	swapchain_desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
+	CDXGISwapChain1 swapchain;
 	hr = dxgi_factory->CreateSwapChainForCoreWindow( d3ddevice, reinterpret_cast<IUnknown*>(CoreWindow::GetForCurrentThread()),
-		&swapchain_desc, nullptr, &dxgi_swap_chain );
+		&swapchain_desc, nullptr, &swapchain );
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating DXGI swapchain!", hr );
+
+	hr = swapchain->QueryInterface( &dxgi_swap_chain );
+	D3D_DISPDBG_RB( KE_ERROR, "Error querying IDXGISwapChain3 pointer!", hr );
 
 	/* This must be set to one in order to pass Windows Store certification */
 	hr = dxgi_device->SetMaximumFrameLatency(1);
 	D3D_DISPDBG_RB( KE_ERROR, "Error setting maximum frame latency!", hr );
+
+	/* Set device orientation */
+	/* TODO: Autodetect or allow a constant orientation to be set */
+	dxgi_swap_chain->SetRotation( DXGI_MODE_ROTATION_IDENTITY );
+
+	/*
+	 * TODO: Enable HDR support
+	 */
 
 	/*
 	 * Setup render target and viewport
 	 */
 
 	CD3D11Texture2D backbuffer;
-	hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**) &backbuffer );
+	hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( CD3D11Texture2D ), (void**) &backbuffer );
 	D3D_DISPDBG_RB( KE_ERROR, "Error getting backbuffer!", hr );
 
-	hr = d3ddevice->CreateRenderTargetView( backbuffer, nullptr, &d3d_render_target_view );
+	CD3D11_RENDER_TARGET_VIEW_DESC rtvdesc( D3D11_RTV_DIMENSION_TEXTURE2D );
+	hr = d3ddevice->CreateRenderTargetView( backbuffer, &rtvdesc, &d3d_render_target_view );
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating render target view!", hr );
 
 	/* Create our depth stencil view */
-	D3D11_TEXTURE2D_DESC depthdesc;
-	depthdesc.Width = device_desc->width;
+	CD3D11_TEXTURE2D_DESC depthdesc( dsfmt, device_desc->width, device_desc->height, 1, 1, D3D11_BIND_DEPTH_STENCIL );
+	/*depthdesc.Width = device_desc->width;
 	depthdesc.Height = device_desc->height;
 	depthdesc.MipLevels = 1;
 	depthdesc.ArraySize = 1;
@@ -447,11 +460,12 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	depthdesc.Usage = D3D11_USAGE_DEFAULT;
 	depthdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	depthdesc.CPUAccessFlags = 0;
-	depthdesc.MiscFlags = 0;
+	depthdesc.MiscFlags = 0;*/
 	hr = d3ddevice->CreateTexture2D( &depthdesc, NULL, &d3d_depth_stencil_buffer );
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil buffer!", hr );
 
-	hr = d3ddevice->CreateDepthStencilView( d3d_depth_stencil_buffer, nullptr, &d3d_depth_stencil_view );
+	CD3D11_DEPTH_STENCIL_VIEW_DESC dsvdesc( D3D11_DSV_DIMENSION_TEXTURE2D );
+	hr = d3ddevice->CreateDepthStencilView( d3d_depth_stencil_buffer, &dsvdesc, &d3d_depth_stencil_view );
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil view!", hr );
 
 	/* Set render target and depth stencil */

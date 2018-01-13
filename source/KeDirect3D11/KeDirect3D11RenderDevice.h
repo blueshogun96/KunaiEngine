@@ -87,6 +87,7 @@ typedef _ComPtr(ID3D11RasterizerState1)		CD3D11RasterizerState1;
 typedef _ComPtr(ID3D11Device2)				CD3D11Device2;
 typedef _ComPtr(ID3D11DeviceContext2)		CD3D11DeviceContext2;
 typedef _ComPtr(IDXGISwapChain2)			CDXGISwapChain2;
+typedef _ComPtr(IDXGISwapChain3)			CDXGISwapChain3;
 //typedef _ComPtr(IDXGISwapChainMedia)		CDXGISwapChainMedia;
 typedef _ComPtr(IDXGIDevice3)				CDXGIDevice3;
 #endif
@@ -375,7 +376,7 @@ protected:
 	CD3D11Device					d3ddevice;
 	CD3D11DeviceContext				d3ddevice_context;
 #ifdef _UWP
-	CDXGISwapChain1					dxgi_swap_chain;
+	CDXGISwapChain3					dxgi_swap_chain;
 #else
 	CDXGISwapChain					dxgi_swap_chain; 
 #endif
