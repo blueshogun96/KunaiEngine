@@ -312,7 +312,17 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	int feature_level_count = ARRAYSIZE( feature_levels );
 
 #ifdef _DEBUG
-	flags |= D3D11_CREATE_DEVICE_DEBUG;  // Comment this out when D3D11CreateDevice fails with 0x887A002D (DXGI_ERROR_SDK_COMPONENT_MISSING)
+	if( PVT_SdkLayersAvaiable() )
+	{
+		flags |= D3D11_CREATE_DEVICE_DEBUG;  // Comment this out when D3D11CreateDevice fails with 0x887A002D (DXGI_ERROR_SDK_COMPONENT_MISSING)
+
+		CDXGIInfoQueue dxgi_info_queue;
+		if( SUCCEEDED( DXGIGetDebugInterface1( 0, IID_IDXGIInfoQueue, (void**) &dxgi_info_queue ) ) )
+		{
+			dxgi_info_queue->SetBreakOnSeverity( DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true );
+			dxgi_info_queue->SetBreakOnSeverity( DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true );
+		}
+	}
 #endif
 
 	HRESULT hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
@@ -331,6 +341,39 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	}
 #endif
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
+
+	CD3D11Debug d3ddebug;
+
+	if( SUCCEEDED( hr = d3ddevice->QueryInterface( &d3ddebug ) ) )
+	{
+		CD3D11InfoQueue d3dinfoqueue;
+		if( SUCCEEDED( hr = d3ddebug->QueryInterface( &d3dinfoqueue ) ) )
+		{
+#ifdef _DEBUG
+			hr = d3dinfoqueue->SetBreakOnSeverity( D3D11_MESSAGE_SEVERITY_CORRUPTION, true );
+			D3D_DISPDBG( KE_WARNING, "Error setting corruption message severity settings...", hr );
+			hr = d3dinfoqueue->SetBreakOnSeverity( D3D11_MESSAGE_SEVERITY_ERROR, true );
+			D3D_DISPDBG( KE_WARNING, "Error setting error message severity settings...", hr );
+#endif
+			D3D11_MESSAGE_ID hide[] = 
+			{
+				D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
+			};
+			D3D11_INFO_QUEUE_FILTER filter = {};
+			filter.DenyList.NumIDs = _countof(hide);
+			filter.DenyList.pIDList = hide;
+			hr = d3dinfoqueue->AddStorageFilterEntries( &filter );
+			D3D_DISPDBG( KE_WARNING, "Error adding storage filter entries...", hr );
+		}
+		else
+		{
+			D3D_DISPDBG( KE_WARNING, "Could not query ID3D11InfoQueue interface!", hr );
+		}
+	}
+	else
+	{
+		D3D_DISPDBG( KE_WARNING, "Could not query ID3D11Debug interface!", hr );
+	}
 
 	/* 
 	 * Initialize swapchain 
@@ -547,6 +590,25 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 
 
 /*
+ * Name: IKeDirect3D11RenderDevice::PVT_SdkLayersAvailable
+ * Desc: Returns true if a debug device can be created or not.
+ */
+bool IKeDirect3D11RenderDevice::PVT_SdkLayersAvaiable()
+{
+	HRESULT hr = D3D11CreateDevice(
+		nullptr,
+		D3D_DRIVER_TYPE_NULL,
+		0,
+		D3D11_CREATE_DEVICE_DEBUG,
+		nullptr, 0,
+		D3D11_SDK_VERSION,
+		nullptr, nullptr, nullptr );
+
+	return SUCCEEDED(hr);
+}
+
+
+/*
 * Name: IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice
 * Desc: Default constructor
 */
@@ -656,6 +718,7 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 	d3ddevice_context->ClearState();
 	d3d_render_target_view = 0;
 	dxgi_swap_chain = 0;
+	d3ddevice_context->Flush();
 	d3ddevice_context = 0;
 	d3ddevice = 0;
 

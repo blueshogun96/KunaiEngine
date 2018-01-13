@@ -18,6 +18,10 @@
 #include <d3d11.h>
 #include <d3d11_1.h>
 #include <d3d11_2.h>
+#include <d3d11_3.h>
+#include <d3d11_4.h>
+#include <dxgi1_5.h>
+#include <dxgidebug.h>
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include <comip.h>
@@ -29,60 +33,68 @@
 /*
  * Non-ATL based smart COM pointer types
  */
-#define _ComPtr(_interface)	_com_ptr_t<_com_IIID<_interface, __uuidof(_interface)>>
+#define _ComPtr(_interface)	_com_ptr_t<_com_IIID<_interface, &__uuidof(_interface)>>
 
 #ifndef _UWP	/* For Desktop Windows only */
-typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>							CDirectDraw7;
+typedef _ComPtr(IDirectDraw7)				CDirectDraw7;
 #endif
 
-typedef _com_ptr_t<_com_IIID<ID3D11Device, &IID_ID3D11Device>>							CD3D11Device;
-typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext, &IID_ID3D11DeviceContext>>			CD3D11DeviceContext;
-typedef _com_ptr_t<_com_IIID<IDXGISwapChain, &IID_IDXGISwapChain>>						CDXGISwapChain;
-typedef _com_ptr_t<_com_IIID<IDXGIOutput, &IID_IDXGIOutput>>							CDXGIOutput;
-typedef _com_ptr_t<_com_IIID<IDXGIDevice, &IID_IDXGIDevice>>							CDXGIDevice;
-typedef _com_ptr_t<_com_IIID<IDXGIDevice1, &IID_IDXGIDevice1>>							CDXGIDevice1;
-typedef _com_ptr_t<_com_IIID<IDXGIAdapter, &IID_IDXGIAdapter>>							CDXGIAdapter;
-typedef _com_ptr_t<_com_IIID<IDXGIFactory, &IID_IDXGIFactory>>							CDXGIFactory;
-typedef _com_ptr_t<_com_IIID<IDXGIFactory1, &IID_IDXGIFactory1>>						CDXGIFactory1;
-typedef _com_ptr_t<_com_IIID<ID3D11RenderTargetView, &IID_ID3D11RenderTargetView>>		CD3D11RenderTargetView;
-typedef _com_ptr_t<_com_IIID<ID3D11DepthStencilView, &IID_ID3D11DepthStencilView>>		CD3D11DepthStencilView;
-typedef _com_ptr_t<_com_IIID<ID3D11Buffer, &IID_ID3D11Buffer>>							CD3D11Buffer;
-typedef _com_ptr_t<_com_IIID<ID3D11VertexShader, &IID_ID3D11VertexShader>>				CD3D11VertexShader;
-typedef _com_ptr_t<_com_IIID<ID3D11PixelShader, &IID_ID3D11PixelShader>>				CD3D11PixelShader;
-typedef _com_ptr_t<_com_IIID<ID3D11GeometryShader, &IID_ID3D11GeometryShader>>			CD3D11GeometryShader;
-typedef _com_ptr_t<_com_IIID<ID3D11HullShader, &IID_ID3D11HullShader>>					CD3D11HullShader;
-typedef _com_ptr_t<_com_IIID<ID3D11DomainShader, &IID_ID3D11DomainShader>>				CD3D11DomainShader;
-typedef _com_ptr_t<_com_IIID<ID3D11ComputeShader, &IID_ID3D11ComputeShader>>			CD3D11ComputeShader;
-typedef _com_ptr_t<_com_IIID<ID3D11InputLayout, &IID_ID3D11InputLayout>>				CD3D11InputLayout;
-typedef _com_ptr_t<_com_IIID<ID3D11Texture1D, &IID_ID3D11Texture1D>>					CD3D11Texture1D;
-typedef _com_ptr_t<_com_IIID<ID3D11Texture2D, &IID_ID3D11Texture2D>>					CD3D11Texture2D;
-typedef _com_ptr_t<_com_IIID<ID3D11Texture3D, &IID_ID3D11Texture3D>>					CD3D11Texture3D;
-typedef _com_ptr_t<_com_IIID<ID3D11BlendState, &IID_ID3D11BlendState>>					CD3D11BlendState;
-typedef _com_ptr_t<_com_IIID<ID3D11RasterizerState, &IID_ID3D11RasterizerState>>		CD3D11RasterizerState;
-typedef _com_ptr_t<_com_IIID<ID3D11DepthStencilState, &IID_ID3D11DepthStencilState>>	CD3D11DepthStencilState;
-typedef _com_ptr_t<_com_IIID<ID3D11SamplerState, &IID_ID3D11SamplerState>>				CD3D11SamplerState;
-typedef _com_ptr_t<_com_IIID<ID3D11Query, &IID_ID3D11Query>>							CD3D11Query;
-typedef _com_ptr_t<_com_IIID<ID3D11CommandList, &IID_ID3D11CommandList>>				CD3D11CommandList;
-typedef _com_ptr_t<_com_IIID<ID3D11ShaderResourceView, &IID_ID3D11ShaderResourceView>>	CD3D11ShaderResourceView;
-typedef _com_ptr_t<_com_IIID<ID3D10Blob, &IID_ID3D10Blob>>								CD3D10Blob;
+typedef _ComPtr(ID3D11Device)				CD3D11Device;
+typedef _ComPtr(ID3D11DeviceContext)		CD3D11DeviceContext;
+typedef _ComPtr(IDXGISwapChain)				CDXGISwapChain;
+typedef _ComPtr(IDXGIOutput)				CDXGIOutput;
+typedef _ComPtr(IDXGIDevice)				CDXGIDevice;
+typedef _ComPtr(IDXGIDevice1)				CDXGIDevice1;
+typedef _ComPtr(IDXGIAdapter)				CDXGIAdapter;
+typedef _ComPtr(IDXGIFactory)				CDXGIFactory;
+typedef _ComPtr(IDXGIFactory1)				CDXGIFactory1;
+typedef _ComPtr(ID3D11RenderTargetView)		CD3D11RenderTargetView;
+typedef _ComPtr(ID3D11DepthStencilView)		CD3D11DepthStencilView;
+typedef _ComPtr(ID3D11Buffer)				CD3D11Buffer;
+typedef _ComPtr(ID3D11VertexShader)			CD3D11VertexShader;
+typedef _ComPtr(ID3D11PixelShader)			CD3D11PixelShader;
+typedef _ComPtr(ID3D11GeometryShader)		CD3D11GeometryShader;
+typedef _ComPtr(ID3D11HullShader)			CD3D11HullShader;
+typedef _ComPtr(ID3D11DomainShader)			CD3D11DomainShader;
+typedef _ComPtr(ID3D11ComputeShader)		CD3D11ComputeShader;
+typedef _ComPtr(ID3D11InputLayout)			CD3D11InputLayout;
+typedef _ComPtr(ID3D11Texture1D)			CD3D11Texture1D;
+typedef _ComPtr(ID3D11Texture2D)			CD3D11Texture2D;
+typedef _ComPtr(ID3D11Texture3D)			CD3D11Texture3D;
+typedef _ComPtr(ID3D11BlendState)			CD3D11BlendState;
+typedef _ComPtr(ID3D11RasterizerState)		CD3D11RasterizerState;
+typedef _ComPtr(ID3D11DepthStencilState)	CD3D11DepthStencilState;
+typedef _ComPtr(ID3D11SamplerState)			CD3D11SamplerState;
+typedef _ComPtr(ID3D11Query)				CD3D11Query;
+typedef _ComPtr(ID3D11CommandList)			CD3D11CommandList;
+typedef _ComPtr(ID3D11ShaderResourceView)	CD3D11ShaderResourceView;
+typedef _ComPtr(ID3D10Blob)					CD3D10Blob;
+typedef _ComPtr(ID3D11Debug)				CD3D11Debug;
+typedef _ComPtr(ID3D11InfoQueue)			CD3D11InfoQueue;
 
 #ifdef __d3d11_1_h__
-typedef _com_ptr_t<_com_IIID<ID3D11Device1, &IID_ID3D11Device1>>						CD3D11Device1;
-typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext1, &IID_ID3D11DeviceContext1>>			CD3D11DeviceContext1;
-typedef _com_ptr_t<_com_IIID<IDXGISwapChain1, &IID_IDXGISwapChain1>>					CDXGISwapChain1;
-typedef _com_ptr_t<_com_IIID<IDXGIOutput1, &IID_IDXGIOutput1>>							CDXGIOutput1;
-typedef _com_ptr_t<_com_IIID<IDXGIDevice2, &IID_IDXGIDevice2>>							CDXGIDevice2;
-typedef _com_ptr_t<_com_IIID<IDXGIFactory2, &IID_IDXGIFactory2>>						CDXGIFactory2;
-typedef _com_ptr_t<_com_IIID<ID3D11BlendState1, &IID_ID3D11BlendState1>>				CD3D11BlendState1;
-typedef _com_ptr_t<_com_IIID<ID3D11RasterizerState1, &IID_ID3D11RasterizerState1>>		CD3D11RasterizerState1;
+typedef _ComPtr(ID3D11Device1)				CD3D11Device1;
+typedef _ComPtr(ID3D11DeviceContext1)		CD3D11DeviceContext1;
+typedef _ComPtr(IDXGISwapChain1)			CDXGISwapChain1;
+typedef _ComPtr(IDXGIOutput1)				CDXGIOutput1;
+typedef _ComPtr(IDXGIDevice2)				CDXGIDevice2;
+typedef _ComPtr(IDXGIFactory2)				CDXGIFactory2;
+typedef _ComPtr(ID3D11BlendState1)			CD3D11BlendState1;
+typedef _ComPtr(ID3D11RasterizerState1)		CD3D11RasterizerState1;
 #endif
 
 #ifdef __d3d11_2_h__
-typedef _com_ptr_t<_com_IIID<ID3D11Device2, &IID_ID3D11Device2>>						CD3D11Device2;
-typedef _com_ptr_t<_com_IIID<ID3D11DeviceContext2, &IID_ID3D11DeviceContext2>>			CD3D11DeviceContext2;
-typedef _com_ptr_t<_com_IIID<IDXGISwapChain2, &IID_IDXGISwapChain2>>					CDXGISwapChain2;
-typedef _com_ptr_t<_com_IIID<IDXGISwapChainMedia, &IID_IDXGISwapChainMedia>>			CDXGISwapChainMedia;
-typedef _com_ptr_t<_com_IIID<IDXGIDevice3, &IID_IDXGIDevice3>>							CDXGIDevice3;
+typedef _ComPtr(ID3D11Device2)				CD3D11Device2;
+typedef _ComPtr(ID3D11DeviceContext2)		CD3D11DeviceContext2;
+typedef _ComPtr(IDXGISwapChain2)			CDXGISwapChain2;
+//typedef _ComPtr(IDXGISwapChainMedia)		CDXGISwapChainMedia;
+typedef _ComPtr(IDXGIDevice3)				CDXGIDevice3;
+#endif
+
+#ifdef __dxgidebug_h__
+typedef _ComPtr(IDXGIInfoQueue)				CDXGIInfoQueue;
+typedef _ComPtr(IDXGIDebug)					CDXGIDebug;
+typedef _ComPtr(IDXGIDebug1)				CDXGIDebug1;
 #endif
 
 /*
@@ -354,6 +366,7 @@ protected:
 #else
 	bool PVT_InitializeDirect3DWin32();
 #endif
+	bool PVT_SdkLayersAvaiable();
 
 protected:
 	SDL_Window*						window;
