@@ -310,7 +310,6 @@ protected:
 	int			major_version;
 	int			minor_version;
 	int			fence_vendor;
-	void*		dd;
 	KeState		samplers[8][16];
 	int			dirty_samplers[8][16];
     uint32_t    im_cache_size;

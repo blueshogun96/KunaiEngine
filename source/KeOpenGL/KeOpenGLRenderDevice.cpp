@@ -24,6 +24,11 @@
 #define USE_D3DKMT_VBLANK		/* Use D3DKMT for vblank detection */
 
 #include <ddraw.h>
+#include <comip.h>
+#include <comdef.h>
+
+/* DirectDraw smart pointer */
+typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>	CDirectDraw7;
 
 
 typedef UINT  D3DDDI_VIDEO_PRESENT_SOURCE_ID;
@@ -105,6 +110,8 @@ struct KeProgramAttribute
 #ifdef _WIN32
 PFND3DKMT_WAITFORVERTICALBLANKEVENT pfnD3DKMTWaitForVerticalBlankEvent;
 PFND3DKMT_OPENADAPTERFROMHDC		pfnD3DKMTOpenAdapterFromHdc;
+
+CDirectDraw7						ddraw = NULL;
 #endif
 
 
@@ -534,7 +541,7 @@ bool IKeOpenGLRenderDevice::PVT_InititalizeDriverHooks()
 void IKeOpenGLRenderDevice::PVT_BlockUntilVerticalBlankDDraw()
 {
 #ifdef _WIN32
-	reinterpret_cast<IDirectDraw7*>(dd)->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
+	ddraw->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
 #else
     DISPDBG( KE_ERROR, "This function should never be called outside of Windows!" );
 #endif
@@ -600,7 +607,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice()
  * Name: IKeOpenGLRenderDevice::IKeOpenGLRenderDevice
  * Desc: Appropriate constructor used for initialization of OpenGL via SDL.
  */
-IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : fence_vendor( KE_FENCE_ARB ), dd(NULL), im_gb(NULL), im_cache_size(0)
+IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_desc ) : fence_vendor( KE_FENCE_ARB ), im_gb(NULL), im_cache_size(0)
 {
     /* Until we are finished initializing, mark this flag as false */
     initialized = false;
@@ -623,9 +630,12 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     
 #if defined(USE_DDRAW_VMEM) || defined(USE_DDRAW_VBLANK)
 	/* Create a DirectDraw object if desired */
-	HRESULT hr = DirectDrawCreateEx( NULL, &dd, IID_IDirectDraw7, NULL );
-	if( FAILED( hr ) )
-		DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!" );
+	if( ddraw != NULL )
+	{
+		HRESULT hr = DirectDrawCreateEx( NULL, (void**) &ddraw, IID_IDirectDraw7, NULL );
+		if( FAILED( hr ) )
+			DISPDBG_R( KE_ERROR, "Error creating DirectDraw7 object.  Disable DirectDraw if not needed!" );
+	}
 #endif
 
 	/* Initialize driver hooks */
@@ -914,8 +924,8 @@ IKeOpenGLRenderDevice::~IKeOpenGLRenderDevice()
 
 	/* Uninitialize DirectDraw */
 #ifdef _WIN32
-	if( dd )
-		reinterpret_cast<IDirectDraw7*>( dd )->Release();
+	/*if( dd )
+		reinterpret_cast<IDirectDraw7*>( dd )->Release();*/
 #endif
 }
 
@@ -2952,7 +2962,7 @@ void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* fre
 #ifdef _WIN32
  #ifdef USE_DDRAW_VMEM
 	DDSCAPS2 caps;
-	reinterpret_cast<IDirectDraw7*>( dd )->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
+	ddraw->GetAvailableVidMem( &caps, (DWORD*) total_memory, (DWORD*) free_memory );
  #endif
 #endif
 
