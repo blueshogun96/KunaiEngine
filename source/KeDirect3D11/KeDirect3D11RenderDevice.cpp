@@ -469,7 +469,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil view!", hr );
 
 	/* Set render target and depth stencil */
-    //d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), d3d_depth_stencil_view );
+    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), /*d3d_depth_stencil_view*/ nullptr );
 
 	D3D11_VIEWPORT vp;
     vp.Width = (FLOAT) device_desc->width;
@@ -2661,4 +2661,23 @@ void IKeDirect3D11RenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t*
   #endif
  #endif
 #endif
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::Trim
+ * Desc: 
+ */
+void IKeDirect3D11RenderDevice::Trim()
+{
+	CDXGIDevice3 dxgidevice;
+	HRESULT hr;
+
+	if( SUCCEEDED( hr = d3ddevice->QueryInterface( &dxgidevice ) ) )
+	{
+		dxgidevice->Trim();
+		return;
+	}
+
+	D3D_DISPDBG( KE_WARNING, "Trim failed!", hr );
 }

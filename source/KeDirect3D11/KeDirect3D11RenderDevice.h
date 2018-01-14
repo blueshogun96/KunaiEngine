@@ -36,7 +36,8 @@
 #define _ComPtr(_interface)	_com_ptr_t<_com_IIID<_interface, &__uuidof(_interface)>>
 
 #ifndef _UWP	/* For Desktop Windows only */
-typedef _ComPtr(IDirectDraw7)				CDirectDraw7;
+//typedef _ComPtr(IDirectDraw7)				CDirectDraw7;
+typedef _com_ptr_t<_com_IIID<IDirectDraw7, &IID_IDirectDraw7>>	CDirectDraw7;
 #endif
 
 typedef _ComPtr(ID3D11Device)				CD3D11Device;
@@ -360,6 +361,7 @@ public:
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory );
+	virtual void Trim();
 
 protected:
 #ifdef _UWP

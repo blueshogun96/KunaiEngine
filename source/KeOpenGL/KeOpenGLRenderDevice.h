@@ -294,6 +294,7 @@ public:
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory );
+	virtual void Trim();
     
 private:    /* Private, internal use only */
     void PVT_ApplySamplerStates();

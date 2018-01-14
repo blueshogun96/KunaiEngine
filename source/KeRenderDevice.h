@@ -609,6 +609,7 @@ public:
     
     /* Misc */
     virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory ) PURE;
+	virtual void Trim() PURE;
     
 protected:
     bool                    initialized;

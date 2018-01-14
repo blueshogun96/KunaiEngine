@@ -2968,3 +2968,11 @@ void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* fre
 }
 
 
+/*
+ * Name: IKeDirect3D11RenderDevice::Trim
+ * Desc: 
+ */
+void IKeOpenGLRenderDevice::Trim()
+{
+	DISPDBG( KE_WARNING, "Trim not implemented for OpenGL..." );
+}
