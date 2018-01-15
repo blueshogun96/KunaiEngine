@@ -469,7 +469,8 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating depth stencil view!", hr );
 
 	/* Set render target and depth stencil */
-    d3ddevice_context->OMSetRenderTargets( 1, &d3d_render_target_view.GetInterfacePtr(), /*d3d_depth_stencil_view*/ nullptr );
+	ID3D11RenderTargetView* rtv[] = { d3d_render_target_view };
+    d3ddevice_context->OMSetRenderTargets( 1, rtv, d3d_depth_stencil_view );
 
 	D3D11_VIEWPORT vp;
     vp.Width = (FLOAT) device_desc->width;
@@ -821,6 +822,8 @@ void IKeDirect3D11RenderDevice::SetClearStencil( uint32_t stencil )
 */
 void IKeDirect3D11RenderDevice::ClearColourBuffer()
 {
+	ID3D11RenderTargetView* rtv[] = { d3d_render_target_view };
+	d3ddevice_context->OMSetRenderTargets(1, rtv, d3d_depth_stencil_view);
 	d3ddevice_context->ClearRenderTargetView( d3d_render_target_view, clear_colour );
 }
 
@@ -853,6 +856,9 @@ void IKeDirect3D11RenderDevice::ClearStencilBuffer()
  */
 void IKeDirect3D11RenderDevice::Clear( uint32_t buffers )
 {
+	ID3D11RenderTargetView* rtv[] = { d3d_render_target_view };
+	d3ddevice_context->OMSetRenderTargets(1, rtv, d3d_depth_stencil_view);
+
 	if( buffers & KE_COLOUR_BUFFER && d3d_render_target_view != nullptr )
 		d3ddevice_context->ClearRenderTargetView( d3d_render_target_view, clear_colour );
 

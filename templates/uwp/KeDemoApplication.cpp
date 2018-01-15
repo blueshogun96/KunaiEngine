@@ -54,8 +54,8 @@ CKeDemoApplication::CKeDemoApplication()
     KeRenderDeviceDesc rddesc;
     
     ZeroMemory( &rddesc, sizeof( KeRenderDeviceDesc ) );
-    rddesc.width = 640;
-    rddesc.height = 480;
+    rddesc.width = 800;
+    rddesc.height = 600;
     rddesc.colour_bpp = 32;
     rddesc.depth_bpp = 24;
     rddesc.stencil_bpp = 8;
