@@ -3155,5 +3155,6 @@
     <None Include="..\..\libraries\uwp\SDL2_ttf\lib\x86\Debug\SDL2_ttf.dll">
       <Filter>Dynamic Link Libraries\Debug\x86</Filter>
     </None>
+    <None Include="KunaiEngine.props" />
   </ItemGroup>
 </Project>
