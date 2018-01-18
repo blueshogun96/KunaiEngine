@@ -242,7 +242,9 @@ DXGI_FORMAT KeDirect3D11GetRenderTargetFormat( int colour_bpp, int alpha_bpp )
 	case 64: rtfmt = DXGI_FORMAT_R16G16B16A16_UNORM; break;
 	case 32:
 	case 24:
-		//if( device_desc->alpha_bpp == 8 )
+		if( alpha_bpp == 2 )
+			rtfmt = DXGI_FORMAT_R10G10B10A2_UNORM;
+		else
 			rtfmt = DXGI_FORMAT_B8G8R8A8_UNORM;
 		//else		
 			//rtfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
@@ -551,6 +553,8 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 #endif
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
 
+	PVT_UpdateColourSpace( false, rtfmt );
+
 	/* Create our render target view */
 	ID3D11Texture2D* back_buffer = NULL;
     hr = dxgi_swap_chain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&back_buffer );
@@ -622,6 +626,87 @@ bool IKeDirect3D11RenderDevice::PVT_SdkLayersAvaiable()
 	return SUCCEEDED(hr);
 }
 
+/*
+ * Name: IDirect3D11RenderDevice::PVT_UpdateColourSpace
+ * Desc: Sets the colour space.  If HDR10 is desired, enable it depending on the render target
+ *		 pixel format.
+ */
+void IKeDirect3D11RenderDevice::PVT_UpdateColourSpace( bool enable_hdr, DXGI_FORMAT rtfmt )
+{
+	DXGI_COLOR_SPACE_TYPE ColourSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
+	HRESULT hr;
+	bool DisplaySupportsHdr10 = false;
+
+	/* 
+	 * Requirements for HDR10 support:
+	 * 
+	 * Win10 Creators Update (SDK 15063)
+	 * Xbox One X (Scorpio)
+	 * 4k UHD Monitor
+	 * HDMI 2.0 compliant display adapter
+	 *
+	 * For NVIDIA GPUs, you can circumvent the Win10 requirement
+	 * with NVAPI and a compatible driver (Windows 7 and above).
+	 */
+
+	CDXGISwapChain3 swapchain;
+#ifndef _UWP
+	hr = dxgi_swap_chain->QueryInterface( &swapchain );
+	D3D_DISPDBG_R( KE_ERROR, "Could not query IDXGISwapChain3!", hr );
+#else
+	swapchain = dxgi_swap_chain;
+#endif
+
+	/* Is HDR actually supported? */
+#ifdef NTDDI_WIN10_RS2
+	if( swapchain )
+	{
+		CDXGIOutput output;
+		if( SUCCEEDED( hr = swapchain->GetContainingOutput( &output ) ) )
+		{
+			CDXGIOutput6 output6;
+			if( SUCCEEDED( hr = output->QueryInterface( &output6 ) ) )
+			{
+				DXGI_OUTPUT_DESC1 desc;
+				hr = output6->GetDesc1( &desc );
+				D3D_DISPDBG( KE_ERROR, "IDXGIOutput6::GetDesc1 failed!  Assuming display is non-HDR...", hr );
+
+				if( desc.ColorSpace = DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020 )
+				{
+					DisplaySupportsHdr10 = true;
+				}
+			}
+		}
+	}
+#endif
+
+	/* Enable HDR10 if it is desired and supported */
+	if( enable_hdr && DisplaySupportsHdr10 )
+	{
+		switch( rtfmt )
+		{
+		case DXGI_FORMAT_R10G10B10A2_UNORM:
+			ColourSpace = DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020;
+			break;
+
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:
+			ColourSpace = DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	colour_space = ColourSpace;
+
+	UINT colour_space_support = 0;
+	hr = swapchain->CheckColorSpaceSupport( colour_space, &colour_space_support );
+	D3D_DISPDBG_R( KE_ERROR, "Unable to check for colour space support!", hr );
+
+	hr = swapchain->SetColorSpace1( colour_space );
+	D3D_DISPDBG_R( KE_ERROR, "Error setting colour space!", hr );
+}
 
 /*
 * Name: IKeDirect3D11RenderDevice::IKeDirect3D11RenderDevice
@@ -867,6 +952,27 @@ void IKeDirect3D11RenderDevice::Clear( uint32_t buffers )
 
 	if( buffers & KE_STENCIL_BUFFER && d3d_depth_stencil_view != nullptr )	
 		d3ddevice_context->ClearDepthStencilView( d3d_depth_stencil_view, D3D11_CLEAR_STENCIL, 0.0f, clear_stencil );
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::ClearState
+ * Desc: Clear the state of the D3D renderer (reset renderstates, rendertargets, etc.)
+ */
+void IKeDirect3D11RenderDevice::ClearState()
+{
+	d3ddevice_context->ClearState();
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::ResizeRenderTargetAndDepthStencil
+ * Desc: Resizes the render target and depth stencil to the desired width/height
+ *		 as well as the swapchain.
+ */
+bool IKeDirect3D11RenderDevice::ResizeRenderTargetAndDepthStencil( int width, int height )
+{
+	return true;
 }
 
 

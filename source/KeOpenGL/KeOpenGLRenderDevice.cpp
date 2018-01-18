@@ -655,7 +655,7 @@ IKeOpenGLRenderDevice::IKeOpenGLRenderDevice( KeRenderDeviceDesc* renderdevice_d
     if( device_desc->device_type == KE_RENDERDEVICE_OGL4 )
     {
 		major_version = 4;
-		minor_version = 5;
+		minor_version = 6;
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, major_version );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, minor_version );
         SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
@@ -1054,6 +1054,22 @@ void IKeOpenGLRenderDevice::Clear( uint32_t buffers )
 
 
 /*
+ * Name: IKeOpenGLRenderDevice::ClearState
+ * Desc: Clear the state of the OpenGL renderer (reset renderstates, rendertargets, etc.)
+ * TODO: Anything, or is there an OpenGL equivalent?
+ */
+void IKeOpenGLRenderDevice::ClearState()
+{
+	static bool warning_issued = false;
+
+	if( warning_issued )
+	{
+		DISPDBG( KE_DBGLVL(1), "Nothing to do here as of yet FYI." );
+		warning_issued = true;
+	}
+}
+
+/*
  * Name: IKeOpenGLRenderDevice::swap
  * Desc: Swaps the double buffer.
  */
@@ -1062,6 +1078,17 @@ void IKeOpenGLRenderDevice::Swap()
     SDL_GL_SwapWindow( window );
 }
 
+/*
+ * Name: IKeOpenGLRenderDevice::ResizeRenderTargetAndDepthStencil
+ * Desc: Resizes the render target and depth stencil to the desired width/height
+ * TODO: So far this isn't necessary for OpenGL as that stuff is managed for us,
+ *		 but in the future, handle that here if we ever need to manage that stuff
+ *		 ourselves for whatever reason...
+ */
+bool IKeOpenGLRenderDevice::ResizeRenderTargetAndDepthStencil( int width, int height )
+{
+	return true;
+}
 
 /* 
  * Name: IKeOpenGLRenderDevice::SetIMCacheSize

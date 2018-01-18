@@ -376,10 +376,10 @@ struct KeConstantBufferDesc
  */
 struct IKeResourceBuffer : public IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
     
-    virtual void* MapData( uint32_t flags ) PURE;
-    virtual void UnmapData( void* ) PURE;
+    _KEMETHOD(void*) MapData( uint32_t flags ) PURE;
+    KEMETHOD UnmapData( void* ) PURE;
 };
 
 
@@ -402,16 +402,16 @@ struct IKeConstantBuffer : public IKeResourceBuffer
  */
 struct IKeGeometryBuffer : public IKeResourceBuffer
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
     
-    virtual void* MapData( uint32_t flags ) PURE;
-	virtual void* MapDataAsync( uint32_t flags ) PURE;
-    virtual void UnmapData( void* ) PURE;
-	virtual void UnmapDataAsync( void* ) PURE;
+    _KEMETHOD(void*) MapData( uint32_t flags ) PURE;
+	_KEMETHOD(void*) MapDataAsync( uint32_t flags ) PURE;
+    KEMETHOD UnmapData( void* ) PURE;
+	KEMETHOD UnmapDataAsync( void* ) PURE;
     
-    virtual bool SetVertexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
-    virtual bool SetIndexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
-	virtual void GetDesc( KeGeometryBufferDesc* desc ) PURE;
+    _KEMETHOD(bool) SetVertexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
+    _KEMETHOD(bool) SetIndexData( uint32_t offset, uint32_t size, void* ptr ) PURE;
+	KEMETHOD GetDesc( KeGeometryBufferDesc* desc ) PURE;
 };
 
 /*
@@ -419,7 +419,7 @@ struct IKeGeometryBuffer : public IKeResourceBuffer
  */
 struct IKeCommandList : public IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
 };
 
 /*
@@ -427,8 +427,8 @@ struct IKeCommandList : public IKeUnknown
  */
 struct IKeGpuProgram : public IKeUnknown
 {
-    virtual void Destroy() PURE;
-	virtual void GetVertexAttributes( KeVertexAttribute* vertex_attributes ) PURE;
+    KEMETHOD Destroy() PURE;
+	KEMETHOD GetVertexAttributes( KeVertexAttribute* vertex_attributes ) PURE;
 };
 
 /*
@@ -436,13 +436,13 @@ struct IKeGpuProgram : public IKeUnknown
  */
 struct IKeTexture : public IKeResourceBuffer
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
     
-    virtual void* MapData( uint32_t flags ) PURE;
-    virtual void UnmapData( void* ) PURE;
+    _KEMETHOD(void*) MapData( uint32_t flags ) PURE;
+    KEMETHOD UnmapData( void* ) PURE;
     
-    virtual bool SetTextureData( KeTextureDesc* texture_data, void* pixels ) PURE;
-	virtual bool GetTextureDesc( KeTextureDesc* texture_desc ) PURE;
+    _KEMETHOD(bool) SetTextureData( KeTextureDesc* texture_data, void* pixels ) PURE;
+	_KEMETHOD(bool) GetTextureDesc( KeTextureDesc* texture_desc ) PURE;
 };
 
 
@@ -451,12 +451,12 @@ struct IKeTexture : public IKeResourceBuffer
  */
 struct IKeRenderTarget : public IKeResourceBuffer
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
     
-    virtual void* MapData( uint32_t flags ) PURE;
-    virtual void UnmapData( void* ) PURE;
+    _KEMETHOD(void*) MapData( uint32_t flags ) PURE;
+    KEMETHOD UnmapData( void* ) PURE;
 
-	virtual bool GetTexture( IKeTexture** texture ) PURE;
+	_KEMETHOD(bool) GetTexture( IKeTexture** texture ) PURE;
 	virtual IKeTexture* GetTexture2() PURE;
 };
 
@@ -465,7 +465,7 @@ struct IKeRenderTarget : public IKeResourceBuffer
  */
 struct IKePalette : public IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
 };
 
 /*
@@ -473,12 +473,12 @@ struct IKePalette : public IKeUnknown
  */
 struct IKeFence : public IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
     
-    virtual bool Insert() PURE;
-    virtual bool Test() PURE;
-    virtual void Block() PURE;
-    virtual bool Valid() PURE;
+    _KEMETHOD(bool) Insert() PURE;
+    _KEMETHOD(bool) Test() PURE;
+    KEMETHOD Block() PURE;
+    _KEMETHOD(bool) Valid() PURE;
 };
 
 /*
@@ -486,12 +486,12 @@ struct IKeFence : public IKeUnknown
  */
 struct IKeRenderStateBuffer : public IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
 };
 
 struct IKeTextureSamplerBuffer : public IKeUnknown
 {
-	virtual void Destroy() PURE;
+	KEMETHOD Destroy() PURE;
 };
 
 /*
@@ -499,7 +499,7 @@ struct IKeTextureSamplerBuffer : public IKeUnknown
  */
 struct IKeOcclusionQuery : public IKeUnknown
 {
-    virtual void Destroy() PURE;
+    KEMETHOD Destroy() PURE;
 };
 
 
@@ -515,101 +515,103 @@ public:
     
 public:
     /* Misc */
-    virtual bool ConfirmDevice() PURE;
-    virtual void GetDeviceDesc( KeRenderDeviceDesc* device_desc ) PURE;
-    virtual void GetDeviceCaps( KeRenderDeviceCaps* device_caps ) PURE;
+    _KEMETHOD(bool) ConfirmDevice() PURE;
+    KEMETHOD GetDeviceDesc( KeRenderDeviceDesc* device_desc ) PURE;
+    KEMETHOD GetDeviceCaps( KeRenderDeviceCaps* device_caps ) PURE;
     
     /* General rendering stuff */
-    virtual void SetClearColourFV( float* colour ) PURE;
-    virtual void SetClearColourUBV( uint8_t* colour ) PURE;
-    virtual void SetClearDepth( float depth ) PURE;
-	virtual void SetClearStencil( uint32_t stencil ) PURE;
-    virtual void ClearColourBuffer() PURE;
-    virtual void ClearDepthBuffer() PURE;
-    virtual void ClearStencilBuffer() PURE;
-	virtual void Clear( uint32_t buffers ) PURE;
-    virtual void Swap() PURE;
+    KEMETHOD SetClearColourFV( float* colour ) PURE;
+    KEMETHOD SetClearColourUBV( uint8_t* colour ) PURE;
+    KEMETHOD SetClearDepth( float depth ) PURE;
+	KEMETHOD SetClearStencil( uint32_t stencil ) PURE;
+    KEMETHOD ClearColourBuffer() PURE;
+    KEMETHOD ClearDepthBuffer() PURE;
+    KEMETHOD ClearStencilBuffer() PURE;
+	KEMETHOD Clear( uint32_t buffers ) PURE;
+	KEMETHOD ClearState() PURE;
+    KEMETHOD Swap() PURE;
+	_KEMETHOD(bool) ResizeRenderTargetAndDepthStencil( int width, int height );
     
-    virtual void SetIMCacheSize( uint32_t cache_size ) PURE;
-    virtual bool CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer ) PURE;
-    virtual void DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
-    virtual void SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
-    virtual bool CreateProgram( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, KeVertexAttribute* vertex_attributes, IKeGpuProgram** gpu_program ) PURE;
-    virtual void DeleteProgram( IKeGpuProgram* gpu_program ) PURE;
-    virtual void SetProgram( IKeGpuProgram* gpu_program ) PURE;
-    virtual void SetProgramConstant1FV( const char* location, int count, float* value ) PURE;
-    virtual void SetProgramConstant2FV( const char* location, int count, float* value ) PURE;
-    virtual void SetProgramConstant3FV( const char* location, int count, float* value ) PURE;
-    virtual void SetProgramConstant4FV( const char* location, int count, float* value ) PURE;
-    virtual void SetProgramConstant1IV( const char* location, int count, int* value ) PURE;
-    virtual void SetProgramConstant2IV( const char* location, int count, int* value ) PURE;
-    virtual void SetProgramConstant3IV( const char* location, int count, int* value ) PURE;
-    virtual void SetProgramConstant4IV( const char* location, int count, int* value ) PURE;
-    virtual void GetProgramConstantFV( const char* location, float* value ) PURE;
-    virtual void GetProgramConstantIV( const char* location, int* value ) PURE;
-	virtual bool CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data = NULL ) PURE;
-	virtual void DeleteConstantBuffer( IKeConstantBuffer* constant_buffer ) PURE;
-	virtual bool SetConstantBufferData( void* data, IKeConstantBuffer* constant_buffer ) PURE;
-	virtual void SetConstantBuffer( int slot, int shader_type, IKeConstantBuffer* constant_buffer ) PURE;
-    virtual bool CreateTexture1D( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
-    virtual bool CreateTexture2D( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
-    virtual bool CreateTexture3D( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
-    virtual void DeleteTexture( IKeTexture* texture ) PURE;
-    virtual void SetTextureData1D( int offsetx, int width, int miplevel, void* pixels, IKeTexture* texture ) PURE;
-    virtual void SetTextureData2D( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, IKeTexture* texture ) PURE;
-    virtual void SetTextureData3D( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, IKeTexture* texture ) PURE;
-    virtual bool CreateRenderTarget( int width, int height, int depth, uint32_t flags, IKeRenderTarget** rendertarget ) PURE;
-    virtual void DeleteRenderTarget( IKeRenderTarget* rendertarget ) PURE;
-    virtual void BindRenderTarget( IKeRenderTarget* rendertarget ) PURE;
-    virtual void SetTexture( int stage, IKeTexture* texture ) PURE;
-    virtual bool CreateRenderStateBuffer( KeState* state_params, int state_count, IKeRenderStateBuffer** state_buffer ) PURE;
-	virtual bool CreateTextureSamplerBuffer( KeState* state_params, int state_count, IKeTextureSamplerBuffer** state_buffer ) PURE;
-    virtual bool SetRenderStateBuffer( IKeRenderStateBuffer* state_buffer ) PURE;
-	virtual bool SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer ) PURE;
-    virtual void SetRenderStates( KeState* states ) PURE;
-    virtual void SetSamplerStates( int stage, KeState* states ) PURE;
-    virtual void DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data ) PURE;
-    virtual void DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data ) PURE;
-    virtual void DrawIndexedVerticesRangeIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int start, int end, int count, void* vertex_data, void* index_data ) PURE;
-    virtual void DrawVertices( uint32_t primtype, uint32_t stride, int first, int count ) PURE;
-    virtual void DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count ) PURE;
-    virtual void DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count ) PURE;
+    KEMETHOD SetIMCacheSize( uint32_t cache_size ) PURE;
+    _KEMETHOD(bool) CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer ) PURE;
+    KEMETHOD DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
+    KEMETHOD SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
+    _KEMETHOD(bool) CreateProgram( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, KeVertexAttribute* vertex_attributes, IKeGpuProgram** gpu_program ) PURE;
+    KEMETHOD DeleteProgram( IKeGpuProgram* gpu_program ) PURE;
+    KEMETHOD SetProgram( IKeGpuProgram* gpu_program ) PURE;
+    KEMETHOD SetProgramConstant1FV( const char* location, int count, float* value ) PURE;
+    KEMETHOD SetProgramConstant2FV( const char* location, int count, float* value ) PURE;
+    KEMETHOD SetProgramConstant3FV( const char* location, int count, float* value ) PURE;
+    KEMETHOD SetProgramConstant4FV( const char* location, int count, float* value ) PURE;
+    KEMETHOD SetProgramConstant1IV( const char* location, int count, int* value ) PURE;
+    KEMETHOD SetProgramConstant2IV( const char* location, int count, int* value ) PURE;
+    KEMETHOD SetProgramConstant3IV( const char* location, int count, int* value ) PURE;
+    KEMETHOD SetProgramConstant4IV( const char* location, int count, int* value ) PURE;
+    KEMETHOD GetProgramConstantFV( const char* location, float* value ) PURE;
+    KEMETHOD GetProgramConstantIV( const char* location, int* value ) PURE;
+	_KEMETHOD(bool) CreateConstantBuffer( KeConstantBufferDesc* desc, IKeConstantBuffer** constant_buffer, void* data = NULL ) PURE;
+	KEMETHOD DeleteConstantBuffer( IKeConstantBuffer* constant_buffer ) PURE;
+	_KEMETHOD(bool) SetConstantBufferData( void* data, IKeConstantBuffer* constant_buffer ) PURE;
+	KEMETHOD SetConstantBuffer( int slot, int shader_type, IKeConstantBuffer* constant_buffer ) PURE;
+    _KEMETHOD(bool) CreateTexture1D( uint32_t target, int width, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
+    _KEMETHOD(bool) CreateTexture2D( uint32_t target, int width, int height, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
+    _KEMETHOD(bool) CreateTexture3D( uint32_t target, int width, int height, int depth, int mipmaps, uint32_t format, uint32_t data_type, IKeTexture** texture, void* pixels = NULL ) PURE;
+    KEMETHOD DeleteTexture( IKeTexture* texture ) PURE;
+    KEMETHOD SetTextureData1D( int offsetx, int width, int miplevel, void* pixels, IKeTexture* texture ) PURE;
+    KEMETHOD SetTextureData2D( int offsetx, int offsety, int width, int height, int miplevel, void* pixels, IKeTexture* texture ) PURE;
+    KEMETHOD SetTextureData3D( int offsetx, int offsety, int offsetz, int width, int height, int depth, int miplevel, void* pixels, IKeTexture* texture ) PURE;
+    _KEMETHOD(bool) CreateRenderTarget( int width, int height, int depth, uint32_t flags, IKeRenderTarget** rendertarget ) PURE;
+    KEMETHOD DeleteRenderTarget( IKeRenderTarget* rendertarget ) PURE;
+    KEMETHOD BindRenderTarget( IKeRenderTarget* rendertarget ) PURE;
+    KEMETHOD SetTexture( int stage, IKeTexture* texture ) PURE;
+    _KEMETHOD(bool) CreateRenderStateBuffer( KeState* state_params, int state_count, IKeRenderStateBuffer** state_buffer ) PURE;
+	_KEMETHOD(bool) CreateTextureSamplerBuffer( KeState* state_params, int state_count, IKeTextureSamplerBuffer** state_buffer ) PURE;
+    _KEMETHOD(bool) SetRenderStateBuffer( IKeRenderStateBuffer* state_buffer ) PURE;
+	_KEMETHOD(bool) SetTextureSamplerBuffer( int stage, IKeTextureSamplerBuffer* state_buffer ) PURE;
+    KEMETHOD SetRenderStates( KeState* states ) PURE;
+    KEMETHOD SetSamplerStates( int stage, KeState* states ) PURE;
+    KEMETHOD DrawVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int first, int count, void* vertex_data ) PURE;
+    KEMETHOD DrawIndexedVerticesIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int count, void* vertex_data, void* index_data ) PURE;
+    KEMETHOD DrawIndexedVerticesRangeIM( uint32_t primtype, uint32_t stride, KeVertexAttribute* vertex_attributes, int start, int end, int count, void* vertex_data, void* index_data ) PURE;
+    KEMETHOD DrawVertices( uint32_t primtype, uint32_t stride, int first, int count ) PURE;
+    KEMETHOD DrawIndexedVertices( uint32_t primtype, uint32_t stride, int count ) PURE;
+    KEMETHOD DrawIndexedVerticesRange( uint32_t primtype, uint32_t stride, int start, int end, int count ) PURE;
     
-    virtual bool GetFramebufferRegion( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels ) PURE;
+    _KEMETHOD(bool) GetFramebufferRegion( int x, int y, int width, int height, uint32_t flags, int* bpp, void** pixels ) PURE;
     
     /* Matrix/viewport related */
-    virtual void SetViewport( int x, int y, int width, int height ) PURE;
-    virtual void SetViewportV( int* viewport ) PURE;
-    virtual void GetViewport( int* x, int* y, int* width, int* height ) PURE;
-    virtual void GetViewportV( int* viewport ) PURE;
-    virtual void SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z ) PURE;
-    virtual void SetViewMatrix( const nv::matrix4f* view ) PURE;
-    virtual void SetWorldMatrix( const nv::matrix4f* world ) PURE;
-    virtual void SetModelviewMatrix( const nv::matrix4f* modelview ) PURE;
-    virtual void SetProjectionMatrix( const nv::matrix4f* projection ) PURE;
-    virtual void GetViewMatrix( nv::matrix4f* view ) PURE;
-    virtual void GetWorldMatrix( nv::matrix4f* world ) PURE;
-    virtual void GetModelviewMatrix( nv::matrix4f* modelview ) PURE;
-    virtual void GetProjectionMatrix( nv::matrix4f* projection ) PURE;
+    KEMETHOD SetViewport( int x, int y, int width, int height ) PURE;
+    KEMETHOD SetViewportV( int* viewport ) PURE;
+    KEMETHOD GetViewport( int* x, int* y, int* width, int* height ) PURE;
+    KEMETHOD GetViewportV( int* viewport ) PURE;
+    KEMETHOD SetPerspectiveMatrix( float fov, float aspect, float near_z, float far_z ) PURE;
+    KEMETHOD SetViewMatrix( const nv::matrix4f* view ) PURE;
+    KEMETHOD SetWorldMatrix( const nv::matrix4f* world ) PURE;
+    KEMETHOD SetModelviewMatrix( const nv::matrix4f* modelview ) PURE;
+    KEMETHOD SetProjectionMatrix( const nv::matrix4f* projection ) PURE;
+    KEMETHOD GetViewMatrix( nv::matrix4f* view ) PURE;
+    KEMETHOD GetWorldMatrix( nv::matrix4f* world ) PURE;
+    KEMETHOD GetModelviewMatrix( nv::matrix4f* modelview ) PURE;
+    KEMETHOD GetProjectionMatrix( nv::matrix4f* projection ) PURE;
     
     /* Synchronization */
-    virtual void BlockUntilVerticalBlank() PURE;
-    virtual void SetSwapInterval( int swap_interval ) PURE;
+    KEMETHOD BlockUntilVerticalBlank() PURE;
+    KEMETHOD SetSwapInterval( int swap_interval ) PURE;
     virtual int GetSwapInterval() PURE;
-	virtual void BlockUntilIdle() PURE;
-	virtual void Kick() PURE;
-    virtual bool CreateFence( IKeFence** fence, uint32_t flags ) PURE;
+	KEMETHOD BlockUntilIdle() PURE;
+	KEMETHOD Kick() PURE;
+    _KEMETHOD(bool) CreateFence( IKeFence** fence, uint32_t flags ) PURE;
 #if 0
-	virtual bool InsertFence( IKeFence** fence ) PURE;
-	virtual bool TestFence( IKeFence* fence ) PURE;
-	virtual void BlockOnFence( IKeFence* fence ) PURE;
-	virtual void DeleteFence( IKeFence* fence ) PURE;
-	virtual bool IsFence( IKeFence* fence ) PURE;
+	_KEMETHOD(bool) InsertFence( IKeFence** fence ) PURE;
+	_KEMETHOD(bool) TestFence( IKeFence* fence ) PURE;
+	KEMETHOD BlockOnFence( IKeFence* fence ) PURE;
+	KEMETHOD DeleteFence( IKeFence* fence ) PURE;
+	_KEMETHOD(bool) IsFence( IKeFence* fence ) PURE;
 #endif
     
     /* Misc */
-    virtual void GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory ) PURE;
-	virtual void Trim() PURE;
+    KEMETHOD GpuMemoryInfo( uint32_t* total_memory, uint32_t* free_memory ) PURE;
+	KEMETHOD Trim() PURE;
     
 protected:
     bool                    initialized;
@@ -641,15 +643,15 @@ public:
     virtual ~IKeSpriteFactory() {}
     
 public:
-    virtual bool Initialized() PURE;
-    //virtual void SetStates( IKeStateBuffer* state ) PURE;
-    virtual void SetProgram( IKeGpuProgram* program ) PURE;
-    virtual void SetTexture( IKeTexture* texture ) PURE;
-    virtual void SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size ) PURE;
-    virtual bool Lock( void** data ) PURE;
-    virtual void Unlock( void* data ) PURE;
+    _KEMETHOD(bool) Initialized() PURE;
+    //KEMETHOD SetStates( IKeStateBuffer* state ) PURE;
+    KEMETHOD SetProgram( IKeGpuProgram* program ) PURE;
+    KEMETHOD SetTexture( IKeTexture* texture ) PURE;
+    KEMETHOD SetVertexData( void* vertex_data, uint32_t offset, uint32_t vertex_data_size ) PURE;
+    _KEMETHOD(bool) Lock( void** data ) PURE;
+    KEMETHOD Unlock( void* data ) PURE;
     
-    virtual void Draw() PURE;
+    KEMETHOD Draw() PURE;
     
 protected:
     IKeRenderDevice*        renderdevice;

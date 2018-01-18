@@ -61,7 +61,7 @@ CKeDemoApplication::CKeDemoApplication()
     rddesc.stencil_bpp = 8;
     rddesc.fullscreen = No;
     rddesc.buffer_count = 1;
-    rddesc.device_type = KE_RENDERDEVICE_D3D11;
+    rddesc.device_type = KE_RENDERDEVICE_OGL3;
 	rddesc.refresh_rate = 60;
     
     bool ret = KeCreateWindowAndDevice( &rddesc, &m_pRenderDevice );
