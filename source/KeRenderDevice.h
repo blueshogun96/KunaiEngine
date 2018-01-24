@@ -530,12 +530,17 @@ public:
 	KEMETHOD Clear( uint32_t buffers ) PURE;
 	KEMETHOD ClearState() PURE;
     KEMETHOD Swap() PURE;
-	_KEMETHOD(bool) ResizeRenderTargetAndDepthStencil( int width, int height );
+	_KEMETHOD(bool) ResizeRenderTargetAndDepthStencil( int width, int height ) PURE;
     
     KEMETHOD SetIMCacheSize( uint32_t cache_size ) PURE;
     _KEMETHOD(bool) CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer ) PURE;
     KEMETHOD DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
     KEMETHOD SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer ) PURE;
+	_KEMETHOD(bool) CreateCommandList( IKeCommandList** command_list ) PURE;
+	_KEMETHOD(bool) BeginCommandList( IKeCommandList* command_list ) PURE;
+	_KEMETHOD(bool) EndCommandList( IKeCommandList** command_list, int restore_state ) PURE;
+	_KEMETHOD(bool) ExecuteCommandList( IKeCommandList* command_list, int restore_state ) PURE;
+	KEMETHOD RestoreImmediateContext() PURE;
     _KEMETHOD(bool) CreateProgram( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, KeVertexAttribute* vertex_attributes, IKeGpuProgram** gpu_program ) PURE;
     KEMETHOD DeleteProgram( IKeGpuProgram* gpu_program ) PURE;
     KEMETHOD SetProgram( IKeGpuProgram* gpu_program ) PURE;

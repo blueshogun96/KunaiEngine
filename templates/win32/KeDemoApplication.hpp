@@ -23,6 +23,7 @@ public:
 protected:
 	IKeGpuProgram*		m_pProgram;
 	IKeGeometryBuffer*	m_pGB;
+	IKeCommandList*		m_pCmdList;
 };
 
 #endif /* KeDemoApplication_hpp */

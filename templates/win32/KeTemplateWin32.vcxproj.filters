@@ -186,6 +186,9 @@
     <Filter Include="Source Files\Engine\3rdParty\glfx\generated">
       <UniqueIdentifier>{5d68c8cc-3fd1-4545-9f27-49db79a73a8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\3rdParty\bullet3">
+      <UniqueIdentifier>{949423e6-9def-49e7-b8b1-638979797d5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Winmain.cpp">

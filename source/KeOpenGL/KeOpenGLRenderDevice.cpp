@@ -1237,6 +1237,55 @@ void IKeOpenGLRenderDevice::SetGeometryBuffer( IKeGeometryBuffer* geometry_buffe
 }
 
 /*
+ * Name: IKeOpenGLRenderDevice::CreateCommandList
+ * Desc: Initializes a command list (requires GL_NV_command_list)
+ */
+bool IKeOpenGLRenderDevice::CreateCommandList( IKeCommandList** command_list )
+{
+	DISPDBG_RB( KE_WARNING, "Not yet implemented..." );
+	return true;
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::BeginCommandList
+ * Desc: Sets up the command buffer to receive commands.
+ */
+bool IKeOpenGLRenderDevice::BeginCommandList( IKeCommandList* command_list )
+{
+	DISPDBG_RB( KE_WARNING, "Not yet implemented..." );
+	return true;
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::EndCommandList
+ * Desc: Finishes the setup for the command list's use.
+ */
+bool IKeOpenGLRenderDevice::EndCommandList( IKeCommandList** command_list, int restore_state )
+{
+	DISPDBG_RB( KE_WARNING, "Not yet implemented..." );
+	return true;
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::ExecuteCommandList
+ * Desc: Executes the contents of the command list.
+ */
+bool IKeOpenGLRenderDevice::ExecuteCommandList( IKeCommandList* command_list, int restore_state )
+{
+	DISPDBG_RB( KE_WARNING, "Not yet implemented..." );
+	return true;
+}
+
+/*
+ * Name: IKeOpenGLRenderDevice::RestoreImmediateContext
+ * Desc: Ensures that the primary context is restored and current.
+ */
+void IKeOpenGLRenderDevice::RestoreImmediateContext()
+{
+	DISPDBG( KE_WARNING, "Not yet implemented!" );
+}
+
+/*
  * Name: IKeOpenGLRenderDevice::create_program
  * Desc: Creates a complete OpenGL program out of shaders in text form. The minimum requirements
  *       are one valid vertex and fragment shader, while geometry and tesselation shaders are
@@ -3006,7 +3055,7 @@ void IKeOpenGLRenderDevice::GpuMemoryInfo( uint32_t* total_memory, uint32_t* fre
 
 
 /*
- * Name: IKeDirect3D11RenderDevice::Trim
+ * Name: IKeOpenGLRenderDevice::Trim
  * Desc: 
  */
 void IKeOpenGLRenderDevice::Trim()

@@ -213,6 +213,9 @@ uint32_t cull_modes[] =
 };
 #endif
 
+bool command_list_recording_in_progress = No;
+
+
 std::string KeDirect3D11FeatureLevelString( D3D_FEATURE_LEVEL feature )
 {
 	switch( feature )
@@ -328,7 +331,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 #endif
 
 	HRESULT hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
-		D3D11_SDK_VERSION, &d3ddevice, &feature_level, &d3ddevice_context );
+		D3D11_SDK_VERSION, &d3ddevice, &feature_level, &immediate_context );
 	
 #ifdef _DEBUG
 	/* If we are requesting a debug device, and we fail to get it, try again without the debug flag. */
@@ -339,7 +342,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 		flags &= ~D3D11_CREATE_DEVICE_DEBUG;
 
 		hr = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count,
-			D3D11_SDK_VERSION, &d3ddevice, &feature_level, &d3ddevice_context );
+			D3D11_SDK_VERSION, &d3ddevice, &feature_level, &immediate_context );
 	}
 #endif
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
@@ -537,7 +540,7 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 	HRESULT hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
-		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );
+		D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &immediate_context );
 
 #ifdef _DEBUG
 	/* If we are requesting a debug device, and we fail to get it, try again without the debug flag. */
@@ -548,11 +551,15 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DWin32()
 		flags &= ~D3D11_CREATE_DEVICE_DEBUG;
 
 		hr = D3D11CreateDeviceAndSwapChain( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, flags, feature_levels, feature_level_count, 
-			D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &d3ddevice_context );	
+			D3D11_SDK_VERSION, &swapchain_desc, &dxgi_swap_chain, &d3ddevice, &feature_level, &immediate_context );	
 	}
 #endif
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D11 device and swapchain!", hr );
 
+	/* Set our immediate context to current */
+	d3ddevice_context = immediate_context;
+
+	/* Determine HDR10 support and usage */
 	PVT_UpdateColourSpace( false, rtfmt );
 
 	/* Create our render target view */
@@ -815,11 +822,11 @@ IKeDirect3D11RenderDevice::~IKeDirect3D11RenderDevice()
 	if( rsb_default ) rsb_default->Destroy();
 
 	dxgi_output = 0;
-	d3ddevice_context->ClearState();
+	immediate_context->ClearState();
 	d3d_render_target_view = 0;
 	dxgi_swap_chain = 0;
-	d3ddevice_context->Flush();
-	d3ddevice_context = 0;
+	immediate_context->Flush();
+	immediate_context = 0;
 	d3ddevice = 0;
 
 	SDL_DestroyWindow( window );
@@ -1116,13 +1123,124 @@ void IKeDirect3D11RenderDevice::DeleteGeometryBuffer( IKeGeometryBuffer* geometr
 }
 
 /*
-* Name: IKeDirect3D11RenderDevice::set_vertex_buffer
+* Name: IKeDirect3D11RenderDevice::SetGeometryBuffer
 * Desc: Sets the current geometry buffer to be used when rendering. Internally, binds the
 *       vertex array object. If NULL, then sets the current vertex array object to 0.
 */
 void IKeDirect3D11RenderDevice::SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer )
 {
 	current_geometrybuffer = geometry_buffer;
+}
+
+
+/*
+ * Name: IKeDirect3D11RenderDevice::CreateCommandList
+ * Desc: Initializes a command list interface for use by creating a deferred context first...
+ */
+bool IKeDirect3D11RenderDevice::CreateCommandList( IKeCommandList** command_list )
+{
+	/* Sanity check */
+	if( !command_list )
+		DISPDBG_RB( KE_ERROR, "Invalid argument(s)!  command_list == nullptr" );
+
+	/* Start by creating a valid interface pointer */
+	*command_list = new IKeDirect3D11CommandList;
+	IKeDirect3D11CommandList* cl = static_cast<IKeDirect3D11CommandList*>( *command_list );
+
+	/* Create our deferred context specific to this command list */
+	HRESULT hr = d3ddevice->CreateDeferredContext( 0, &cl->deferred_ctxt );
+	D3D_DISPDBG_RB( KE_ERROR, "Error creating deferred rendering context!", hr );
+
+	return true;
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::BeginCommandList
+ * Desc: Sets up the deferred context to be used for recording commands until EndCommandList()
+ *		 is called.
+ */
+bool IKeDirect3D11RenderDevice::BeginCommandList( IKeCommandList* command_list )
+{
+	if( command_list_recording_in_progress )
+		DISPDBG_RB( KE_ERROR, "A command list is already recording..." );
+
+	if( !command_list )
+		DISPDBG_RB( KE_ERROR, "Invalid argument(s)!  command_list == nullptr" );
+
+	IKeDirect3D11CommandList* cl = static_cast<IKeDirect3D11CommandList*>( command_list );
+
+	if( !cl->deferred_ctxt )
+		DISPDBG_RB( KE_ERROR, "Invalid deferred context!" );
+
+	/* All we have to do is just set the deferred context, and that's it! */
+	d3ddevice_context = cl->deferred_ctxt;
+
+	/* Command list recording is now in progress */
+	command_list_recording_in_progress = Yes;
+
+	return true;
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::EndCommandList
+ * Desc: Finishes the setup for the command list's use and restores the immediate context.
+ */
+bool IKeDirect3D11RenderDevice::EndCommandList( IKeCommandList** command_list, int restore_state )
+{
+	if( !command_list_recording_in_progress )
+		DISPDBG_RB( KE_ERROR, "No command list was recording..." );
+
+	/* Sanity check */
+	if( !command_list )
+		DISPDBG_RB( KE_ERROR, "Invalid argument(s)!  command_list == nullptr" );
+
+	/* Stop recording for this command list */
+	command_list_recording_in_progress = No;
+
+	IKeDirect3D11CommandList* cl = static_cast<IKeDirect3D11CommandList*>( *command_list );
+
+	/* Restore immediate context */
+	this->RestoreImmediateContext();
+
+	/* Finish recording for this command list */
+	HRESULT hr = cl->deferred_ctxt->FinishCommandList( restore_state, &cl->cl );
+	D3D_DISPDBG_RB( KE_ERROR, "Error occured finishing command list!", hr );
+
+	return true;
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::ExecuteCommandList
+ * Desc: Executes the contents of the command list.
+ */
+bool IKeDirect3D11RenderDevice::ExecuteCommandList( IKeCommandList* command_list, int restore_state )
+{
+	if( !command_list )
+		DISPDBG_RB( KE_ERROR, "Invalid argument(s)!  command_list == nullptr" );
+
+	IKeDirect3D11CommandList* cl = static_cast<IKeDirect3D11CommandList*>( command_list );
+
+	if( !cl->deferred_ctxt )
+		DISPDBG_RB( KE_ERROR, "Invalid deferred context!" );
+	if( !cl->cl )
+		DISPDBG_RB( KE_ERROR, "Invalid command list!" );
+
+	/* Use our immediate context to execute the command list */
+	d3ddevice_context->ExecuteCommandList( cl->cl, restore_state );
+
+	return true;
+}
+
+/*
+ * Name: IKeDirect3D11RenderDevice::RestoreImmediateContext
+ * Desc: Ensures that the primary context is restored and current.
+ */
+void IKeDirect3D11RenderDevice::RestoreImmediateContext()
+{
+	d3ddevice_context = immediate_context;
+	
+	if( immediate_context == nullptr )
+		DISPDBG( KE_WARNING, "Immediate context == nullptr!" );
 }
 
 /*

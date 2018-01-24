@@ -61,7 +61,7 @@ CKeDemoApplication::CKeDemoApplication()
     rddesc.stencil_bpp = 8;
     rddesc.fullscreen = No;
     rddesc.buffer_count = 1;
-    rddesc.device_type = KE_RENDERDEVICE_OGL3;
+    rddesc.device_type = KE_RENDERDEVICE_D3D11;
 	rddesc.refresh_rate = 60;
     
     bool ret = KeCreateWindowAndDevice( &rddesc, &m_pRenderDevice );
@@ -91,11 +91,33 @@ CKeDemoApplication::CKeDemoApplication()
 	else
 		m_pRenderDevice->CreateProgram( glvs.c_str(), glfs.c_str(), NULL, NULL, va, &m_pProgram );
 	m_pRenderDevice->CreateGeometryBuffer( &vd, sizeof(nv::vec3f)*3, NULL, 0, 0, KE_USAGE_STATIC_WRITE, va, &m_pGB );
+
+	if( m_pRenderDevice->CreateCommandList( &m_pCmdList ) )
+	{
+		if( m_pRenderDevice->BeginCommandList( m_pCmdList ) )
+		{
+			m_pRenderDevice->SetProgram( m_pProgram );
+			m_pRenderDevice->SetGeometryBuffer( m_pGB );
+			m_pRenderDevice->SetTexture( 0, NULL );
+
+			float green[4] = { 0.0f, 0.5f, 0.0f, 1.0 };
+			m_pRenderDevice->SetClearColourFV( green );
+			m_pRenderDevice->SetClearDepth( 1.0f );
+			m_pRenderDevice->SetClearStencil(0);
+			m_pRenderDevice->Clear( KE_COLOUR_BUFFER | KE_DEPTH_BUFFER /*| KE_STENCIL_BUFFER*/ );
+			m_pRenderDevice->DrawVertices( KE_TRIANGLES, sizeof(nv::vec3f), 0, 3 );
+
+			m_pRenderDevice->EndCommandList( &m_pCmdList, Yes );
+		}
+	}
 }
 
 
 CKeDemoApplication::~CKeDemoApplication()
 {
+	if( m_pCmdList )
+		m_pCmdList->Destroy();
+
 	if( m_pGB )
 		m_pGB->Destroy();
 
@@ -110,20 +132,24 @@ CKeDemoApplication::~CKeDemoApplication()
 
 void CKeDemoApplication::Run()
 {
-	m_pRenderDevice->SetProgram( m_pProgram );
+	/*m_pRenderDevice->SetProgram( m_pProgram );
 	m_pRenderDevice->SetGeometryBuffer( m_pGB );
-	m_pRenderDevice->SetTexture( 0, NULL );
+	m_pRenderDevice->SetTexture( 0, NULL );*/
 
     while( !KeQuitRequested() )
     {
         KeProcessEvents();
         
+#if 0
         float green[4] = { 0.0f, 0.5f, 0.0f, 1.0 };
         m_pRenderDevice->SetClearColourFV( green );
 		m_pRenderDevice->SetClearDepth( 1.0f );
 		m_pRenderDevice->SetClearStencil(0);
         m_pRenderDevice->Clear( KE_COLOUR_BUFFER | KE_DEPTH_BUFFER /*| KE_STENCIL_BUFFER*/ );
 		m_pRenderDevice->DrawVertices( KE_TRIANGLES, sizeof(nv::vec3f), 0, 3 );
+#endif
+		//m_pRenderDevice->Clear( KE_COLOUR_BUFFER | KE_DEPTH_BUFFER /*| KE_STENCIL_BUFFER*/ );
+		m_pRenderDevice->ExecuteCommandList( m_pCmdList, Yes );
         m_pRenderDevice->Swap();
     }
 }

@@ -103,6 +103,8 @@ typedef _ComPtr(IDXGIDebug1)				CDXGIDebug1;
 #ifdef __dxgi1_6_h__
 typedef _ComPtr(IDXGIOutput6)				CDXGIOutput6;
 #endif
+
+
 /*
  * Constant buffer structure
  */
@@ -153,6 +155,7 @@ struct IKeDirect3D11CommandList : public IKeCommandList
 	KEMETHOD Destroy();
 
 	CD3D11CommandList cl;
+	CD3D11DeviceContext deferred_ctxt;
 };
 
 /*
@@ -293,11 +296,17 @@ public:
 	KEMETHOD Clear( uint32_t buffers );
 	KEMETHOD ClearState();
     KEMETHOD Swap();
+	_KEMETHOD(bool) ResizeRenderTargetAndDepthStencil( int width, int height );
     
 	KEMETHOD SetIMCacheSize( uint32_t cache_size );
     _KEMETHOD(bool) CreateGeometryBuffer( void* vertex_data, uint32_t vertex_data_size, void* index_data, uint32_t index_data_size, uint32_t index_data_type, uint32_t flags, KeVertexAttribute* va, IKeGeometryBuffer** geometry_buffer );
     KEMETHOD DeleteGeometryBuffer( IKeGeometryBuffer* geometry_buffer );
     KEMETHOD SetGeometryBuffer( IKeGeometryBuffer* geometry_buffer );
+	_KEMETHOD(bool) CreateCommandList( IKeCommandList** command_list );
+	_KEMETHOD(bool) BeginCommandList( IKeCommandList* command_list );
+	_KEMETHOD(bool) EndCommandList( IKeCommandList** command_list, int restore_state );
+	_KEMETHOD(bool) ExecuteCommandList( IKeCommandList* command_list, int restore_state );
+	KEMETHOD RestoreImmediateContext();
     _KEMETHOD(bool) CreateProgram( const char* vertex_shader, const char* fragment_shader, const char* geometry_shader, const char* tesselation_shader, KeVertexAttribute* vertex_attributes, IKeGpuProgram** gpu_program );
     KEMETHOD DeleteProgram( IKeGpuProgram* gpu_program );
     KEMETHOD SetProgram( IKeGpuProgram* gpu_program );
@@ -381,9 +390,10 @@ protected:
 	SDL_Window*						window;
 	D3D_DRIVER_TYPE					driver_type;
 	D3D_FEATURE_LEVEL				feature_level;
-	DXGI_COLOR_SPACE_TYPE			colour_space;
+	DXGI_COLOR_SPACE_TYPE			colour_space;		/* Keep track of the colour space we are using (HDR10, sRGB, etc.) */
 	CD3D11Device					d3ddevice;
-	CD3D11DeviceContext				d3ddevice_context;
+	CD3D11DeviceContext				immediate_context;	/* Our actual immediate device context */
+	ID3D11DeviceContext*			d3ddevice_context;	/* The pointer to the currently active device context (can be changed to a deferred context) */
 #ifdef _UWP
 	CDXGISwapChain3					dxgi_swap_chain;
 #else
