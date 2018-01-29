@@ -346,6 +346,9 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	}
 #endif
 	D3D_DISPDBG_RB( KE_ERROR, "Error creating Direct3D device!", hr );
+	
+	/* Set our immediate context to current */
+	d3ddevice_context = immediate_context;
 
 	CD3D11Debug d3ddebug;
 
@@ -438,8 +441,9 @@ bool IKeDirect3D11RenderDevice::PVT_InitializeDirect3DUWP()
 	dxgi_swap_chain->SetRotation( DXGI_MODE_ROTATION_IDENTITY );
 
 	/*
-	 * TODO: Enable HDR support
+	 * Enable HDR support (if desired, TODO)
 	 */
+	this->PVT_UpdateColourSpace( false, rtfmt );
 
 	/*
 	 * Setup render target and viewport

@@ -163,15 +163,21 @@ INLINE void ulVector1::Allocate(const int &elements)
 {
     alloc_n = n = elements;
     v = new real[n];
+#if _DEBUG
     if (v == 0)
     {
         char buff[1000];
         sprintf(buff, "Out of Memory [%d bytes]! Exitting", n);
 
+#ifdef _UWP
+		OutputDebugStringA(buff);
+		OutputDebugStringA("\n");
+#else
         MessageBoxA(0, buff, "Error", MB_OK);
+#endif
         exit(1);
     }
-        
+#endif   
 }
 
 
@@ -229,7 +235,12 @@ INLINE real & ulVector1::operator[](int i) const
     {
         char buff[1000];
         sprintf(buff, "ulVector1 %d %d",i, n);
+#ifdef _UWP
+		OutputDebugStringA(buff);
+		OutputDebugStringA(buff);
+#else
         MessageBoxA(0, buff, 0, MB_OK);
+#endif
         exit(1);
 
     }

@@ -62,6 +62,8 @@ IKeXAudio2AudioDevice::IKeXAudio2AudioDevice( KeAudioDeviceDesc* audiodevice_des
 
 		return;
 	}
+
+	initialized = Yes;
 }
 
 IKeXAudio2AudioDevice::~IKeXAudio2AudioDevice()

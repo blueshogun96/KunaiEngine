@@ -2,6 +2,7 @@
 
 #include "VertexCache.h"
 
+#if 0
 VertexCache::VertexCache()
 {
   VertexCache(16);
@@ -23,7 +24,6 @@ VertexCache::~VertexCache()
 {
   delete[] entries;
 }
-
 
 int VertexCache::At(int index)
 {
@@ -85,4 +85,4 @@ int VertexCache::AddEntry(int entry)
   return removed;
 }
 
-  
+#endif
